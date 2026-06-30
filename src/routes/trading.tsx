@@ -89,9 +89,7 @@ function TradingPage() {
           </div>
 
           <div className="relative min-h-[300px] flex-1">
-            <ClientOnly fallback={<div className="grid h-full place-items-center text-sm text-muted-foreground">Loading chart…</div>}>
-              <TradingChart symbol={symbol} timeframe={tf} />
-            </ClientOnly>
+            {mounted ? <TradingChart symbol={symbol} timeframe={tf} /> : <div className="grid h-full place-items-center text-sm text-muted-foreground">Loading chart…</div>}
           </div>
 
           <div className="h-64 border-t border-border/60">
