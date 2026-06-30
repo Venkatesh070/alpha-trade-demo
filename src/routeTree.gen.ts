@@ -9,38 +9,710 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VerifyRouteImport } from './routes/verify'
+import { Route as TradingRouteImport } from './routes/trading'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as PlatformRouteImport } from './routes/platform'
+import { Route as MarketsRouteImport } from './routes/markets'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as HelpRouteImport } from './routes/help'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as FaqRouteImport } from './routes/faq'
+import { Route as EducationRouteImport } from './routes/education'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as BlogRouteImport } from './routes/blog'
+import { Route as AppRouteImport } from './routes/app'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AppWalletRouteImport } from './routes/app.wallet'
+import { Route as AppVerificationRouteImport } from './routes/app.verification'
+import { Route as AppSettingsRouteImport } from './routes/app.settings'
+import { Route as AppReferralRouteImport } from './routes/app.referral'
+import { Route as AppProfileRouteImport } from './routes/app.profile'
+import { Route as AppPortfolioRouteImport } from './routes/app.portfolio'
+import { Route as AppOrdersRouteImport } from './routes/app.orders'
+import { Route as AppNotificationsRouteImport } from './routes/app.notifications'
+import { Route as AppLeaderboardsRouteImport } from './routes/app.leaderboards'
+import { Route as AppHistoryRouteImport } from './routes/app.history'
+import { Route as AppCopyTradingRouteImport } from './routes/app.copy-trading'
+import { Route as AppCompetitionsRouteImport } from './routes/app.competitions'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminTestimonialsRouteImport } from './routes/admin.testimonials'
+import { Route as AdminRolesRouteImport } from './routes/admin.roles'
+import { Route as AdminReferralsRouteImport } from './routes/admin.referrals'
+import { Route as AdminNewsRouteImport } from './routes/admin.news'
+import { Route as AdminMediaRouteImport } from './routes/admin.media'
+import { Route as AdminMarketsRouteImport } from './routes/admin.markets'
+import { Route as AdminFaqsRouteImport } from './routes/admin.faqs'
+import { Route as AdminCompetitionsRouteImport } from './routes/admin.competitions'
+import { Route as AdminCmsRouteImport } from './routes/admin.cms'
+import { Route as AppWalletWithdrawRouteImport } from './routes/app.wallet.withdraw'
+import { Route as AppWalletDepositRouteImport } from './routes/app.wallet.deposit'
 
+const VerifyRoute = VerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TradingRoute = TradingRouteImport.update({
+  id: '/trading',
+  path: '/trading',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlatformRoute = PlatformRouteImport.update({
+  id: '/platform',
+  path: '/platform',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketsRoute = MarketsRouteImport.update({
+  id: '/markets',
+  path: '/markets',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HelpRoute = HelpRouteImport.update({
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EducationRoute = EducationRouteImport.update({
+  id: '/education',
+  path: '/education',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogRoute = BlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AppWalletRoute = AppWalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppVerificationRoute = AppVerificationRouteImport.update({
+  id: '/verification',
+  path: '/verification',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppReferralRoute = AppReferralRouteImport.update({
+  id: '/referral',
+  path: '/referral',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProfileRoute = AppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPortfolioRoute = AppPortfolioRouteImport.update({
+  id: '/portfolio',
+  path: '/portfolio',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppOrdersRoute = AppOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppNotificationsRoute = AppNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppLeaderboardsRoute = AppLeaderboardsRouteImport.update({
+  id: '/leaderboards',
+  path: '/leaderboards',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppHistoryRoute = AppHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCopyTradingRoute = AppCopyTradingRouteImport.update({
+  id: '/copy-trading',
+  path: '/copy-trading',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCompetitionsRoute = AppCompetitionsRouteImport.update({
+  id: '/competitions',
+  path: '/competitions',
+  getParentRoute: () => AppRoute,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminTestimonialsRoute = AdminTestimonialsRouteImport.update({
+  id: '/testimonials',
+  path: '/testimonials',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRolesRoute = AdminRolesRouteImport.update({
+  id: '/roles',
+  path: '/roles',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminReferralsRoute = AdminReferralsRouteImport.update({
+  id: '/referrals',
+  path: '/referrals',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminNewsRoute = AdminNewsRouteImport.update({
+  id: '/news',
+  path: '/news',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMediaRoute = AdminMediaRouteImport.update({
+  id: '/media',
+  path: '/media',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMarketsRoute = AdminMarketsRouteImport.update({
+  id: '/markets',
+  path: '/markets',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminFaqsRoute = AdminFaqsRouteImport.update({
+  id: '/faqs',
+  path: '/faqs',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCompetitionsRoute = AdminCompetitionsRouteImport.update({
+  id: '/competitions',
+  path: '/competitions',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCmsRoute = AdminCmsRouteImport.update({
+  id: '/cms',
+  path: '/cms',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AppWalletWithdrawRoute = AppWalletWithdrawRouteImport.update({
+  id: '/withdraw',
+  path: '/withdraw',
+  getParentRoute: () => AppWalletRoute,
+} as any)
+const AppWalletDepositRoute = AppWalletDepositRouteImport.update({
+  id: '/deposit',
+  path: '/deposit',
+  getParentRoute: () => AppWalletRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/app': typeof AppRouteWithChildren
+  '/blog': typeof BlogRoute
+  '/contact': typeof ContactRoute
+  '/education': typeof EducationRoute
+  '/faq': typeof FaqRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/help': typeof HelpRoute
+  '/login': typeof LoginRoute
+  '/markets': typeof MarketsRoute
+  '/platform': typeof PlatformRoute
+  '/pricing': typeof PricingRoute
+  '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/trading': typeof TradingRoute
+  '/verify': typeof VerifyRoute
+  '/admin/cms': typeof AdminCmsRoute
+  '/admin/competitions': typeof AdminCompetitionsRoute
+  '/admin/faqs': typeof AdminFaqsRoute
+  '/admin/markets': typeof AdminMarketsRoute
+  '/admin/media': typeof AdminMediaRoute
+  '/admin/news': typeof AdminNewsRoute
+  '/admin/referrals': typeof AdminReferralsRoute
+  '/admin/roles': typeof AdminRolesRoute
+  '/admin/testimonials': typeof AdminTestimonialsRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/app/competitions': typeof AppCompetitionsRoute
+  '/app/copy-trading': typeof AppCopyTradingRoute
+  '/app/history': typeof AppHistoryRoute
+  '/app/leaderboards': typeof AppLeaderboardsRoute
+  '/app/notifications': typeof AppNotificationsRoute
+  '/app/orders': typeof AppOrdersRoute
+  '/app/portfolio': typeof AppPortfolioRoute
+  '/app/profile': typeof AppProfileRoute
+  '/app/referral': typeof AppReferralRoute
+  '/app/settings': typeof AppSettingsRoute
+  '/app/verification': typeof AppVerificationRoute
+  '/app/wallet': typeof AppWalletRouteWithChildren
+  '/admin/': typeof AdminIndexRoute
+  '/app/': typeof AppIndexRoute
+  '/app/wallet/deposit': typeof AppWalletDepositRoute
+  '/app/wallet/withdraw': typeof AppWalletWithdrawRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/blog': typeof BlogRoute
+  '/contact': typeof ContactRoute
+  '/education': typeof EducationRoute
+  '/faq': typeof FaqRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/help': typeof HelpRoute
+  '/login': typeof LoginRoute
+  '/markets': typeof MarketsRoute
+  '/platform': typeof PlatformRoute
+  '/pricing': typeof PricingRoute
+  '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/trading': typeof TradingRoute
+  '/verify': typeof VerifyRoute
+  '/admin/cms': typeof AdminCmsRoute
+  '/admin/competitions': typeof AdminCompetitionsRoute
+  '/admin/faqs': typeof AdminFaqsRoute
+  '/admin/markets': typeof AdminMarketsRoute
+  '/admin/media': typeof AdminMediaRoute
+  '/admin/news': typeof AdminNewsRoute
+  '/admin/referrals': typeof AdminReferralsRoute
+  '/admin/roles': typeof AdminRolesRoute
+  '/admin/testimonials': typeof AdminTestimonialsRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/app/competitions': typeof AppCompetitionsRoute
+  '/app/copy-trading': typeof AppCopyTradingRoute
+  '/app/history': typeof AppHistoryRoute
+  '/app/leaderboards': typeof AppLeaderboardsRoute
+  '/app/notifications': typeof AppNotificationsRoute
+  '/app/orders': typeof AppOrdersRoute
+  '/app/portfolio': typeof AppPortfolioRoute
+  '/app/profile': typeof AppProfileRoute
+  '/app/referral': typeof AppReferralRoute
+  '/app/settings': typeof AppSettingsRoute
+  '/app/verification': typeof AppVerificationRoute
+  '/app/wallet': typeof AppWalletRouteWithChildren
+  '/admin': typeof AdminIndexRoute
+  '/app': typeof AppIndexRoute
+  '/app/wallet/deposit': typeof AppWalletDepositRoute
+  '/app/wallet/withdraw': typeof AppWalletWithdrawRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/app': typeof AppRouteWithChildren
+  '/blog': typeof BlogRoute
+  '/contact': typeof ContactRoute
+  '/education': typeof EducationRoute
+  '/faq': typeof FaqRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/help': typeof HelpRoute
+  '/login': typeof LoginRoute
+  '/markets': typeof MarketsRoute
+  '/platform': typeof PlatformRoute
+  '/pricing': typeof PricingRoute
+  '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/trading': typeof TradingRoute
+  '/verify': typeof VerifyRoute
+  '/admin/cms': typeof AdminCmsRoute
+  '/admin/competitions': typeof AdminCompetitionsRoute
+  '/admin/faqs': typeof AdminFaqsRoute
+  '/admin/markets': typeof AdminMarketsRoute
+  '/admin/media': typeof AdminMediaRoute
+  '/admin/news': typeof AdminNewsRoute
+  '/admin/referrals': typeof AdminReferralsRoute
+  '/admin/roles': typeof AdminRolesRoute
+  '/admin/testimonials': typeof AdminTestimonialsRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/app/competitions': typeof AppCompetitionsRoute
+  '/app/copy-trading': typeof AppCopyTradingRoute
+  '/app/history': typeof AppHistoryRoute
+  '/app/leaderboards': typeof AppLeaderboardsRoute
+  '/app/notifications': typeof AppNotificationsRoute
+  '/app/orders': typeof AppOrdersRoute
+  '/app/portfolio': typeof AppPortfolioRoute
+  '/app/profile': typeof AppProfileRoute
+  '/app/referral': typeof AppReferralRoute
+  '/app/settings': typeof AppSettingsRoute
+  '/app/verification': typeof AppVerificationRoute
+  '/app/wallet': typeof AppWalletRouteWithChildren
+  '/admin/': typeof AdminIndexRoute
+  '/app/': typeof AppIndexRoute
+  '/app/wallet/deposit': typeof AppWalletDepositRoute
+  '/app/wallet/withdraw': typeof AppWalletWithdrawRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/admin'
+    | '/app'
+    | '/blog'
+    | '/contact'
+    | '/education'
+    | '/faq'
+    | '/forgot-password'
+    | '/help'
+    | '/login'
+    | '/markets'
+    | '/platform'
+    | '/pricing'
+    | '/register'
+    | '/reset-password'
+    | '/sitemap.xml'
+    | '/trading'
+    | '/verify'
+    | '/admin/cms'
+    | '/admin/competitions'
+    | '/admin/faqs'
+    | '/admin/markets'
+    | '/admin/media'
+    | '/admin/news'
+    | '/admin/referrals'
+    | '/admin/roles'
+    | '/admin/testimonials'
+    | '/admin/users'
+    | '/app/competitions'
+    | '/app/copy-trading'
+    | '/app/history'
+    | '/app/leaderboards'
+    | '/app/notifications'
+    | '/app/orders'
+    | '/app/portfolio'
+    | '/app/profile'
+    | '/app/referral'
+    | '/app/settings'
+    | '/app/verification'
+    | '/app/wallet'
+    | '/admin/'
+    | '/app/'
+    | '/app/wallet/deposit'
+    | '/app/wallet/withdraw'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/about'
+    | '/blog'
+    | '/contact'
+    | '/education'
+    | '/faq'
+    | '/forgot-password'
+    | '/help'
+    | '/login'
+    | '/markets'
+    | '/platform'
+    | '/pricing'
+    | '/register'
+    | '/reset-password'
+    | '/sitemap.xml'
+    | '/trading'
+    | '/verify'
+    | '/admin/cms'
+    | '/admin/competitions'
+    | '/admin/faqs'
+    | '/admin/markets'
+    | '/admin/media'
+    | '/admin/news'
+    | '/admin/referrals'
+    | '/admin/roles'
+    | '/admin/testimonials'
+    | '/admin/users'
+    | '/app/competitions'
+    | '/app/copy-trading'
+    | '/app/history'
+    | '/app/leaderboards'
+    | '/app/notifications'
+    | '/app/orders'
+    | '/app/portfolio'
+    | '/app/profile'
+    | '/app/referral'
+    | '/app/settings'
+    | '/app/verification'
+    | '/app/wallet'
+    | '/admin'
+    | '/app'
+    | '/app/wallet/deposit'
+    | '/app/wallet/withdraw'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/admin'
+    | '/app'
+    | '/blog'
+    | '/contact'
+    | '/education'
+    | '/faq'
+    | '/forgot-password'
+    | '/help'
+    | '/login'
+    | '/markets'
+    | '/platform'
+    | '/pricing'
+    | '/register'
+    | '/reset-password'
+    | '/sitemap.xml'
+    | '/trading'
+    | '/verify'
+    | '/admin/cms'
+    | '/admin/competitions'
+    | '/admin/faqs'
+    | '/admin/markets'
+    | '/admin/media'
+    | '/admin/news'
+    | '/admin/referrals'
+    | '/admin/roles'
+    | '/admin/testimonials'
+    | '/admin/users'
+    | '/app/competitions'
+    | '/app/copy-trading'
+    | '/app/history'
+    | '/app/leaderboards'
+    | '/app/notifications'
+    | '/app/orders'
+    | '/app/portfolio'
+    | '/app/profile'
+    | '/app/referral'
+    | '/app/settings'
+    | '/app/verification'
+    | '/app/wallet'
+    | '/admin/'
+    | '/app/'
+    | '/app/wallet/deposit'
+    | '/app/wallet/withdraw'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  AdminRoute: typeof AdminRouteWithChildren
+  AppRoute: typeof AppRouteWithChildren
+  BlogRoute: typeof BlogRoute
+  ContactRoute: typeof ContactRoute
+  EducationRoute: typeof EducationRoute
+  FaqRoute: typeof FaqRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  HelpRoute: typeof HelpRoute
+  LoginRoute: typeof LoginRoute
+  MarketsRoute: typeof MarketsRoute
+  PlatformRoute: typeof PlatformRoute
+  PricingRoute: typeof PricingRoute
+  RegisterRoute: typeof RegisterRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TradingRoute: typeof TradingRoute
+  VerifyRoute: typeof VerifyRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/verify': {
+      id: '/verify'
+      path: '/verify'
+      fullPath: '/verify'
+      preLoaderRoute: typeof VerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trading': {
+      id: '/trading'
+      path: '/trading'
+      fullPath: '/trading'
+      preLoaderRoute: typeof TradingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/platform': {
+      id: '/platform'
+      path: '/platform'
+      fullPath: '/platform'
+      preLoaderRoute: typeof PlatformRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/markets': {
+      id: '/markets'
+      path: '/markets'
+      fullPath: '/markets'
+      preLoaderRoute: typeof MarketsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/help': {
+      id: '/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/education': {
+      id: '/education'
+      path: '/education'
+      fullPath: '/education'
+      preLoaderRoute: typeof EducationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog': {
+      id: '/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof BlogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +720,290 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/': {
+      id: '/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/app/wallet': {
+      id: '/app/wallet'
+      path: '/wallet'
+      fullPath: '/app/wallet'
+      preLoaderRoute: typeof AppWalletRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/verification': {
+      id: '/app/verification'
+      path: '/verification'
+      fullPath: '/app/verification'
+      preLoaderRoute: typeof AppVerificationRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/settings': {
+      id: '/app/settings'
+      path: '/settings'
+      fullPath: '/app/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/referral': {
+      id: '/app/referral'
+      path: '/referral'
+      fullPath: '/app/referral'
+      preLoaderRoute: typeof AppReferralRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/profile': {
+      id: '/app/profile'
+      path: '/profile'
+      fullPath: '/app/profile'
+      preLoaderRoute: typeof AppProfileRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/portfolio': {
+      id: '/app/portfolio'
+      path: '/portfolio'
+      fullPath: '/app/portfolio'
+      preLoaderRoute: typeof AppPortfolioRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/orders': {
+      id: '/app/orders'
+      path: '/orders'
+      fullPath: '/app/orders'
+      preLoaderRoute: typeof AppOrdersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/notifications': {
+      id: '/app/notifications'
+      path: '/notifications'
+      fullPath: '/app/notifications'
+      preLoaderRoute: typeof AppNotificationsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/leaderboards': {
+      id: '/app/leaderboards'
+      path: '/leaderboards'
+      fullPath: '/app/leaderboards'
+      preLoaderRoute: typeof AppLeaderboardsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/history': {
+      id: '/app/history'
+      path: '/history'
+      fullPath: '/app/history'
+      preLoaderRoute: typeof AppHistoryRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/copy-trading': {
+      id: '/app/copy-trading'
+      path: '/copy-trading'
+      fullPath: '/app/copy-trading'
+      preLoaderRoute: typeof AppCopyTradingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/competitions': {
+      id: '/app/competitions'
+      path: '/competitions'
+      fullPath: '/app/competitions'
+      preLoaderRoute: typeof AppCompetitionsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/testimonials': {
+      id: '/admin/testimonials'
+      path: '/testimonials'
+      fullPath: '/admin/testimonials'
+      preLoaderRoute: typeof AdminTestimonialsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/roles': {
+      id: '/admin/roles'
+      path: '/roles'
+      fullPath: '/admin/roles'
+      preLoaderRoute: typeof AdminRolesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/referrals': {
+      id: '/admin/referrals'
+      path: '/referrals'
+      fullPath: '/admin/referrals'
+      preLoaderRoute: typeof AdminReferralsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/news': {
+      id: '/admin/news'
+      path: '/news'
+      fullPath: '/admin/news'
+      preLoaderRoute: typeof AdminNewsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/media': {
+      id: '/admin/media'
+      path: '/media'
+      fullPath: '/admin/media'
+      preLoaderRoute: typeof AdminMediaRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/markets': {
+      id: '/admin/markets'
+      path: '/markets'
+      fullPath: '/admin/markets'
+      preLoaderRoute: typeof AdminMarketsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/faqs': {
+      id: '/admin/faqs'
+      path: '/faqs'
+      fullPath: '/admin/faqs'
+      preLoaderRoute: typeof AdminFaqsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/competitions': {
+      id: '/admin/competitions'
+      path: '/competitions'
+      fullPath: '/admin/competitions'
+      preLoaderRoute: typeof AdminCompetitionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/cms': {
+      id: '/admin/cms'
+      path: '/cms'
+      fullPath: '/admin/cms'
+      preLoaderRoute: typeof AdminCmsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/app/wallet/withdraw': {
+      id: '/app/wallet/withdraw'
+      path: '/withdraw'
+      fullPath: '/app/wallet/withdraw'
+      preLoaderRoute: typeof AppWalletWithdrawRouteImport
+      parentRoute: typeof AppWalletRoute
+    }
+    '/app/wallet/deposit': {
+      id: '/app/wallet/deposit'
+      path: '/deposit'
+      fullPath: '/app/wallet/deposit'
+      preLoaderRoute: typeof AppWalletDepositRouteImport
+      parentRoute: typeof AppWalletRoute
+    }
   }
 }
 
+interface AdminRouteChildren {
+  AdminCmsRoute: typeof AdminCmsRoute
+  AdminCompetitionsRoute: typeof AdminCompetitionsRoute
+  AdminFaqsRoute: typeof AdminFaqsRoute
+  AdminMarketsRoute: typeof AdminMarketsRoute
+  AdminMediaRoute: typeof AdminMediaRoute
+  AdminNewsRoute: typeof AdminNewsRoute
+  AdminReferralsRoute: typeof AdminReferralsRoute
+  AdminRolesRoute: typeof AdminRolesRoute
+  AdminTestimonialsRoute: typeof AdminTestimonialsRoute
+  AdminUsersRoute: typeof AdminUsersRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminCmsRoute: AdminCmsRoute,
+  AdminCompetitionsRoute: AdminCompetitionsRoute,
+  AdminFaqsRoute: AdminFaqsRoute,
+  AdminMarketsRoute: AdminMarketsRoute,
+  AdminMediaRoute: AdminMediaRoute,
+  AdminNewsRoute: AdminNewsRoute,
+  AdminReferralsRoute: AdminReferralsRoute,
+  AdminRolesRoute: AdminRolesRoute,
+  AdminTestimonialsRoute: AdminTestimonialsRoute,
+  AdminUsersRoute: AdminUsersRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
+interface AppWalletRouteChildren {
+  AppWalletDepositRoute: typeof AppWalletDepositRoute
+  AppWalletWithdrawRoute: typeof AppWalletWithdrawRoute
+}
+
+const AppWalletRouteChildren: AppWalletRouteChildren = {
+  AppWalletDepositRoute: AppWalletDepositRoute,
+  AppWalletWithdrawRoute: AppWalletWithdrawRoute,
+}
+
+const AppWalletRouteWithChildren = AppWalletRoute._addFileChildren(
+  AppWalletRouteChildren,
+)
+
+interface AppRouteChildren {
+  AppCompetitionsRoute: typeof AppCompetitionsRoute
+  AppCopyTradingRoute: typeof AppCopyTradingRoute
+  AppHistoryRoute: typeof AppHistoryRoute
+  AppLeaderboardsRoute: typeof AppLeaderboardsRoute
+  AppNotificationsRoute: typeof AppNotificationsRoute
+  AppOrdersRoute: typeof AppOrdersRoute
+  AppPortfolioRoute: typeof AppPortfolioRoute
+  AppProfileRoute: typeof AppProfileRoute
+  AppReferralRoute: typeof AppReferralRoute
+  AppSettingsRoute: typeof AppSettingsRoute
+  AppVerificationRoute: typeof AppVerificationRoute
+  AppWalletRoute: typeof AppWalletRouteWithChildren
+  AppIndexRoute: typeof AppIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppCompetitionsRoute: AppCompetitionsRoute,
+  AppCopyTradingRoute: AppCopyTradingRoute,
+  AppHistoryRoute: AppHistoryRoute,
+  AppLeaderboardsRoute: AppLeaderboardsRoute,
+  AppNotificationsRoute: AppNotificationsRoute,
+  AppOrdersRoute: AppOrdersRoute,
+  AppPortfolioRoute: AppPortfolioRoute,
+  AppProfileRoute: AppProfileRoute,
+  AppReferralRoute: AppReferralRoute,
+  AppSettingsRoute: AppSettingsRoute,
+  AppVerificationRoute: AppVerificationRoute,
+  AppWalletRoute: AppWalletRouteWithChildren,
+  AppIndexRoute: AppIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  AdminRoute: AdminRouteWithChildren,
+  AppRoute: AppRouteWithChildren,
+  BlogRoute: BlogRoute,
+  ContactRoute: ContactRoute,
+  EducationRoute: EducationRoute,
+  FaqRoute: FaqRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
+  HelpRoute: HelpRoute,
+  LoginRoute: LoginRoute,
+  MarketsRoute: MarketsRoute,
+  PlatformRoute: PlatformRoute,
+  PricingRoute: PricingRoute,
+  RegisterRoute: RegisterRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TradingRoute: TradingRoute,
+  VerifyRoute: VerifyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
