@@ -36,7 +36,7 @@ function LandingPage() {
       <section className="relative overflow-hidden">
         <div className="mx-auto grid max-w-7xl gap-10 px-4 pb-10 pt-14 sm:px-6 lg:grid-cols-12 lg:pt-20">
           <div className="lg:col-span-7">
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+            <div>
               <span className="inline-flex items-center gap-2 rounded-full border border-[color:var(--gold)]/30 bg-[color:var(--gold)]/10 px-3 py-1 text-xs font-medium text-[color:var(--gold)]">
                 <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--gold)] pulse-gold" />
                 Live demo · India edition
@@ -71,13 +71,10 @@ function LandingPage() {
                   </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.15 }}
-            className="lg:col-span-5"
-          >
+          <div className="lg:col-span-5">
             <HeroChartCard />
           </motion.div>
         </div>
