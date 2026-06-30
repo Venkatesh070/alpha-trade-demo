@@ -26,7 +26,7 @@ function AppLayout() {
       {mobileOpen && <div onClick={() => setMobileOpen(false)} className="fixed inset-0 z-30 bg-black/60 lg:hidden" />}
       <div className="flex min-w-0 flex-1 flex-col">
         <AppTopbar onMenu={() => setMobileOpen(true)} />
-        <main className="flex-1 overflow-y-auto">
+        <main className="relative min-h-0 flex-1 overflow-y-auto bg-gradient-to-b from-background via-background to-surface/30">
           <Outlet />
         </main>
       </div>

@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { randomId } from "@/lib/id";
 
 export interface DemoUser {
   id: string;
@@ -67,7 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const key = email.toLowerCase();
     if (db[key]) throw new Error("An account with that email already exists.");
     const u: DemoUser = {
-      id: crypto.randomUUID(),
+      id: randomId(),
       email: key,
       name,
       verified: false,

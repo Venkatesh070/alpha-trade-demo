@@ -9,7 +9,7 @@ import { useLivePrices, formatPrice } from "@/hooks/use-live-prices";
 
 type OrderType = "market" | "limit" | "stop";
 
-export function OrderPanel({ symbol, onPlace }: { symbol: string; onPlace: (o: { side: "buy" | "sell"; qty: number; type: OrderType; price: number; symbol: string; tp?: number; sl?: number }) => void }) {
+export function OrderPanel({ symbol, onPlace, disabled }: { symbol: string; onPlace: (o: { side: "buy" | "sell"; qty: number; type: OrderType; price: number; symbol: string; tp?: number; sl?: number }) => void; disabled?: boolean }) {
   const asset = getAsset(symbol);
   const live = useLivePrices(2000);
   const price = live[symbol]?.price ?? asset?.price ?? 100;
@@ -24,6 +24,7 @@ export function OrderPanel({ symbol, onPlace }: { symbol: string; onPlace: (o: {
   if (!asset) return null;
 
   const submit = (side: "buy" | "sell") => {
+    if (disabled) return;
     const q = Number(qty);
     if (!q || q <= 0) { toast.error("Enter a valid quantity"); return; }
     const px = type === "market" ? price : Number(limit || price);
@@ -32,7 +33,7 @@ export function OrderPanel({ symbol, onPlace }: { symbol: string; onPlace: (o: {
   };
 
   return (
-    <div className="flex h-full flex-col gap-3 p-3">
+    <div className={cn("flex h-full flex-col gap-3 p-3", disabled && "pointer-events-none opacity-60")}>
       <div>
         <div className="text-xs uppercase tracking-wider text-muted-foreground">Order</div>
         <div className="mt-1 flex items-baseline justify-between">

@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { ThemeProvider } from "@/hooks/use-theme";
 import { AuthProvider } from "@/hooks/use-auth";
+import { WalletProvider } from "@/hooks/use-wallet";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -105,8 +106,10 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>
-          <Outlet />
-          <Toaster position="top-right" theme="dark" />
+          <WalletProvider>
+            <Outlet />
+            <Toaster position="top-right" theme="dark" />
+          </WalletProvider>
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>

@@ -32,6 +32,7 @@ import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AppWalletRouteImport } from './routes/app.wallet'
 import { Route as AppVerificationRouteImport } from './routes/app.verification'
+import { Route as AppTradingRouteImport } from './routes/app.trading'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppReferralRouteImport } from './routes/app.referral'
 import { Route as AppProfileRouteImport } from './routes/app.profile'
@@ -50,8 +51,10 @@ import { Route as AdminNewsRouteImport } from './routes/admin.news'
 import { Route as AdminMediaRouteImport } from './routes/admin.media'
 import { Route as AdminMarketsRouteImport } from './routes/admin.markets'
 import { Route as AdminFaqsRouteImport } from './routes/admin.faqs'
+import { Route as AdminDepositsRouteImport } from './routes/admin.deposits'
 import { Route as AdminCompetitionsRouteImport } from './routes/admin.competitions'
 import { Route as AdminCmsRouteImport } from './routes/admin.cms'
+import { Route as AppWalletIndexRouteImport } from './routes/app.wallet.index'
 import { Route as AppWalletWithdrawRouteImport } from './routes/app.wallet.withdraw'
 import { Route as AppWalletDepositRouteImport } from './routes/app.wallet.deposit'
 
@@ -170,6 +173,11 @@ const AppVerificationRoute = AppVerificationRouteImport.update({
   path: '/verification',
   getParentRoute: () => AppRoute,
 } as any)
+const AppTradingRoute = AppTradingRouteImport.update({
+  id: '/trading',
+  path: '/trading',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppSettingsRoute = AppSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -260,6 +268,11 @@ const AdminFaqsRoute = AdminFaqsRouteImport.update({
   path: '/faqs',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminDepositsRoute = AdminDepositsRouteImport.update({
+  id: '/deposits',
+  path: '/deposits',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCompetitionsRoute = AdminCompetitionsRouteImport.update({
   id: '/competitions',
   path: '/competitions',
@@ -269,6 +282,11 @@ const AdminCmsRoute = AdminCmsRouteImport.update({
   id: '/cms',
   path: '/cms',
   getParentRoute: () => AdminRoute,
+} as any)
+const AppWalletIndexRoute = AppWalletIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppWalletRoute,
 } as any)
 const AppWalletWithdrawRoute = AppWalletWithdrawRouteImport.update({
   id: '/withdraw',
@@ -303,6 +321,7 @@ export interface FileRoutesByFullPath {
   '/verify': typeof VerifyRoute
   '/admin/cms': typeof AdminCmsRoute
   '/admin/competitions': typeof AdminCompetitionsRoute
+  '/admin/deposits': typeof AdminDepositsRoute
   '/admin/faqs': typeof AdminFaqsRoute
   '/admin/markets': typeof AdminMarketsRoute
   '/admin/media': typeof AdminMediaRoute
@@ -321,12 +340,14 @@ export interface FileRoutesByFullPath {
   '/app/profile': typeof AppProfileRoute
   '/app/referral': typeof AppReferralRoute
   '/app/settings': typeof AppSettingsRoute
+  '/app/trading': typeof AppTradingRoute
   '/app/verification': typeof AppVerificationRoute
   '/app/wallet': typeof AppWalletRouteWithChildren
   '/admin/': typeof AdminIndexRoute
   '/app/': typeof AppIndexRoute
   '/app/wallet/deposit': typeof AppWalletDepositRoute
   '/app/wallet/withdraw': typeof AppWalletWithdrawRoute
+  '/app/wallet/': typeof AppWalletIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -348,6 +369,7 @@ export interface FileRoutesByTo {
   '/verify': typeof VerifyRoute
   '/admin/cms': typeof AdminCmsRoute
   '/admin/competitions': typeof AdminCompetitionsRoute
+  '/admin/deposits': typeof AdminDepositsRoute
   '/admin/faqs': typeof AdminFaqsRoute
   '/admin/markets': typeof AdminMarketsRoute
   '/admin/media': typeof AdminMediaRoute
@@ -366,12 +388,13 @@ export interface FileRoutesByTo {
   '/app/profile': typeof AppProfileRoute
   '/app/referral': typeof AppReferralRoute
   '/app/settings': typeof AppSettingsRoute
+  '/app/trading': typeof AppTradingRoute
   '/app/verification': typeof AppVerificationRoute
-  '/app/wallet': typeof AppWalletRouteWithChildren
   '/admin': typeof AdminIndexRoute
   '/app': typeof AppIndexRoute
   '/app/wallet/deposit': typeof AppWalletDepositRoute
   '/app/wallet/withdraw': typeof AppWalletWithdrawRoute
+  '/app/wallet': typeof AppWalletIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -396,6 +419,7 @@ export interface FileRoutesById {
   '/verify': typeof VerifyRoute
   '/admin/cms': typeof AdminCmsRoute
   '/admin/competitions': typeof AdminCompetitionsRoute
+  '/admin/deposits': typeof AdminDepositsRoute
   '/admin/faqs': typeof AdminFaqsRoute
   '/admin/markets': typeof AdminMarketsRoute
   '/admin/media': typeof AdminMediaRoute
@@ -414,12 +438,14 @@ export interface FileRoutesById {
   '/app/profile': typeof AppProfileRoute
   '/app/referral': typeof AppReferralRoute
   '/app/settings': typeof AppSettingsRoute
+  '/app/trading': typeof AppTradingRoute
   '/app/verification': typeof AppVerificationRoute
   '/app/wallet': typeof AppWalletRouteWithChildren
   '/admin/': typeof AdminIndexRoute
   '/app/': typeof AppIndexRoute
   '/app/wallet/deposit': typeof AppWalletDepositRoute
   '/app/wallet/withdraw': typeof AppWalletWithdrawRoute
+  '/app/wallet/': typeof AppWalletIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -445,6 +471,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/admin/cms'
     | '/admin/competitions'
+    | '/admin/deposits'
     | '/admin/faqs'
     | '/admin/markets'
     | '/admin/media'
@@ -463,12 +490,14 @@ export interface FileRouteTypes {
     | '/app/profile'
     | '/app/referral'
     | '/app/settings'
+    | '/app/trading'
     | '/app/verification'
     | '/app/wallet'
     | '/admin/'
     | '/app/'
     | '/app/wallet/deposit'
     | '/app/wallet/withdraw'
+    | '/app/wallet/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -490,6 +519,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/admin/cms'
     | '/admin/competitions'
+    | '/admin/deposits'
     | '/admin/faqs'
     | '/admin/markets'
     | '/admin/media'
@@ -508,12 +538,13 @@ export interface FileRouteTypes {
     | '/app/profile'
     | '/app/referral'
     | '/app/settings'
+    | '/app/trading'
     | '/app/verification'
-    | '/app/wallet'
     | '/admin'
     | '/app'
     | '/app/wallet/deposit'
     | '/app/wallet/withdraw'
+    | '/app/wallet'
   id:
     | '__root__'
     | '/'
@@ -537,6 +568,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/admin/cms'
     | '/admin/competitions'
+    | '/admin/deposits'
     | '/admin/faqs'
     | '/admin/markets'
     | '/admin/media'
@@ -555,12 +587,14 @@ export interface FileRouteTypes {
     | '/app/profile'
     | '/app/referral'
     | '/app/settings'
+    | '/app/trading'
     | '/app/verification'
     | '/app/wallet'
     | '/admin/'
     | '/app/'
     | '/app/wallet/deposit'
     | '/app/wallet/withdraw'
+    | '/app/wallet/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -748,6 +782,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppVerificationRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/trading': {
+      id: '/app/trading'
+      path: '/trading'
+      fullPath: '/app/trading'
+      preLoaderRoute: typeof AppTradingRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/settings': {
       id: '/app/settings'
       path: '/settings'
@@ -874,6 +915,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminFaqsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/deposits': {
+      id: '/admin/deposits'
+      path: '/deposits'
+      fullPath: '/admin/deposits'
+      preLoaderRoute: typeof AdminDepositsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/competitions': {
       id: '/admin/competitions'
       path: '/competitions'
@@ -887,6 +935,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/cms'
       preLoaderRoute: typeof AdminCmsRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/app/wallet/': {
+      id: '/app/wallet/'
+      path: '/'
+      fullPath: '/app/wallet/'
+      preLoaderRoute: typeof AppWalletIndexRouteImport
+      parentRoute: typeof AppWalletRoute
     }
     '/app/wallet/withdraw': {
       id: '/app/wallet/withdraw'
@@ -908,6 +963,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminCmsRoute: typeof AdminCmsRoute
   AdminCompetitionsRoute: typeof AdminCompetitionsRoute
+  AdminDepositsRoute: typeof AdminDepositsRoute
   AdminFaqsRoute: typeof AdminFaqsRoute
   AdminMarketsRoute: typeof AdminMarketsRoute
   AdminMediaRoute: typeof AdminMediaRoute
@@ -922,6 +978,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminCmsRoute: AdminCmsRoute,
   AdminCompetitionsRoute: AdminCompetitionsRoute,
+  AdminDepositsRoute: AdminDepositsRoute,
   AdminFaqsRoute: AdminFaqsRoute,
   AdminMarketsRoute: AdminMarketsRoute,
   AdminMediaRoute: AdminMediaRoute,
@@ -938,11 +995,13 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 interface AppWalletRouteChildren {
   AppWalletDepositRoute: typeof AppWalletDepositRoute
   AppWalletWithdrawRoute: typeof AppWalletWithdrawRoute
+  AppWalletIndexRoute: typeof AppWalletIndexRoute
 }
 
 const AppWalletRouteChildren: AppWalletRouteChildren = {
   AppWalletDepositRoute: AppWalletDepositRoute,
   AppWalletWithdrawRoute: AppWalletWithdrawRoute,
+  AppWalletIndexRoute: AppWalletIndexRoute,
 }
 
 const AppWalletRouteWithChildren = AppWalletRoute._addFileChildren(
@@ -960,6 +1019,7 @@ interface AppRouteChildren {
   AppProfileRoute: typeof AppProfileRoute
   AppReferralRoute: typeof AppReferralRoute
   AppSettingsRoute: typeof AppSettingsRoute
+  AppTradingRoute: typeof AppTradingRoute
   AppVerificationRoute: typeof AppVerificationRoute
   AppWalletRoute: typeof AppWalletRouteWithChildren
   AppIndexRoute: typeof AppIndexRoute
@@ -976,6 +1036,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppProfileRoute: AppProfileRoute,
   AppReferralRoute: AppReferralRoute,
   AppSettingsRoute: AppSettingsRoute,
+  AppTradingRoute: AppTradingRoute,
   AppVerificationRoute: AppVerificationRoute,
   AppWalletRoute: AppWalletRouteWithChildren,
   AppIndexRoute: AppIndexRoute,
@@ -1007,3 +1068,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

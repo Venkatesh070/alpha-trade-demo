@@ -7,7 +7,7 @@ type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; exact?
 const ITEMS: NavItem[] = [
   { to: "/app", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/app/portfolio", label: "Portfolio", icon: Briefcase },
-  { to: "/trading", label: "Trading", icon: LineChart },
+  { to: "/app/trading", label: "Trading", icon: LineChart },
   { to: "/app/wallet", label: "Wallet", icon: Wallet },
   { to: "/app/orders", label: "Orders", icon: ListOrdered },
   { to: "/app/history", label: "History", icon: History },
@@ -25,8 +25,11 @@ export function AppSidebar({ onNavigate }: { onNavigate?: () => void }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   return (
     <aside className="flex h-full w-64 flex-col border-r border-border/60 bg-sidebar text-sidebar-foreground">
-      <div className="px-5 py-5">
+      <div className="border-b border-border/40 px-5 py-5">
         <Link to="/"><Logo /></Link>
+      </div>
+      <div className="px-5 py-3">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--gold)]">Terminal</p>
       </div>
       <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 pb-6">
         {ITEMS.map(({ to, label, icon: Icon, exact }) => {
@@ -37,10 +40,10 @@ export function AppSidebar({ onNavigate }: { onNavigate?: () => void }) {
               to={to as never}
               onClick={onNavigate}
               className={cn(
-                "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all",
                 active
-                  ? "bg-sidebar-accent text-sidebar-foreground ring-gold"
-                  : "text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
+                  ? "bg-sidebar-accent text-sidebar-foreground shadow-sm ring-1 ring-[color:var(--gold)]/30"
+                  : "text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground",
               )}
             >
               <Icon className={cn("h-4 w-4", active && "text-[color:var(--gold)]")} />

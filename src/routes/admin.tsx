@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, Users, BarChart3, Newspaper, Trophy, Gift, FileText, HelpCircle, MessageSquare, Image as ImageIcon, ShieldCheck } from "lucide-react";
+import { LayoutDashboard, Users, BarChart3, Newspaper, Trophy, Gift, FileText, HelpCircle, MessageSquare, Image as ImageIcon, ShieldCheck, Wallet } from "lucide-react";
 import { Logo } from "@/components/site/logo";
 import { cn } from "@/lib/utils";
 
@@ -11,6 +11,7 @@ export const Route = createFileRoute("/admin")({
 const NAV = [
   { to: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
   { to: "/admin/users", label: "Users", icon: Users },
+  { to: "/admin/deposits", label: "Deposits", icon: Wallet },
   { to: "/admin/markets", label: "Markets", icon: BarChart3 },
   { to: "/admin/news", label: "News", icon: Newspaper },
   { to: "/admin/competitions", label: "Competitions", icon: Trophy },
