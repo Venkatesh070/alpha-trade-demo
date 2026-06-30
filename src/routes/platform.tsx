@@ -16,7 +16,7 @@ const PLATFORMS = [
   { icon: Cpu, name: "API & FIX", desc: "REST + WebSocket + FIX 4.4 endpoints for algorithmic strategies.", tag: "Pro / Institutional" },
 ];
 
-export default function PlatformPage() {
+function PlatformPage() {
   return (
     <div className="min-h-screen">
       <SiteHeader />
