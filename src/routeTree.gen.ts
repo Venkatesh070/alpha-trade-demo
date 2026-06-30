@@ -27,6 +27,20 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppWalletRouteImport } from './routes/app.wallet'
+import { Route as AppVerificationRouteImport } from './routes/app.verification'
+import { Route as AppSettingsRouteImport } from './routes/app.settings'
+import { Route as AppReferralRouteImport } from './routes/app.referral'
+import { Route as AppProfileRouteImport } from './routes/app.profile'
+import { Route as AppPortfolioRouteImport } from './routes/app.portfolio'
+import { Route as AppOrdersRouteImport } from './routes/app.orders'
+import { Route as AppNotificationsRouteImport } from './routes/app.notifications'
+import { Route as AppLeaderboardsRouteImport } from './routes/app.leaderboards'
+import { Route as AppHistoryRouteImport } from './routes/app.history'
+import { Route as AppCopyTradingRouteImport } from './routes/app.copy-trading'
+import { Route as AppCompetitionsRouteImport } from './routes/app.competitions'
+import { Route as AppWalletWithdrawRouteImport } from './routes/app.wallet.withdraw'
+import { Route as AppWalletDepositRouteImport } from './routes/app.wallet.deposit'
 
 const VerifyRoute = VerifyRouteImport.update({
   id: '/verify',
@@ -118,6 +132,76 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppWalletRoute = AppWalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppVerificationRoute = AppVerificationRouteImport.update({
+  id: '/verification',
+  path: '/verification',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppReferralRoute = AppReferralRouteImport.update({
+  id: '/referral',
+  path: '/referral',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProfileRoute = AppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPortfolioRoute = AppPortfolioRouteImport.update({
+  id: '/portfolio',
+  path: '/portfolio',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppOrdersRoute = AppOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppNotificationsRoute = AppNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppLeaderboardsRoute = AppLeaderboardsRouteImport.update({
+  id: '/leaderboards',
+  path: '/leaderboards',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppHistoryRoute = AppHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCopyTradingRoute = AppCopyTradingRouteImport.update({
+  id: '/copy-trading',
+  path: '/copy-trading',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCompetitionsRoute = AppCompetitionsRouteImport.update({
+  id: '/competitions',
+  path: '/competitions',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppWalletWithdrawRoute = AppWalletWithdrawRouteImport.update({
+  id: '/withdraw',
+  path: '/withdraw',
+  getParentRoute: () => AppWalletRoute,
+} as any)
+const AppWalletDepositRoute = AppWalletDepositRouteImport.update({
+  id: '/deposit',
+  path: '/deposit',
+  getParentRoute: () => AppWalletRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -137,7 +221,21 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/trading': typeof TradingRoute
   '/verify': typeof VerifyRoute
+  '/app/competitions': typeof AppCompetitionsRoute
+  '/app/copy-trading': typeof AppCopyTradingRoute
+  '/app/history': typeof AppHistoryRoute
+  '/app/leaderboards': typeof AppLeaderboardsRoute
+  '/app/notifications': typeof AppNotificationsRoute
+  '/app/orders': typeof AppOrdersRoute
+  '/app/portfolio': typeof AppPortfolioRoute
+  '/app/profile': typeof AppProfileRoute
+  '/app/referral': typeof AppReferralRoute
+  '/app/settings': typeof AppSettingsRoute
+  '/app/verification': typeof AppVerificationRoute
+  '/app/wallet': typeof AppWalletRouteWithChildren
   '/app/': typeof AppIndexRoute
+  '/app/wallet/deposit': typeof AppWalletDepositRoute
+  '/app/wallet/withdraw': typeof AppWalletWithdrawRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -156,7 +254,21 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/trading': typeof TradingRoute
   '/verify': typeof VerifyRoute
+  '/app/competitions': typeof AppCompetitionsRoute
+  '/app/copy-trading': typeof AppCopyTradingRoute
+  '/app/history': typeof AppHistoryRoute
+  '/app/leaderboards': typeof AppLeaderboardsRoute
+  '/app/notifications': typeof AppNotificationsRoute
+  '/app/orders': typeof AppOrdersRoute
+  '/app/portfolio': typeof AppPortfolioRoute
+  '/app/profile': typeof AppProfileRoute
+  '/app/referral': typeof AppReferralRoute
+  '/app/settings': typeof AppSettingsRoute
+  '/app/verification': typeof AppVerificationRoute
+  '/app/wallet': typeof AppWalletRouteWithChildren
   '/app': typeof AppIndexRoute
+  '/app/wallet/deposit': typeof AppWalletDepositRoute
+  '/app/wallet/withdraw': typeof AppWalletWithdrawRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -177,7 +289,21 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/trading': typeof TradingRoute
   '/verify': typeof VerifyRoute
+  '/app/competitions': typeof AppCompetitionsRoute
+  '/app/copy-trading': typeof AppCopyTradingRoute
+  '/app/history': typeof AppHistoryRoute
+  '/app/leaderboards': typeof AppLeaderboardsRoute
+  '/app/notifications': typeof AppNotificationsRoute
+  '/app/orders': typeof AppOrdersRoute
+  '/app/portfolio': typeof AppPortfolioRoute
+  '/app/profile': typeof AppProfileRoute
+  '/app/referral': typeof AppReferralRoute
+  '/app/settings': typeof AppSettingsRoute
+  '/app/verification': typeof AppVerificationRoute
+  '/app/wallet': typeof AppWalletRouteWithChildren
   '/app/': typeof AppIndexRoute
+  '/app/wallet/deposit': typeof AppWalletDepositRoute
+  '/app/wallet/withdraw': typeof AppWalletWithdrawRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -199,7 +325,21 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/trading'
     | '/verify'
+    | '/app/competitions'
+    | '/app/copy-trading'
+    | '/app/history'
+    | '/app/leaderboards'
+    | '/app/notifications'
+    | '/app/orders'
+    | '/app/portfolio'
+    | '/app/profile'
+    | '/app/referral'
+    | '/app/settings'
+    | '/app/verification'
+    | '/app/wallet'
     | '/app/'
+    | '/app/wallet/deposit'
+    | '/app/wallet/withdraw'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -218,7 +358,21 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/trading'
     | '/verify'
+    | '/app/competitions'
+    | '/app/copy-trading'
+    | '/app/history'
+    | '/app/leaderboards'
+    | '/app/notifications'
+    | '/app/orders'
+    | '/app/portfolio'
+    | '/app/profile'
+    | '/app/referral'
+    | '/app/settings'
+    | '/app/verification'
+    | '/app/wallet'
     | '/app'
+    | '/app/wallet/deposit'
+    | '/app/wallet/withdraw'
   id:
     | '__root__'
     | '/'
@@ -238,7 +392,21 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/trading'
     | '/verify'
+    | '/app/competitions'
+    | '/app/copy-trading'
+    | '/app/history'
+    | '/app/leaderboards'
+    | '/app/notifications'
+    | '/app/orders'
+    | '/app/portfolio'
+    | '/app/profile'
+    | '/app/referral'
+    | '/app/settings'
+    | '/app/verification'
+    | '/app/wallet'
     | '/app/'
+    | '/app/wallet/deposit'
+    | '/app/wallet/withdraw'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -389,14 +557,150 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/wallet': {
+      id: '/app/wallet'
+      path: '/wallet'
+      fullPath: '/app/wallet'
+      preLoaderRoute: typeof AppWalletRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/verification': {
+      id: '/app/verification'
+      path: '/verification'
+      fullPath: '/app/verification'
+      preLoaderRoute: typeof AppVerificationRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/settings': {
+      id: '/app/settings'
+      path: '/settings'
+      fullPath: '/app/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/referral': {
+      id: '/app/referral'
+      path: '/referral'
+      fullPath: '/app/referral'
+      preLoaderRoute: typeof AppReferralRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/profile': {
+      id: '/app/profile'
+      path: '/profile'
+      fullPath: '/app/profile'
+      preLoaderRoute: typeof AppProfileRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/portfolio': {
+      id: '/app/portfolio'
+      path: '/portfolio'
+      fullPath: '/app/portfolio'
+      preLoaderRoute: typeof AppPortfolioRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/orders': {
+      id: '/app/orders'
+      path: '/orders'
+      fullPath: '/app/orders'
+      preLoaderRoute: typeof AppOrdersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/notifications': {
+      id: '/app/notifications'
+      path: '/notifications'
+      fullPath: '/app/notifications'
+      preLoaderRoute: typeof AppNotificationsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/leaderboards': {
+      id: '/app/leaderboards'
+      path: '/leaderboards'
+      fullPath: '/app/leaderboards'
+      preLoaderRoute: typeof AppLeaderboardsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/history': {
+      id: '/app/history'
+      path: '/history'
+      fullPath: '/app/history'
+      preLoaderRoute: typeof AppHistoryRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/copy-trading': {
+      id: '/app/copy-trading'
+      path: '/copy-trading'
+      fullPath: '/app/copy-trading'
+      preLoaderRoute: typeof AppCopyTradingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/competitions': {
+      id: '/app/competitions'
+      path: '/competitions'
+      fullPath: '/app/competitions'
+      preLoaderRoute: typeof AppCompetitionsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/wallet/withdraw': {
+      id: '/app/wallet/withdraw'
+      path: '/withdraw'
+      fullPath: '/app/wallet/withdraw'
+      preLoaderRoute: typeof AppWalletWithdrawRouteImport
+      parentRoute: typeof AppWalletRoute
+    }
+    '/app/wallet/deposit': {
+      id: '/app/wallet/deposit'
+      path: '/deposit'
+      fullPath: '/app/wallet/deposit'
+      preLoaderRoute: typeof AppWalletDepositRouteImport
+      parentRoute: typeof AppWalletRoute
+    }
   }
 }
 
+interface AppWalletRouteChildren {
+  AppWalletDepositRoute: typeof AppWalletDepositRoute
+  AppWalletWithdrawRoute: typeof AppWalletWithdrawRoute
+}
+
+const AppWalletRouteChildren: AppWalletRouteChildren = {
+  AppWalletDepositRoute: AppWalletDepositRoute,
+  AppWalletWithdrawRoute: AppWalletWithdrawRoute,
+}
+
+const AppWalletRouteWithChildren = AppWalletRoute._addFileChildren(
+  AppWalletRouteChildren,
+)
+
 interface AppRouteChildren {
+  AppCompetitionsRoute: typeof AppCompetitionsRoute
+  AppCopyTradingRoute: typeof AppCopyTradingRoute
+  AppHistoryRoute: typeof AppHistoryRoute
+  AppLeaderboardsRoute: typeof AppLeaderboardsRoute
+  AppNotificationsRoute: typeof AppNotificationsRoute
+  AppOrdersRoute: typeof AppOrdersRoute
+  AppPortfolioRoute: typeof AppPortfolioRoute
+  AppProfileRoute: typeof AppProfileRoute
+  AppReferralRoute: typeof AppReferralRoute
+  AppSettingsRoute: typeof AppSettingsRoute
+  AppVerificationRoute: typeof AppVerificationRoute
+  AppWalletRoute: typeof AppWalletRouteWithChildren
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppCompetitionsRoute: AppCompetitionsRoute,
+  AppCopyTradingRoute: AppCopyTradingRoute,
+  AppHistoryRoute: AppHistoryRoute,
+  AppLeaderboardsRoute: AppLeaderboardsRoute,
+  AppNotificationsRoute: AppNotificationsRoute,
+  AppOrdersRoute: AppOrdersRoute,
+  AppPortfolioRoute: AppPortfolioRoute,
+  AppProfileRoute: AppProfileRoute,
+  AppReferralRoute: AppReferralRoute,
+  AppSettingsRoute: AppSettingsRoute,
+  AppVerificationRoute: AppVerificationRoute,
+  AppWalletRoute: AppWalletRouteWithChildren,
   AppIndexRoute: AppIndexRoute,
 }
 
