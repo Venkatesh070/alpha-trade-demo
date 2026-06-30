@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ClientOnly } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/header";
 import { MarketWatch } from "@/components/trading/market-watch";
 import { OrderPanel } from "@/components/trading/order-panel";
@@ -29,6 +28,8 @@ function TradingPage() {
   const [tf, setTf] = useState<(typeof TIMEFRAMES)[number]>("15m");
   const [favorites, setFavorites] = useState<Set<string>>(new Set(["BTC/USD", "XAU/USD", "EUR/USD"]));
   const [orders, setOrders] = useState<OpenOrder[]>([]);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const live = useLivePrices(2000);
 
   const toggleFav = (s: string) => setFavorites((prev) => {

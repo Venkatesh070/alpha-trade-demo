@@ -76,7 +76,7 @@ function LandingPage() {
 
           <div className="lg:col-span-5">
             <HeroChartCard />
-          </motion.div>
+          </div>
         </div>
 
         <Ticker />
