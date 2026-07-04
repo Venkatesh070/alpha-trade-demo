@@ -27,18 +27,34 @@ export function PageShell({
   className?: string;
 }) {
   return (
-    <div className={cn("relative mx-auto space-y-6 p-4 pb-10 sm:p-6 lg:p-8", WIDTHS[width], className)}>
-      <header className="flex flex-col gap-4 border-b border-border/50 pb-6 sm:flex-row sm:items-end sm:justify-between">
-        <div className="space-y-1.5">
+    <div
+      className={cn(
+        "relative mx-auto space-y-8 p-5 pb-12 sm:p-6 sm:space-y-10 lg:p-8 lg:pb-14",
+        WIDTHS[width],
+        className,
+      )}
+    >
+      <header className="flex flex-col gap-5 border-b border-border/50 pb-7 sm:flex-row sm:items-end sm:justify-between sm:gap-6 sm:pb-8">
+        <div className="space-y-2">
           {eyebrow && (
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--gold)]">{eyebrow}</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--gold)]">
+              {eyebrow}
+            </p>
           )}
-          <h1 className="font-display text-2xl font-bold tracking-tight sm:text-[1.75rem]">{title}</h1>
-          {description && <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">{description}</p>}
+          <h1 className="font-display text-2xl font-bold tracking-tight sm:text-[1.85rem] lg:text-3xl">
+            {title}
+          </h1>
+          {description && (
+            <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-[0.9375rem]">
+              {description}
+            </p>
+          )}
         </div>
-        {actions && <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>}
+        {actions && (
+          <div className="flex shrink-0 flex-wrap items-center gap-3 sm:pb-0.5">{actions}</div>
+        )}
       </header>
-      {children}
+      <div className="space-y-8 sm:space-y-10">{children}</div>
     </div>
   );
 }

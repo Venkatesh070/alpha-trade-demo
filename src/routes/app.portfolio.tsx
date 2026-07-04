@@ -7,6 +7,7 @@ import { StatCard } from "@/components/dashboard/stat-card";
 import { DataPanel } from "@/components/dashboard/data-panel";
 import { DataTable, DataTableHead, DataTableRow, Th, Td } from "@/components/dashboard/data-table";
 import { ALL_ASSETS, sparklineFor } from "@/data/markets";
+import { GatedNumber, PriceLockBanner } from "@/components/pricing/price-gate";
 
 const HOLDINGS = [
   { sym: "BTC/USD", qty: 0.18, avg: 64200, alloc: 28 },
@@ -28,19 +29,33 @@ function PortfolioPage() {
     <PageShell
       eyebrow="Holdings"
       title="Portfolio"
-      description="Asset allocation, open positions, and unrealised P&L across your demo account."
+      description="Asset allocation, open positions, and unrealised P&L across your account."
       width="2xl"
     >
+      <PriceLockBanner />
+
       <div className="grid gap-3 sm:grid-cols-3">
-        <StatCard label="Equity" value={<AnimatedNumber value={1024520} format={(n) => `₹${n.toLocaleString()}`} />} icon={Briefcase} />
-        <StatCard label="P&L (30d)" accent="var(--success)" value={<AnimatedNumber value={24520} format={(n) => `+₹${n.toLocaleString()}`} />} />
+        <StatCard
+          label="Equity"
+          value={<AnimatedNumber value={1024520} format={(n) => `₹${n.toLocaleString()}`} />}
+          icon={Briefcase}
+        />
+        <StatCard
+          label="P&L (30d)"
+          accent="var(--success)"
+          value={<AnimatedNumber value={24520} format={(n) => `+₹${n.toLocaleString()}`} />}
+        />
         <StatCard label="Open positions" value={HOLDINGS.length} sub="Across 6 instruments" />
       </div>
 
       <DataPanel title="Asset allocation" description="Portfolio weight by instrument">
         <div className="flex h-2.5 overflow-hidden rounded-full bg-surface">
           {HOLDINGS.map((h, i) => (
-            <div key={h.sym} style={{ width: `${h.alloc}%`, background: COLORS[i % 6] }} title={`${h.sym} ${h.alloc}%`} />
+            <div
+              key={h.sym}
+              style={{ width: `${h.alloc}%`, background: COLORS[i % 6] }}
+              title={`${h.sym} ${h.alloc}%`}
+            />
           ))}
         </div>
         <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-muted-foreground">
@@ -73,13 +88,33 @@ function PortfolioPage() {
               return (
                 <DataTableRow key={h.sym}>
                   <Td className="font-sans font-semibold">{h.sym}</Td>
-                  <Td mono className="text-right">{h.qty}</Td>
-                  <Td mono className="text-right">{h.avg}</Td>
-                  <Td mono className="text-right">{a.price}</Td>
-                  <Td mono className={"text-right font-medium " + (up ? "text-[color:var(--success)]" : "text-[color:var(--destructive)]")}>
-                    {up ? "+" : ""}{pnl.toFixed(2)}
+                  <Td mono className="text-right">
+                    {h.qty}
                   </Td>
-                  <Td><Sparkline points={sparklineFor(h.sym)} up={up} className="w-24" /></Td>
+                  <Td mono className="text-right">
+                    <GatedNumber value={h.avg} />
+                  </Td>
+                  <Td mono className="text-right">
+                    <GatedNumber value={a.price} />
+                  </Td>
+                  <Td
+                    mono
+                    className={
+                      "text-right font-medium " +
+                      (up ? "text-[color:var(--success)]" : "text-[color:var(--destructive)]")
+                    }
+                  >
+                    <GatedNumber
+                      value={pnl.toFixed(2)}
+                      prefix={up ? "+" : ""}
+                      className={
+                        up ? "text-[color:var(--success)]" : "text-[color:var(--destructive)]"
+                      }
+                    />
+                  </Td>
+                  <Td>
+                    <Sparkline points={sparklineFor(h.sym)} up={up} className="w-24" />
+                  </Td>
                 </DataTableRow>
               );
             })}

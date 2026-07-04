@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { ThemeProvider } from "@/hooks/use-theme";
 import { AuthProvider } from "@/hooks/use-auth";
+import { AdminAuthProvider } from "@/hooks/use-admin-auth";
 import { WalletProvider } from "@/hooks/use-wallet";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -26,7 +27,10 @@ function NotFoundComponent() {
           The page you're looking for doesn't exist or has been moved.
         </p>
         <div className="mt-6">
-          <Link to="/" className="gold-button hover:gold-button-hover inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-semibold">
+          <Link
+            to="/"
+            className="gold-button hover:gold-button-hover inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-semibold"
+          >
             Go home
           </Link>
         </div>
@@ -45,16 +49,24 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">This page didn't load</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">
+          This page didn't load
+        </h1>
         <p className="mt-2 text-sm text-muted-foreground">Something went wrong on our end.</p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
-            onClick={() => { router.invalidate(); reset(); }}
+            onClick={() => {
+              router.invalidate();
+              reset();
+            }}
             className="gold-button hover:gold-button-hover inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-semibold"
           >
             Try again
           </button>
-          <a href="/" className="inline-flex items-center justify-center rounded-md border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground hover:bg-accent">
+          <a
+            href="/"
+            className="inline-flex items-center justify-center rounded-md border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground hover:bg-accent"
+          >
             Go home
           </a>
         </div>
@@ -69,17 +81,28 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Exness India — Premium Trading Platform (Demo)" },
-      { name: "description", content: "Exness India demo trading platform — forex, crypto, gold, oil, indices and global stocks with ultra-fast execution, low spreads and copy trading." },
+      {
+        name: "description",
+        content:
+          "Exness India demo trading platform — forex, crypto, gold, oil, indices and global stocks with ultra-fast execution, low spreads and copy trading.",
+      },
       { name: "author", content: "Exness India" },
       { name: "theme-color", content: "#0F1A15" },
       { property: "og:title", content: "Exness India — Premium Trading Platform (Demo)" },
-      { property: "og:description", content: "Trade 200+ markets with razor-thin spreads, 2000:1 leverage and instant UPI deposits — fully simulated demo." },
+      {
+        property: "og:description",
+        content:
+          "Trade 200+ markets with razor-thin spreads, 2000:1 leverage and instant UPI deposits — fully simulated demo.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "stylesheet", href: appCss }],
     scripts: [
-      { children: "try{var t=localStorage.getItem('exness-theme')||'dark';document.documentElement.classList.add(t);document.documentElement.style.colorScheme=t;}catch(e){document.documentElement.classList.add('dark');}" },
+      {
+        children:
+          "try{var t=localStorage.getItem('exness-theme')||'dark';document.documentElement.classList.add(t);document.documentElement.style.colorScheme=t;}catch(e){document.documentElement.classList.add('dark');}",
+      },
     ],
   }),
   shellComponent: RootShell,
@@ -91,7 +114,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className="dark">
-      <head><HeadContent /></head>
+      <head>
+        <HeadContent />
+      </head>
       <body>
         {children}
         <Scripts />
@@ -106,10 +131,12 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>
-          <WalletProvider>
-            <Outlet />
-            <Toaster position="top-right" theme="dark" />
-          </WalletProvider>
+          <AdminAuthProvider>
+            <WalletProvider>
+              <Outlet />
+              <Toaster position="top-right" theme="dark" />
+            </WalletProvider>
+          </AdminAuthProvider>
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>

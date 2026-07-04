@@ -26,9 +26,15 @@ function ResetPage() {
     if (pw.length < 8) return toast.error("Min 8 characters");
     if (pw !== pw2) return toast.error("Passwords don't match");
     setLoading(true);
-    try { await resetPassword(email, pw); toast.success("Password updated"); nav({ to: "/login" }); }
-    catch (err) { toast.error((err as Error).message); }
-    finally { setLoading(false); }
+    try {
+      await resetPassword(email, pw);
+      toast.success("Password updated");
+      nav({ to: "/login" });
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -43,11 +49,23 @@ function ResetPage() {
           </div>
           <div>
             <Label htmlFor="pw">New password</Label>
-            <Input id="pw" type="password" value={pw} onChange={(e) => setPw(e.target.value)} required />
+            <Input
+              id="pw"
+              type="password"
+              value={pw}
+              onChange={(e) => setPw(e.target.value)}
+              required
+            />
           </div>
           <div>
             <Label htmlFor="pw2">Confirm password</Label>
-            <Input id="pw2" type="password" value={pw2} onChange={(e) => setPw2(e.target.value)} required />
+            <Input
+              id="pw2"
+              type="password"
+              value={pw2}
+              onChange={(e) => setPw2(e.target.value)}
+              required
+            />
           </div>
           <Button disabled={loading} className="gold-button hover:gold-button-hover w-full">
             {loading ? "Updating…" : "Update password"}

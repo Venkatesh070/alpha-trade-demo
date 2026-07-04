@@ -24,7 +24,9 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/70 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
-        <Link to="/" className="shrink-0"><Logo /></Link>
+        <Link to="/" className="shrink-0">
+          <Logo />
+        </Link>
 
         <nav className="hidden items-center gap-1 lg:flex">
           {NAV.map((n) => (
@@ -57,7 +59,7 @@ export function SiteHeader() {
                 <Link to="/login">Login</Link>
               </Button>
               <Button asChild className="gold-button hover:gold-button-hover">
-                <Link to="/register">Open Demo</Link>
+                <Link to="/register">Open Account</Link>
               </Button>
             </>
           )}
@@ -71,7 +73,12 @@ export function SiteHeader() {
         </div>
       </div>
 
-      <div className={cn("lg:hidden border-t border-border/60 overflow-hidden transition-[max-height]", open ? "max-h-96" : "max-h-0")}>
+      <div
+        className={cn(
+          "lg:hidden border-t border-border/60 overflow-hidden transition-[max-height]",
+          open ? "max-h-96" : "max-h-0",
+        )}
+      >
         <div className="flex flex-col gap-1 p-3">
           {NAV.map((n) => (
             <Link
@@ -83,8 +90,20 @@ export function SiteHeader() {
               {n.label}
             </Link>
           ))}
-          <Link to="/help" onClick={() => setOpen(false)} className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground">Help</Link>
-          <Link to="/contact" onClick={() => setOpen(false)} className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground">Contact</Link>
+          <Link
+            to="/help"
+            onClick={() => setOpen(false)}
+            className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
+          >
+            Help
+          </Link>
+          <Link
+            to="/contact"
+            onClick={() => setOpen(false)}
+            className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
+          >
+            Contact
+          </Link>
         </div>
       </div>
     </header>

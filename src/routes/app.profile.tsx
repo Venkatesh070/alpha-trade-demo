@@ -48,11 +48,17 @@ function ProfilePage() {
             </div>
             <div className="space-y-2">
               <Label>Account ID</Label>
-              <Input value={user?.id ?? ""} readOnly className="bg-surface/50 font-mono text-xs opacity-80" />
+              <Input
+                value={user?.id ?? ""}
+                readOnly
+                className="bg-surface/50 font-mono text-xs opacity-80"
+              />
             </div>
           </div>
           <div className="border-t border-border/50 px-4 py-4 sm:px-5">
-            <Button type="submit" className="gold-button hover:gold-button-hover">Save changes</Button>
+            <Button type="submit" className="gold-button hover:gold-button-hover">
+              Save changes
+            </Button>
           </div>
         </DataPanel>
       </form>
@@ -63,9 +69,14 @@ function ProfilePage() {
             <ShieldCheck className="h-5 w-5 text-[color:var(--gold)]" />
           </span>
           <h2 className="mt-4 font-display text-lg font-bold">Two-factor authentication</h2>
-          <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">Add an authenticator app for an extra layer of security.</p>
+          <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+            Add an authenticator app for an extra layer of security.
+          </p>
           <Button
-            onClick={() => { updateUser({ twoFA: !user?.twoFA }); toast.success(user?.twoFA ? "2FA disabled" : "2FA enabled"); }}
+            onClick={() => {
+              updateUser({ twoFA: !user?.twoFA });
+              toast.success(user?.twoFA ? "2FA disabled" : "2FA enabled");
+            }}
             variant="outline"
             className="mt-4"
           >
@@ -78,19 +89,32 @@ function ProfilePage() {
           </span>
           <h2 className="mt-4 font-display text-lg font-bold">Password</h2>
           <p className="mt-1.5 text-sm text-muted-foreground">Last changed 14 days ago.</p>
-          <Button asChild variant="outline" className="mt-4"><a href="/forgot-password">Change password</a></Button>
+          <Button asChild variant="outline" className="mt-4">
+            <a href="/forgot-password">Change password</a>
+          </Button>
         </div>
       </div>
 
       <DataPanel title="Active sessions" description="Devices currently signed in">
         <ul className="divide-y divide-border/50">
-          {[{ d: "Chrome · Mumbai", t: "Active now", live: true }, { d: "iOS · Safari", t: "2h ago", live: false }, { d: "Edge · Bengaluru", t: "Yesterday", live: false }].map((s) => (
+          {[
+            { d: "Chrome · Mumbai", t: "Active now", live: true },
+            { d: "iOS · Safari", t: "2h ago", live: false },
+            { d: "Edge · Bengaluru", t: "Yesterday", live: false },
+          ].map((s) => (
             <li key={s.d} className="flex items-center justify-between px-4 py-3.5 sm:px-5">
               <div className="flex items-center gap-3">
                 <Monitor className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm">{s.d}</span>
               </div>
-              <span className={"text-xs " + (s.live ? "font-medium text-[color:var(--success)]" : "text-muted-foreground")}>{s.t}</span>
+              <span
+                className={
+                  "text-xs " +
+                  (s.live ? "font-medium text-[color:var(--success)]" : "text-muted-foreground")
+                }
+              >
+                {s.t}
+              </span>
             </li>
           ))}
         </ul>

@@ -50,6 +50,7 @@ import { Route as AdminReferralsRouteImport } from './routes/admin.referrals'
 import { Route as AdminNewsRouteImport } from './routes/admin.news'
 import { Route as AdminMediaRouteImport } from './routes/admin.media'
 import { Route as AdminMarketsRouteImport } from './routes/admin.markets'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminFaqsRouteImport } from './routes/admin.faqs'
 import { Route as AdminDepositsRouteImport } from './routes/admin.deposits'
 import { Route as AdminCompetitionsRouteImport } from './routes/admin.competitions'
@@ -263,6 +264,11 @@ const AdminMarketsRoute = AdminMarketsRouteImport.update({
   path: '/markets',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminFaqsRoute = AdminFaqsRouteImport.update({
   id: '/faqs',
   path: '/faqs',
@@ -323,6 +329,7 @@ export interface FileRoutesByFullPath {
   '/admin/competitions': typeof AdminCompetitionsRoute
   '/admin/deposits': typeof AdminDepositsRoute
   '/admin/faqs': typeof AdminFaqsRoute
+  '/admin/login': typeof AdminLoginRoute
   '/admin/markets': typeof AdminMarketsRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/news': typeof AdminNewsRoute
@@ -371,6 +378,7 @@ export interface FileRoutesByTo {
   '/admin/competitions': typeof AdminCompetitionsRoute
   '/admin/deposits': typeof AdminDepositsRoute
   '/admin/faqs': typeof AdminFaqsRoute
+  '/admin/login': typeof AdminLoginRoute
   '/admin/markets': typeof AdminMarketsRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/news': typeof AdminNewsRoute
@@ -421,6 +429,7 @@ export interface FileRoutesById {
   '/admin/competitions': typeof AdminCompetitionsRoute
   '/admin/deposits': typeof AdminDepositsRoute
   '/admin/faqs': typeof AdminFaqsRoute
+  '/admin/login': typeof AdminLoginRoute
   '/admin/markets': typeof AdminMarketsRoute
   '/admin/media': typeof AdminMediaRoute
   '/admin/news': typeof AdminNewsRoute
@@ -473,6 +482,7 @@ export interface FileRouteTypes {
     | '/admin/competitions'
     | '/admin/deposits'
     | '/admin/faqs'
+    | '/admin/login'
     | '/admin/markets'
     | '/admin/media'
     | '/admin/news'
@@ -521,6 +531,7 @@ export interface FileRouteTypes {
     | '/admin/competitions'
     | '/admin/deposits'
     | '/admin/faqs'
+    | '/admin/login'
     | '/admin/markets'
     | '/admin/media'
     | '/admin/news'
@@ -570,6 +581,7 @@ export interface FileRouteTypes {
     | '/admin/competitions'
     | '/admin/deposits'
     | '/admin/faqs'
+    | '/admin/login'
     | '/admin/markets'
     | '/admin/media'
     | '/admin/news'
@@ -908,6 +920,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminMarketsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/faqs': {
       id: '/admin/faqs'
       path: '/faqs'
@@ -965,6 +984,7 @@ interface AdminRouteChildren {
   AdminCompetitionsRoute: typeof AdminCompetitionsRoute
   AdminDepositsRoute: typeof AdminDepositsRoute
   AdminFaqsRoute: typeof AdminFaqsRoute
+  AdminLoginRoute: typeof AdminLoginRoute
   AdminMarketsRoute: typeof AdminMarketsRoute
   AdminMediaRoute: typeof AdminMediaRoute
   AdminNewsRoute: typeof AdminNewsRoute
@@ -980,6 +1000,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCompetitionsRoute: AdminCompetitionsRoute,
   AdminDepositsRoute: AdminDepositsRoute,
   AdminFaqsRoute: AdminFaqsRoute,
+  AdminLoginRoute: AdminLoginRoute,
   AdminMarketsRoute: AdminMarketsRoute,
   AdminMediaRoute: AdminMediaRoute,
   AdminNewsRoute: AdminNewsRoute,

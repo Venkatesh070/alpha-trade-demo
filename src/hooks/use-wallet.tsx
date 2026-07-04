@@ -1,4 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { addDepositRequest } from "@/lib/payments";
 import { emptyWallet, getWallet, updateWallet, type WalletState } from "@/lib/wallet-db";
@@ -36,68 +44,105 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     setLoading(false);
   }, [refresh]);
 
-  const persist = useCallback((updater: (prev: WalletState) => WalletState) => {
-    if (!user?.email) return;
-    const next = updateWallet(user.email, updater);
-    setWallet(next);
-  }, [user?.email]);
+  const persist = useCallback(
+    (updater: (prev: WalletState) => WalletState) => {
+      if (!user?.email) return;
+      const next = updateWallet(user.email, updater);
+      setWallet(next);
+    },
+    [user?.email],
+  );
 
-  const deposit = useCallback((amount: number, method: string) => {
-    if (!user?.email || amount <= 0) return;
-    persist((prev) => ({
-      balance: prev.balance + amount,
-      transactions: [{
-        id: `txn-${Date.now()}`,
-        type: "Deposit",
-        method,
+  const deposit = useCallback(
+    (amount: number, method: string) => {
+      if (!user?.email || amount <= 0) return;
+      persist((prev) => ({
+        balance: prev.balance + amount,
+        transactions: [
+          {
+            id: `txn-${Date.now()}`,
+            type: "Deposit",
+            method,
+            amount,
+            status: "Completed",
+            date: new Date().toLocaleDateString("en-IN", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            }),
+          },
+          ...prev.transactions,
+        ],
+      }));
+    },
+    [persist, user?.email],
+  );
+
+  const withdraw = useCallback(
+    (amount: number, method: string) => {
+      if (!user?.email || amount <= 0) return;
+      persist((prev) => {
+        if (amount > prev.balance) return prev;
+        return {
+          balance: prev.balance - amount,
+          transactions: [
+            {
+              id: `txn-${Date.now()}`,
+              type: "Withdrawal",
+              method,
+              amount: -amount,
+              status: "Completed",
+              date: new Date().toLocaleDateString("en-IN", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              }),
+            },
+            ...prev.transactions,
+          ],
+        };
+      });
+    },
+    [persist, user?.email],
+  );
+
+  const submitDepositRequest = useCallback(
+    (amount: number, referenceId: string, screenshot: string) => {
+      if (!user?.email) return;
+      addDepositRequest({
+        userId: user.id,
+        userEmail: user.email,
+        userName: user.name,
         amount,
-        status: "Completed",
-        date: new Date().toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" }),
-      }, ...prev.transactions],
-    }));
-  }, [persist, user?.email]);
+        referenceId,
+        screenshot,
+      });
+      refresh();
+    },
+    [refresh, user],
+  );
 
-  const withdraw = useCallback((amount: number, method: string) => {
-    if (!user?.email || amount <= 0) return;
-    persist((prev) => {
-      if (amount > prev.balance) return prev;
-      return {
-        balance: prev.balance - amount,
-        transactions: [{
-          id: `txn-${Date.now()}`,
-          type: "Withdrawal",
-          method,
-          amount: -amount,
-          status: "Completed",
-          date: new Date().toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" }),
-        }, ...prev.transactions],
-      };
-    });
-  }, [persist, user?.email]);
-
-  const submitDepositRequest = useCallback((amount: number, referenceId: string, screenshot: string) => {
-    if (!user?.email) return;
-    addDepositRequest({
-      userId: user.id,
-      userEmail: user.email,
-      userName: user.name,
-      amount,
-      referenceId,
-      screenshot,
-    });
-    refresh();
-  }, [refresh, user]);
-
-  const value = useMemo<WalletCtx>(() => ({
-    balance: wallet.balance,
-    transactions: wallet.transactions,
-    loading,
-    canTrade: wallet.balance >= MIN_TRADING_BALANCE,
-    deposit,
-    withdraw,
-    submitDepositRequest,
-    refresh,
-  }), [wallet.balance, wallet.transactions, loading, deposit, withdraw, submitDepositRequest, refresh]);
+  const value = useMemo<WalletCtx>(
+    () => ({
+      balance: wallet.balance,
+      transactions: wallet.transactions,
+      loading,
+      canTrade: wallet.balance >= MIN_TRADING_BALANCE,
+      deposit,
+      withdraw,
+      submitDepositRequest,
+      refresh,
+    }),
+    [
+      wallet.balance,
+      wallet.transactions,
+      loading,
+      deposit,
+      withdraw,
+      submitDepositRequest,
+      refresh,
+    ],
+  );
 
   return <WalletContext.Provider value={value}>{children}</WalletContext.Provider>;
 }

@@ -1,6 +1,14 @@
 import { cn } from "@/lib/utils";
 
-export function FilterTabs({ tabs, value, onChange }: { tabs: { id: string; label: string }[]; value: string; onChange: (id: string) => void }) {
+export function FilterTabs({
+  tabs,
+  value,
+  onChange,
+}: {
+  tabs: { id: string; label: string }[];
+  value: string;
+  onChange: (id: string) => void;
+}) {
   return (
     <div className="flex flex-wrap gap-1 rounded-xl border border-border/60 bg-surface/60 p-1">
       {tabs.map((t) => (

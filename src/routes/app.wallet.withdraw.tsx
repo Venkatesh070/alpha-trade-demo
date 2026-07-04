@@ -37,7 +37,9 @@ function WithdrawPage() {
       width="md"
       actions={
         <Button asChild variant="ghost" size="sm">
-          <Link to="/app/wallet"><ArrowLeft className="mr-1 h-4 w-4" /> Wallet</Link>
+          <Link to="/app/wallet">
+            <ArrowLeft className="mr-1 h-4 w-4" /> Wallet
+          </Link>
         </Button>
       }
     >
@@ -46,24 +48,43 @@ function WithdrawPage() {
           <div className="space-y-4 p-4 sm:p-5">
             <div className="space-y-2">
               <Label htmlFor="amt">Amount (₹)</Label>
-              <Input id="amt" type="number" value={amount} onChange={(e) => setAmount(e.target.value)} className="font-mono text-lg" />
+              <Input
+                id="amt"
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                className="font-mono text-lg"
+              />
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="acc">Bank account number</Label>
-                <Input id="acc" value={account} onChange={(e) => setAccount(e.target.value)} className="font-mono" />
+                <Input
+                  id="acc"
+                  value={account}
+                  onChange={(e) => setAccount(e.target.value)}
+                  className="font-mono"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="ifsc">IFSC code</Label>
-                <Input id="ifsc" value={ifsc} onChange={(e) => setIfsc(e.target.value.toUpperCase())} className="font-mono uppercase" />
+                <Input
+                  id="ifsc"
+                  value={ifsc}
+                  onChange={(e) => setIfsc(e.target.value.toUpperCase())}
+                  className="font-mono uppercase"
+                />
               </div>
             </div>
             <p className="rounded-xl border border-border/50 bg-surface/50 p-3 text-xs leading-relaxed text-muted-foreground">
-              UPI withdrawals are instant where supported. Bank transfers settle within 1 business day on business days.
+              UPI withdrawals are instant where supported. Bank transfers settle within 1 business
+              day on business days.
             </p>
           </div>
           <div className="border-t border-border/50 px-4 py-4 sm:px-5">
-            <Button className="gold-button hover:gold-button-hover w-full sm:w-auto">Confirm withdrawal</Button>
+            <Button className="gold-button hover:gold-button-hover w-full sm:w-auto">
+              Confirm withdrawal
+            </Button>
           </div>
         </DataPanel>
       </form>

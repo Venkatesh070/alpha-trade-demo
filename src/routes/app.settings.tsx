@@ -3,7 +3,13 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useTheme } from "@/hooks/use-theme";
 import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { PageShell } from "@/components/dashboard/page-shell";
 import { DataPanel } from "@/components/dashboard/data-panel";
@@ -12,7 +18,15 @@ export const Route = createFileRoute("/app/settings")({
   component: SettingsPage,
 });
 
-function SettingRow({ label, desc, children }: { label: string; desc?: string; children: React.ReactNode }) {
+function SettingRow({
+  label,
+  desc,
+  children,
+}: {
+  label: string;
+  desc?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="flex items-center justify-between gap-4 border-b border-border/40 py-4 last:border-0 last:pb-0 first:pt-0">
       <div>
@@ -42,11 +56,19 @@ function SettingsPage() {
       <DataPanel title="Appearance" description="Visual preferences for the terminal">
         <div className="px-4 sm:px-5">
           <SettingRow label="Dark mode" desc="Use dark theme across the platform">
-            <Switch checked={theme === "dark"} onCheckedChange={(v) => { setTheme(v ? "dark" : "light"); toast.success(`Switched to ${v ? "dark" : "light"} mode`); }} />
+            <Switch
+              checked={theme === "dark"}
+              onCheckedChange={(v) => {
+                setTheme(v ? "dark" : "light");
+                toast.success(`Switched to ${v ? "dark" : "light"} mode`);
+              }}
+            />
           </SettingRow>
           <SettingRow label="Language">
             <Select value={lang} onValueChange={setLang}>
-              <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="w-44">
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="en-IN">English (IN)</SelectItem>
                 <SelectItem value="hi-IN">हिन्दी</SelectItem>
@@ -57,7 +79,9 @@ function SettingsPage() {
           </SettingRow>
           <SettingRow label="Display currency">
             <Select value={ccy} onValueChange={setCcy}>
-              <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="w-44">
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="INR">INR · ₹</SelectItem>
                 <SelectItem value="USD">USD · $</SelectItem>

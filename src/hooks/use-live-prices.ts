@@ -6,7 +6,9 @@ import { ALL_ASSETS, type Asset } from "@/data/markets";
  * by a small random delta and changePct adjusts accordingly.
  */
 export function useLivePrices(intervalMs = 2000) {
-  const [prices, setPrices] = useState<Record<string, { price: number; changePct: number; dir: 1 | -1 | 0 }>>(() => {
+  const [prices, setPrices] = useState<
+    Record<string, { price: number; changePct: number; dir: 1 | -1 | 0 }>
+  >(() => {
     const init: Record<string, { price: number; changePct: number; dir: 1 | -1 | 0 }> = {};
     for (const a of ALL_ASSETS) init[a.symbol] = { price: a.price, changePct: a.changePct, dir: 0 };
     return init;

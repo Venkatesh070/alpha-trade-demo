@@ -29,7 +29,15 @@ export function Th({ children, className }: { children: ReactNode; className?: s
   return <th className={cn("px-4 py-3 font-medium sm:px-5", className)}>{children}</th>;
 }
 
-export function Td({ children, className, mono }: { children: ReactNode; className?: string; mono?: boolean }) {
+export function Td({
+  children,
+  className,
+  mono,
+}: {
+  children: ReactNode;
+  className?: string;
+  mono?: boolean;
+}) {
   return (
     <td className={cn("px-4 py-3.5 sm:px-5", mono && "font-mono text-[13px]", className)}>
       {children}

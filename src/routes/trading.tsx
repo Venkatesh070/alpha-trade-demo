@@ -6,7 +6,11 @@ export const Route = createFileRoute("/trading")({
   head: () => ({
     meta: [
       { title: "Trading Terminal — Exness India" },
-      { name: "description", content: "Professional trading terminal with live charts, market watch, and one-click execution." },
+      {
+        name: "description",
+        content:
+          "Professional trading terminal with live charts, market watch, and one-click execution.",
+      },
     ],
   }),
   component: TradingPage,

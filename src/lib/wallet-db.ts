@@ -24,7 +24,11 @@ export function emptyWallet(): WalletState {
 
 export function loadWalletDb(): WalletDb {
   if (typeof window === "undefined") return {};
-  try { return JSON.parse(window.localStorage.getItem(WALLET_STORAGE_KEY) ?? "{}"); } catch { return {}; }
+  try {
+    return JSON.parse(window.localStorage.getItem(WALLET_STORAGE_KEY) ?? "{}");
+  } catch {
+    return {};
+  }
 }
 
 export function saveWalletDb(db: WalletDb) {
@@ -50,25 +54,38 @@ export function creditWallet(
   opts?: { depositRequestId?: string; referenceId?: string },
 ) {
   return updateWallet(email, (prev) => {
-    const hasPending = opts?.depositRequestId
-      && prev.transactions.some((t) => t.depositRequestId === opts.depositRequestId);
+    const hasPending =
+      opts?.depositRequestId &&
+      prev.transactions.some((t) => t.depositRequestId === opts.depositRequestId);
 
     const transactions = hasPending
       ? prev.transactions.map((t) =>
           t.depositRequestId === opts.depositRequestId
-            ? { ...t, status: "Completed" as const, method, referenceId: opts.referenceId ?? t.referenceId }
+            ? {
+                ...t,
+                status: "Completed" as const,
+                method,
+                referenceId: opts.referenceId ?? t.referenceId,
+              }
             : t,
         )
-      : [{
-          id: `txn-${Date.now()}`,
-          type: "Deposit" as const,
-          method,
-          amount,
-          status: "Completed" as const,
-          date: new Date().toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" }),
-          referenceId: opts?.referenceId,
-          depositRequestId: opts?.depositRequestId,
-        }, ...prev.transactions];
+      : [
+          {
+            id: `txn-${Date.now()}`,
+            type: "Deposit" as const,
+            method,
+            amount,
+            status: "Completed" as const,
+            date: new Date().toLocaleDateString("en-IN", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            }),
+            referenceId: opts?.referenceId,
+            depositRequestId: opts?.depositRequestId,
+          },
+          ...prev.transactions,
+        ];
 
     return { balance: prev.balance + amount, transactions };
   });

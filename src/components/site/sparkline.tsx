@@ -1,7 +1,15 @@
 import { useId } from "react";
 import { cn } from "@/lib/utils";
 
-export function Sparkline({ points, up = true, className }: { points: number[]; up?: boolean; className?: string }) {
+export function Sparkline({
+  points,
+  up = true,
+  className,
+}: {
+  points: number[];
+  up?: boolean;
+  className?: string;
+}) {
   const uid = useId().replace(/:/g, "");
   if (!points.length) return null;
   const w = 100;
@@ -10,7 +18,12 @@ export function Sparkline({ points, up = true, className }: { points: number[]; 
   const max = Math.max(...points);
   const span = Math.max(1, max - min);
   const step = w / (points.length - 1);
-  const d = points.map((v, i) => `${i === 0 ? "M" : "L"} ${(i * step).toFixed(2)} ${(h - ((v - min) / span) * h).toFixed(2)}`).join(" ");
+  const d = points
+    .map(
+      (v, i) =>
+        `${i === 0 ? "M" : "L"} ${(i * step).toFixed(2)} ${(h - ((v - min) / span) * h).toFixed(2)}`,
+    )
+    .join(" ");
   const color = up ? "var(--success)" : "var(--destructive)";
   const id = `sg-${uid}`;
   return (

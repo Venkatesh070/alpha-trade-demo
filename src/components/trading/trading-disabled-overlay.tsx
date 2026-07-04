@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Wallet } from "lucide-react";
+import { Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MIN_TRADING_BALANCE } from "@/hooks/use-wallet";
 
@@ -10,17 +10,21 @@ export function TradingDisabledOverlay({ balance }: { balance: number }) {
     <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/75 backdrop-blur-[2px]">
       <div className="mx-4 max-w-md rounded-2xl border border-border/80 bg-surface/95 p-6 text-center shadow-2xl">
         <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-[color:var(--gold)]/15">
-          <Wallet className="h-6 w-6 text-[color:var(--gold)]" />
+          <Lock className="h-6 w-6 text-[color:var(--gold)]" />
         </div>
         <h3 className="mt-4 font-display text-lg font-bold">Trading unavailable</h3>
         <p className="mt-2 text-sm text-muted-foreground">
-          To trade, please deposit ₹{MIN_TRADING_BALANCE.toLocaleString()} in your account to enable trading.
-          You can still browse live markets in the watchlist.
+          Deposit ₹{MIN_TRADING_BALANCE.toLocaleString()} to unlock live prices and trading. You can
+          still browse symbols in the market list.
         </p>
         <p className="mt-3 font-mono text-sm">
-          Balance: <span className="text-[color:var(--destructive)]">₹{balance.toLocaleString()}</span>
+          Balance:{" "}
+          <span className="text-[color:var(--destructive)]">₹{balance.toLocaleString()}</span>
           {shortfall > 0 && (
-            <span className="text-muted-foreground"> · ₹{shortfall.toLocaleString()} more needed</span>
+            <span className="text-muted-foreground">
+              {" "}
+              · ₹{shortfall.toLocaleString()} more needed
+            </span>
           )}
         </p>
         <Button asChild className="gold-button hover:gold-button-hover mt-5 w-full">

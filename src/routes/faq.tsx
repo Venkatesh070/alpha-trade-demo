@@ -2,7 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { SiteHeader } from "@/components/site/header";
 import { SiteFooter } from "@/components/site/footer";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { FAQS } from "@/data/content";
 import { cn } from "@/lib/utils";
 
@@ -23,7 +28,16 @@ function FaqPage() {
         <h1 className="mt-2 font-display text-4xl font-extrabold">Frequently asked questions</h1>
         <div className="mt-6 flex flex-wrap gap-1 rounded-md border border-border bg-surface p-1 text-xs">
           {["All", ...cats].map((c) => (
-            <button key={c} onClick={() => setCat(c)} className={cn("rounded px-3 py-1.5 font-medium", cat === c ? "bg-[color:var(--gold)] text-[color:var(--primary-foreground)]" : "text-muted-foreground hover:text-foreground")}>
+            <button
+              key={c}
+              onClick={() => setCat(c)}
+              className={cn(
+                "rounded px-3 py-1.5 font-medium",
+                cat === c
+                  ? "bg-[color:var(--gold)] text-[color:var(--primary-foreground)]"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
               {c}
             </button>
           ))}
@@ -31,7 +45,9 @@ function FaqPage() {
         <Accordion type="single" collapsible className="mt-8">
           {list.map((f, i) => (
             <AccordionItem key={i} value={`f-${i}`} className="border-b border-border/60">
-              <AccordionTrigger className="text-left font-medium hover:text-[color:var(--gold)]">{f.q}</AccordionTrigger>
+              <AccordionTrigger className="text-left font-medium hover:text-[color:var(--gold)]">
+                {f.q}
+              </AccordionTrigger>
               <AccordionContent className="text-sm text-muted-foreground">{f.a}</AccordionContent>
             </AccordionItem>
           ))}

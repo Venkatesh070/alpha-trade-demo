@@ -24,7 +24,10 @@ const HISTORY = [
 function ReferralPage() {
   const { user } = useAuth();
   const code = useMemo(() => "EX" + (user?.id ?? "GUEST").slice(0, 6).toUpperCase(), [user]);
-  const link = typeof window !== "undefined" ? `${window.location.origin}/register?ref=${code}` : `https://exness-india.demo/register?ref=${code}`;
+  const link =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/register?ref=${code}`
+      : `https://exness-india.demo/register?ref=${code}`;
 
   return (
     <PageShell
@@ -35,11 +38,21 @@ function ReferralPage() {
     >
       <DataPanel title="Your referral link" description={`Code: ${code}`}>
         <div className="flex flex-wrap items-center gap-2">
-          <code className="min-w-0 flex-1 truncate rounded-xl border border-border/60 bg-surface/60 px-4 py-3 font-mono text-sm">{link}</code>
-          <Button onClick={() => { navigator.clipboard?.writeText(link); toast.success("Link copied"); }} className="gold-button hover:gold-button-hover shrink-0">
+          <code className="min-w-0 flex-1 truncate rounded-xl border border-border/60 bg-surface/60 px-4 py-3 font-mono text-sm">
+            {link}
+          </code>
+          <Button
+            onClick={() => {
+              navigator.clipboard?.writeText(link);
+              toast.success("Link copied");
+            }}
+            className="gold-button hover:gold-button-hover shrink-0"
+          >
             <Copy className="mr-2 h-4 w-4" /> Copy
           </Button>
-          <Button variant="outline" className="shrink-0"><Share2 className="mr-2 h-4 w-4" /> Share</Button>
+          <Button variant="outline" className="shrink-0">
+            <Share2 className="mr-2 h-4 w-4" /> Share
+          </Button>
         </div>
       </DataPanel>
 
@@ -64,9 +77,13 @@ function ReferralPage() {
               <DataTableRow key={i}>
                 <Td className="font-sans font-medium">{h.name}</Td>
                 <Td className="font-sans text-muted-foreground">{h.joined}</Td>
-                <Td mono className="text-right font-medium">₹{h.earned.toLocaleString()}</Td>
+                <Td mono className="text-right font-medium">
+                  ₹{h.earned.toLocaleString()}
+                </Td>
                 <Td>
-                  <StatusBadge variant={h.status === "Active" ? "success" : "warning"}>{h.status}</StatusBadge>
+                  <StatusBadge variant={h.status === "Active" ? "success" : "warning"}>
+                    {h.status}
+                  </StatusBadge>
                 </Td>
               </DataTableRow>
             ))}

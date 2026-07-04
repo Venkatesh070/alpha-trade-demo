@@ -74,19 +74,35 @@ function AdminDeposits() {
 
       <section className="glossy rounded-2xl p-6">
         <h2 className="font-display text-lg font-bold">Payment QR code</h2>
-        <p className="mt-1 text-sm text-muted-foreground">Upload the UPI QR users scan when depositing.</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Upload the UPI QR users scan when depositing.
+        </p>
 
         <div className="mt-5 grid gap-6 lg:grid-cols-2">
           <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-surface/50 p-6">
             {settings.qrImage ? (
-              <img src={settings.qrImage} alt="Payment QR" className="max-h-56 rounded-lg border border-border" />
+              <img
+                src={settings.qrImage}
+                alt="Payment QR"
+                className="max-h-56 rounded-lg border border-border"
+              />
             ) : (
               <div className="grid h-48 w-48 place-items-center rounded-lg bg-muted/30">
                 <QrCode className="h-16 w-16 text-muted-foreground/40" />
               </div>
             )}
-            <input ref={qrRef} type="file" accept="image/*" className="hidden" onChange={(e) => onQrUpload(e.target.files?.[0])} />
-            <Button type="button" className="mt-4 gold-button hover:gold-button-hover" onClick={() => qrRef.current?.click()}>
+            <input
+              ref={qrRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => onQrUpload(e.target.files?.[0])}
+            />
+            <Button
+              type="button"
+              className="mt-4 gold-button hover:gold-button-hover"
+              onClick={() => qrRef.current?.click()}
+            >
               <Upload className="mr-2 h-4 w-4" /> {settings.qrImage ? "Replace QR" : "Upload QR"}
             </Button>
           </div>
@@ -98,9 +114,16 @@ function AdminDeposits() {
             </div>
             <div>
               <Label htmlFor="upiId">UPI ID</Label>
-              <Input id="upiId" name="upiId" defaultValue={settings.upiId} placeholder="merchant@upi" />
+              <Input
+                id="upiId"
+                name="upiId"
+                defaultValue={settings.upiId}
+                placeholder="merchant@upi"
+              />
             </div>
-            <Button type="submit" variant="outline">Save details</Button>
+            <Button type="submit" variant="outline">
+              Save details
+            </Button>
           </form>
         </div>
       </section>
@@ -108,11 +131,15 @@ function AdminDeposits() {
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-lg font-bold">Pending deposits ({pending.length})</h2>
-          <Button variant="outline" size="sm" onClick={reload}>Refresh</Button>
+          <Button variant="outline" size="sm" onClick={reload}>
+            Refresh
+          </Button>
         </div>
 
         {pending.length === 0 ? (
-          <div className="glossy-soft rounded-2xl p-8 text-center text-sm text-muted-foreground">No pending deposit requests.</div>
+          <div className="glossy-soft rounded-2xl p-8 text-center text-sm text-muted-foreground">
+            No pending deposit requests.
+          </div>
         ) : (
           <div className="glossy overflow-hidden rounded-2xl">
             <table className="w-full text-sm">
@@ -136,8 +163,16 @@ function AdminDeposits() {
                     <td className="px-4 py-3 text-right font-mono">₹{r.amount.toLocaleString()}</td>
                     <td className="px-4 py-3 font-mono text-xs">{r.referenceId}</td>
                     <td className="px-4 py-3">
-                      <button type="button" onClick={() => setPreview(r)} className="block overflow-hidden rounded border border-border">
-                        <img src={r.screenshot} alt="Payment proof" className="h-14 w-14 object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => setPreview(r)}
+                        className="block overflow-hidden rounded border border-border"
+                      >
+                        <img
+                          src={r.screenshot}
+                          alt="Payment proof"
+                          className="h-14 w-14 object-cover"
+                        />
                       </button>
                     </td>
                     <td className="px-4 py-3 text-xs text-muted-foreground">
@@ -145,10 +180,19 @@ function AdminDeposits() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex gap-2">
-                        <Button size="sm" className="bg-[color:var(--success)] text-[color:var(--success-foreground)] hover:brightness-110" onClick={() => approve(r.id)}>
+                        <Button
+                          size="sm"
+                          className="bg-[color:var(--success)] text-[color:var(--success-foreground)] hover:brightness-110"
+                          onClick={() => approve(r.id)}
+                        >
                           <Check className="mr-1 h-3.5 w-3.5" /> Approve
                         </Button>
-                        <Button size="sm" variant="outline" className="text-[color:var(--destructive)]" onClick={() => reject(r.id)}>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-[color:var(--destructive)]"
+                          onClick={() => reject(r.id)}
+                        >
                           <X className="mr-1 h-3.5 w-3.5" /> Reject
                         </Button>
                       </div>
@@ -182,7 +226,9 @@ function AdminDeposits() {
                     <td className="px-4 py-3 text-right font-mono">₹{r.amount.toLocaleString()}</td>
                     <td className="px-4 py-3 font-mono text-xs">{r.referenceId}</td>
                     <td className="px-4 py-3">
-                      <span className={`rounded px-2 py-0.5 text-xs capitalize ${r.status === "approved" ? "bg-[color:var(--success)]/15 text-[color:var(--success)]" : "bg-[color:var(--destructive)]/15 text-[color:var(--destructive)]"}`}>
+                      <span
+                        className={`rounded px-2 py-0.5 text-xs capitalize ${r.status === "approved" ? "bg-[color:var(--success)]/15 text-[color:var(--success)]" : "bg-[color:var(--destructive)]/15 text-[color:var(--destructive)]"}`}
+                      >
                         {r.status}
                       </span>
                     </td>
@@ -200,20 +246,45 @@ function AdminDeposits() {
       )}
 
       {preview && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setPreview(null)}>
-          <div className="max-h-[90vh] max-w-lg overflow-y-auto rounded-2xl border border-border bg-background p-5 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+          onClick={() => setPreview(null)}
+        >
+          <div
+            className="max-h-[90vh] max-w-lg overflow-y-auto rounded-2xl border border-border bg-background p-5 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h3 className="font-display font-bold">{preview.userName}</h3>
-                <p className="text-sm text-muted-foreground">₹{preview.amount.toLocaleString()} · Ref: {preview.referenceId}</p>
+                <p className="text-sm text-muted-foreground">
+                  ₹{preview.amount.toLocaleString()} · Ref: {preview.referenceId}
+                </p>
               </div>
-              <button type="button" onClick={() => setPreview(null)}><X className="h-5 w-5" /></button>
+              <button type="button" onClick={() => setPreview(null)}>
+                <X className="h-5 w-5" />
+              </button>
             </div>
-            <img src={preview.screenshot} alt="Payment screenshot" className="mt-4 w-full rounded-lg border border-border" />
+            <img
+              src={preview.screenshot}
+              alt="Payment screenshot"
+              className="mt-4 w-full rounded-lg border border-border"
+            />
             {preview.status === "pending" && (
               <div className="mt-4 flex gap-2">
-                <Button className="flex-1 bg-[color:var(--success)] text-[color:var(--success-foreground)]" onClick={() => approve(preview.id)}>Approve</Button>
-                <Button variant="outline" className="flex-1 text-[color:var(--destructive)]" onClick={() => reject(preview.id)}>Reject</Button>
+                <Button
+                  className="flex-1 bg-[color:var(--success)] text-[color:var(--success-foreground)]"
+                  onClick={() => approve(preview.id)}
+                >
+                  Approve
+                </Button>
+                <Button
+                  variant="outline"
+                  className="flex-1 text-[color:var(--destructive)]"
+                  onClick={() => reject(preview.id)}
+                >
+                  Reject
+                </Button>
               </div>
             )}
           </div>

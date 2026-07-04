@@ -112,7 +112,11 @@ export function addDepositRequest(input: Omit<DepositRequest, "id" | "status" | 
     method: "UPI · QR",
     amount: input.amount,
     status: "Pending",
-    date: new Date().toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" }),
+    date: new Date().toLocaleDateString("en-IN", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }),
     referenceId: input.referenceId,
     depositRequestId: request.id,
   };
@@ -159,7 +163,7 @@ export function rejectDepositRequest(requestId: string) {
   updateWallet(req.userEmail, (prev) => ({
     ...prev,
     transactions: prev.transactions.map((t) =>
-      t.depositRequestId === requestId ? { ...t, status: "Rejected" as const } : t
+      t.depositRequestId === requestId ? { ...t, status: "Rejected" as const } : t,
     ),
   }));
 

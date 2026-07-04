@@ -11,7 +11,13 @@ export const Route = createFileRoute("/app/notifications")({
   component: NotificationsPage,
 });
 
-const ICONS = { trade: CheckCircle2, deposit: CreditCard, verification: ShieldCheck, promo: Sparkles, system: Server } as const;
+const ICONS = {
+  trade: CheckCircle2,
+  deposit: CreditCard,
+  verification: ShieldCheck,
+  promo: Sparkles,
+  system: Server,
+} as const;
 
 const TABS = [
   { id: "all", label: "All" },
@@ -27,14 +33,21 @@ function NotificationsPage() {
   const [items, setItems] = useState<AppNotification[]>(NOTIFICATIONS);
   const [tab, setTab] = useState("all");
 
-  const filtered = tab === "all" ? items : tab === "unread" ? items.filter((i) => !i.read) : items.filter((i) => i.type === tab);
+  const filtered =
+    tab === "all"
+      ? items
+      : tab === "unread"
+        ? items.filter((i) => !i.read)
+        : items.filter((i) => i.type === tab);
   const unread = items.filter((i) => !i.read).length;
 
   return (
     <PageShell
       eyebrow="Inbox"
       title="Notifications"
-      description={unread > 0 ? `${unread} unread message${unread === 1 ? "" : "s"}` : "You're all caught up."}
+      description={
+        unread > 0 ? `${unread} unread message${unread === 1 ? "" : "s"}` : "You're all caught up."
+      }
       width="md"
       actions={
         <button
@@ -51,7 +64,11 @@ function NotificationsPage() {
       <ul className="space-y-2">
         {filtered.length === 0 && (
           <li className="glossy-soft rounded-2xl">
-            <EmptyState icon={Inbox} title="All caught up" description="No notifications in this filter." />
+            <EmptyState
+              icon={Inbox}
+              title="All caught up"
+              description="No notifications in this filter."
+            />
           </li>
         )}
         {filtered.map((n) => {

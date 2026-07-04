@@ -51,12 +51,27 @@ function HistoryPage() {
             {HIST.map((h) => (
               <DataTableRow key={h.id}>
                 <Td className="font-sans font-semibold">{h.sym}</Td>
-                <Td><StatusBadge variant={h.side === "BUY" ? "buy" : "sell"}>{h.side}</StatusBadge></Td>
-                <Td mono className="text-right">{h.qty}</Td>
-                <Td mono className="text-right">{h.open}</Td>
-                <Td mono className="text-right">{h.close}</Td>
-                <Td mono className={"text-right font-medium " + (h.pnl >= 0 ? "text-[color:var(--success)]" : "text-[color:var(--destructive)]")}>
-                  {h.pnl >= 0 ? "+" : ""}{h.pnl.toFixed(2)}
+                <Td>
+                  <StatusBadge variant={h.side === "BUY" ? "buy" : "sell"}>{h.side}</StatusBadge>
+                </Td>
+                <Td mono className="text-right">
+                  {h.qty}
+                </Td>
+                <Td mono className="text-right">
+                  {h.open}
+                </Td>
+                <Td mono className="text-right">
+                  {h.close}
+                </Td>
+                <Td
+                  mono
+                  className={
+                    "text-right font-medium " +
+                    (h.pnl >= 0 ? "text-[color:var(--success)]" : "text-[color:var(--destructive)]")
+                  }
+                >
+                  {h.pnl >= 0 ? "+" : ""}
+                  {h.pnl.toFixed(2)}
                 </Td>
                 <Td className="font-sans text-muted-foreground">{h.closed}</Td>
               </DataTableRow>

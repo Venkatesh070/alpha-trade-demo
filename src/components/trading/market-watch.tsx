@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { ASSETS_BY_CATEGORY, type AssetCategory } from "@/data/markets";
-import { useLivePrices, formatPrice } from "@/hooks/use-live-prices";
+import { useLivePrices } from "@/hooks/use-live-prices";
+import { GatedPrice } from "@/components/pricing/price-gate";
 import { Search, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -30,10 +31,17 @@ export function MarketWatch({
   const live = useLivePrices(2000);
 
   const list = useMemo(() => {
-    const base = tab === "favorites"
-      ? Object.values(ASSETS_BY_CATEGORY).flat().filter((a) => favorites.has(a.symbol))
-      : ASSETS_BY_CATEGORY[tab];
-    return base.filter((a) => a.symbol.toLowerCase().includes(q.toLowerCase()) || a.name.toLowerCase().includes(q.toLowerCase()));
+    const base =
+      tab === "favorites"
+        ? Object.values(ASSETS_BY_CATEGORY)
+            .flat()
+            .filter((a) => favorites.has(a.symbol))
+        : ASSETS_BY_CATEGORY[tab];
+    return base.filter(
+      (a) =>
+        a.symbol.toLowerCase().includes(q.toLowerCase()) ||
+        a.name.toLowerCase().includes(q.toLowerCase()),
+    );
   }, [tab, q, favorites]);
 
   return (
@@ -56,7 +64,9 @@ export function MarketWatch({
             onClick={() => setTab(t.id)}
             className={cn(
               "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
-              tab === t.id ? "bg-[color:var(--gold)] text-[color:var(--primary-foreground)]" : "text-muted-foreground hover:bg-accent hover:text-foreground"
+              tab === t.id
+                ? "bg-[color:var(--gold)] text-[color:var(--primary-foreground)]"
+                : "text-muted-foreground hover:bg-accent hover:text-foreground",
             )}
           >
             {t.label}
@@ -70,7 +80,6 @@ export function MarketWatch({
           )}
           {list.map((a) => {
             const p = live[a.symbol];
-            const up = (p?.changePct ?? a.changePct) >= 0;
             const isSel = selected === a.symbol;
             return (
               <li
@@ -78,27 +87,34 @@ export function MarketWatch({
                 onClick={() => onSelect(a.symbol)}
                 className={cn(
                   "group flex cursor-pointer items-center justify-between gap-2 px-3 py-2 text-sm transition-colors",
-                  isSel ? "bg-accent" : "hover:bg-accent/60"
+                  isSel ? "bg-accent" : "hover:bg-accent/60",
                 )}
               >
                 <div className="flex min-w-0 items-center gap-2">
                   <button
-                    onClick={(e) => { e.stopPropagation(); toggleFav(a.symbol); }}
-                    className={cn("rounded p-1 text-muted-foreground", favorites.has(a.symbol) && "text-[color:var(--gold)]")}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleFav(a.symbol);
+                    }}
+                    className={cn(
+                      "rounded p-1 text-muted-foreground",
+                      favorites.has(a.symbol) && "text-[color:var(--gold)]",
+                    )}
                   >
-                    <Star className={cn("h-3.5 w-3.5", favorites.has(a.symbol) && "fill-current")} />
+                    <Star
+                      className={cn("h-3.5 w-3.5", favorites.has(a.symbol) && "fill-current")}
+                    />
                   </button>
                   <div className="min-w-0">
                     <div className="truncate font-medium">{a.symbol}</div>
                     <div className="truncate text-[11px] text-muted-foreground">{a.name}</div>
                   </div>
                 </div>
-                <div className="text-right font-mono text-xs">
-                  <div className="text-foreground">{formatPrice(a, p?.price ?? a.price)}</div>
-                  <div className={up ? "text-[color:var(--success)]" : "text-[color:var(--destructive)]"}>
-                    {(p?.changePct ?? a.changePct).toFixed(2)}%
-                  </div>
-                </div>
+                <GatedPrice
+                  asset={a}
+                  price={p?.price ?? a.price}
+                  changePct={p?.changePct ?? a.changePct}
+                />
               </li>
             );
           })}

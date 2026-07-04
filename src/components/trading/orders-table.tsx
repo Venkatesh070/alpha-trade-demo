@@ -13,9 +13,19 @@ export interface OpenOrder {
   openedAt: number;
 }
 
-export function OrdersTable({ orders, onClose }: { orders: OpenOrder[]; onClose?: (id: string) => void }) {
+export function OrdersTable({
+  orders,
+  onClose,
+}: {
+  orders: OpenOrder[];
+  onClose?: (id: string) => void;
+}) {
   if (!orders.length) {
-    return <div className="grid h-full place-items-center p-8 text-center text-sm text-muted-foreground">No open positions yet. Place a trade from the right panel.</div>;
+    return (
+      <div className="grid h-full place-items-center p-8 text-center text-sm text-muted-foreground">
+        No open positions yet. Place a trade from the right panel.
+      </div>
+    );
   }
   return (
     <div className="h-full overflow-auto">
@@ -35,14 +45,36 @@ export function OrdersTable({ orders, onClose }: { orders: OpenOrder[]; onClose?
           {orders.map((o) => (
             <tr key={o.id} className="border-t border-border/60 hover:bg-accent/40">
               <td className="px-3 py-2 font-semibold">{o.symbol}</td>
-              <td className={cn("px-3 py-2 uppercase", o.side === "buy" ? "text-[color:var(--success)]" : "text-[color:var(--destructive)]")}>{o.side}</td>
+              <td
+                className={cn(
+                  "px-3 py-2 uppercase",
+                  o.side === "buy"
+                    ? "text-[color:var(--success)]"
+                    : "text-[color:var(--destructive)]",
+                )}
+              >
+                {o.side}
+              </td>
               <td className="px-3 py-2 text-right">{o.qty}</td>
               <td className="px-3 py-2 text-right">{o.price.toFixed(4)}</td>
-              <td className={cn("px-3 py-2 text-right", o.pnl >= 0 ? "text-[color:var(--success)]" : "text-[color:var(--destructive)]")}>{o.pnl >= 0 ? "+" : ""}{o.pnl.toFixed(2)}</td>
+              <td
+                className={cn(
+                  "px-3 py-2 text-right",
+                  o.pnl >= 0 ? "text-[color:var(--success)]" : "text-[color:var(--destructive)]",
+                )}
+              >
+                {o.pnl >= 0 ? "+" : ""}
+                {o.pnl.toFixed(2)}
+              </td>
               <td className="px-3 py-2 capitalize text-muted-foreground">{o.type}</td>
               <td className="px-3 py-2 text-right">
                 {onClose && (
-                  <Button size="sm" variant="ghost" onClick={() => onClose(o.id)} className="h-7 px-2">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => onClose(o.id)}
+                    className="h-7 px-2"
+                  >
                     <X className="h-3.5 w-3.5" />
                   </Button>
                 )}
