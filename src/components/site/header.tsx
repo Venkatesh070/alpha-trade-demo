@@ -59,7 +59,7 @@ export function SiteHeader() {
                 <Link to="/login">Login</Link>
               </Button>
               <Button asChild className="gold-button hover:gold-button-hover">
-                <Link to="/register"> Account</Link>
+                <Link to="/register">Open Account</Link>
               </Button>
             </>
           )}
