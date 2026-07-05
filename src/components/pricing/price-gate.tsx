@@ -192,17 +192,17 @@ export function PriceLockBanner({ className }: { className?: string }) {
     <div
       className={cn(
         "flex flex-wrap items-center justify-between gap-3 rounded-xl border px-4 py-3 sm:px-5 sm:py-3.5",
-        "border-amber-200/80 bg-amber-50/90",
+        "border-[color:var(--gold)]/25 bg-[color:var(--gold)]/10",
         "dark:border-[color:var(--gold)]/30 dark:bg-[color:var(--gold)]/8",
         className,
       )}
     >
       <div className="flex items-center gap-2.5 text-sm">
-        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-amber-100 dark:bg-[color:var(--gold)]/15">
-          <Lock className="h-4 w-4 text-amber-700 dark:text-[color:var(--gold)]" />
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[color:var(--gold)]/20 dark:bg-[color:var(--gold)]/15">
+          <Lock className="h-4 w-4 text-[color:var(--gold-deep)] dark:text-[color:var(--gold)]" />
         </span>
-        <span className="text-amber-900/80 dark:text-muted-foreground">
-          Deposit <strong className="text-amber-950 dark:text-foreground">₹{minBalance.toLocaleString()}</strong> to
+        <span className="text-foreground/80 dark:text-muted-foreground">
+          Deposit <strong className="text-foreground">₹{minBalance.toLocaleString()}</strong> to
           unlock live market prices
         </span>
       </div>
@@ -221,13 +221,7 @@ export function PriceLockInline({ className }: { className?: string }) {
     <Button
       asChild
       size="sm"
-      variant="outline"
-      className={cn(
-        "h-7 gap-1.5 px-2.5 text-xs",
-        "border-amber-300/70 text-amber-800 hover:bg-amber-50",
-        "dark:border-[color:var(--gold)]/30 dark:text-[color:var(--gold)]",
-        className,
-      )}
+      className={cn("h-7 gap-1.5 px-2.5 text-xs font-semibold", className)}
     >
       <Link to="/app/wallet/deposit">
         <Lock className="h-3 w-3" />

@@ -77,8 +77,8 @@ function SidebarFooter() {
 
   return (
     <div className="shrink-0 border-t border-border/40 px-4 py-4">
-      <div className="rounded-xl border border-amber-200/80 bg-amber-50 px-3.5 py-3.5 dark:border-[color:var(--gold)]/25 dark:bg-[color:var(--gold)]/5">
-        <div className="flex items-center gap-2 text-xs font-medium text-amber-800 dark:text-[color:var(--gold)]">
+      <div className="rounded-xl border border-[color:var(--gold)]/25 bg-[color:var(--gold)]/10 px-3.5 py-3.5 dark:border-[color:var(--gold)]/25 dark:bg-[color:var(--gold)]/5">
+        <div className="flex items-center gap-2 text-xs font-medium text-[color:var(--gold-deep)] dark:text-[color:var(--gold)]">
           <Lock className="h-3.5 w-3.5" />
           Markets locked
         </div>
@@ -125,8 +125,8 @@ export function AppSidebar({ onNavigate }: { onNavigate?: () => void }) {
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
                         active
-                          ? "border-l-2 border-[color:var(--gold-deep)] bg-sidebar-accent pl-[10px] font-medium text-sidebar-foreground shadow-sm dark:border-[color:var(--gold)] dark:shadow-none"
-                          : "border-l-2 border-transparent text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground",
+                          ? "border-l-2 border-[color:var(--gold)] bg-[color:var(--gold)]/12 pl-[10px] font-semibold text-foreground shadow-sm dark:bg-sidebar-accent dark:text-sidebar-foreground dark:shadow-none"
+                          : "border-l-2 border-transparent text-sidebar-foreground/70 hover:bg-[color:var(--gold)]/6 hover:text-foreground dark:hover:bg-sidebar-accent/60 dark:hover:text-sidebar-foreground",
                   )}
                 >
                       <Icon

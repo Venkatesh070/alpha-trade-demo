@@ -1,30 +1,71 @@
 import { cn } from "@/lib/utils";
 
-export function Logo({ className, mark = false }: { className?: string; mark?: boolean }) {
+const MARK = "/logo.png";
+const TEXT = "/logo-text.png";
+
+const SIZES = {
+  sm: { mark: "h-7 w-7", textBox: "h-3.5", textImg: "h-6" },
+  md: { mark: "h-8 w-8", textBox: "h-4", textImg: "h-7" },
+  lg: { mark: "h-10 w-10", textBox: "h-5", textImg: "h-9" },
+} as const;
+
+function LogoText({
+  textBox,
+  textImg,
+  className,
+}: {
+  textBox: string;
+  textImg: string;
+  className?: string;
+}) {
   return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-2 font-display font-extrabold tracking-tight",
-        className,
-      )}
-    >
-      <span className="relative inline-grid h-8 w-8 place-items-center rounded-lg glossy">
-        <span
-          className="absolute inset-0 rounded-lg"
-          style={{
-            background:
-              "linear-gradient(135deg, var(--gold-soft), var(--gold) 50%, var(--gold-deep))",
-            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5), inset 0 -1px 0 rgba(0,0,0,0.2)",
-          }}
-        />
-        <span className="relative text-[color:var(--primary-foreground)] text-sm font-black">
-          E
-        </span>
-      </span>
+    <span className={cn("inline-flex shrink-0 items-center overflow-hidden", textBox, className)}>
+      <img
+        src={TEXT}
+        alt="exness"
+        className={cn(textImg, "block w-auto max-w-none object-contain mix-blend-multiply dark:hidden")}
+      />
+      <img
+        src={TEXT}
+        alt="exness"
+        className={cn(
+          textImg,
+          "hidden w-auto max-w-none object-contain dark:block dark:invert dark:mix-blend-screen",
+        )}
+      />
+    </span>
+  );
+}
+
+export function Logo({
+  className,
+  mark = false,
+  size = "md",
+  showRegion = true,
+}: {
+  className?: string;
+  mark?: boolean;
+  size?: keyof typeof SIZES;
+  showRegion?: boolean;
+}) {
+  const s = SIZES[size];
+
+  return (
+    <span className={cn("inline-flex items-center gap-2", className)}>
+      <img
+        src={MARK}
+        alt=""
+        aria-hidden
+        className={cn(s.mark, "block shrink-0 rounded-full object-cover")}
+      />
       {!mark && (
-        <span className="leading-none">
-          <span className="gold-text">EXNESS</span>
-          <span className="ml-1 text-foreground/90">INDIA</span>
+        <span className="inline-flex items-center gap-1.5">
+          <LogoText textBox={s.textBox} textImg={s.textImg} />
+          {showRegion && (
+            <span className="text-[11px] font-semibold leading-none tracking-wide text-muted-foreground">
+              India
+            </span>
+          )}
         </span>
       )}
     </span>

@@ -18,7 +18,7 @@ export function AppTopbar({ onMenu }: { onMenu: () => void }) {
   const nav = useNavigate();
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border/60 bg-background/95 px-4 backdrop-blur-xl">
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border/60 bg-background/95 px-4 backdrop-blur-xl light:shadow-sm light:shadow-black/[0.03]">
       <button
         onClick={onMenu}
         className="grid h-9 w-9 place-items-center rounded-md border border-border/60 lg:hidden"

@@ -31,7 +31,7 @@ function AppLayout() {
         )}
         <div className="flex min-w-0 flex-1 flex-col bg-background">
           <AppTopbar onMenu={() => setMobileOpen(true)} />
-          <main className="relative min-h-0 flex-1 overflow-y-auto bg-background dark:bg-gradient-to-b dark:from-background dark:via-background dark:to-surface/30">
+          <main className="relative min-h-0 flex-1 overflow-y-auto bg-surface-2/35 dark:bg-gradient-to-b dark:from-background dark:via-background dark:to-surface/30">
             <Outlet />
           </main>
         </div>

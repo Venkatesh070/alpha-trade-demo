@@ -22,7 +22,7 @@ export function TradingChart({ symbol, timeframe }: { symbol: string; timeframe:
       layout: {
         background: { color: "transparent" },
         textColor: "rgba(245,240,224,0.7)",
-        fontFamily: "JetBrains Mono, ui-monospace, monospace",
+        fontFamily: "Montserrat, ui-sans-serif, sans-serif",
       },
       grid: {
         vertLines: { color: "rgba(255,255,255,0.04)" },
@@ -35,8 +35,8 @@ export function TradingChart({ symbol, timeframe }: { symbol: string; timeframe:
         secondsVisible: false,
       },
       crosshair: {
-        vertLine: { color: "rgba(250,204,21,0.4)", labelBackgroundColor: "#FACC15" },
-        horzLine: { color: "rgba(250,204,21,0.4)", labelBackgroundColor: "#FACC15" },
+        vertLine: { color: "rgba(255,209,12,0.4)", labelBackgroundColor: "#FFD10C" },
+        horzLine: { color: "rgba(255,209,12,0.4)", labelBackgroundColor: "#FFD10C" },
       },
     });
 

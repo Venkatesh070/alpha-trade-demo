@@ -1,15 +1,10 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
-@import "@fontsource/sora/400.css";
-@import "@fontsource/sora/600.css";
-@import "@fontsource/sora/700.css";
-@import "@fontsource/sora/800.css";
-@import "@fontsource/manrope/400.css";
-@import "@fontsource/manrope/500.css";
-@import "@fontsource/manrope/600.css";
-@import "@fontsource/jetbrains-mono/400.css";
-@import "@fontsource/jetbrains-mono/500.css";
+@import "@fontsource/montserrat/400.css";
+@import "@fontsource/montserrat/500.css";
+@import "@fontsource/montserrat/600.css";
+@import "@fontsource/montserrat/700.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -69,9 +64,9 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-display: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Montserrat", ui-sans-serif, system-ui, sans-serif;
 }
 
 /* Dark is the canonical theme. */
@@ -89,13 +84,13 @@
   --popover: oklch(0.18 0.02 165);
   --popover-foreground: oklch(0.97 0.01 95);
 
-  /* Primary = glossy gold */
-  --gold: oklch(0.84 0.16 90); /* #FACC15-ish */
-  --gold-deep: oklch(0.72 0.14 80); /* deeper gold */
-  --gold-soft: oklch(0.93 0.1 95); /* highlight */
+  /* Primary = Exness brand yellow #FFD10C */
+  --gold: #FFD10C;
+  --gold-deep: #E0B800;
+  --gold-soft: #FFE566;
   --emerald-ink: oklch(0.3 0.06 165);
 
-  --primary: var(--gold);
+  --primary: #FFD10C;
   --primary-foreground: oklch(0.16 0.02 165);
 
   --secondary: oklch(0.26 0.02 165);
@@ -118,7 +113,7 @@
   --input: oklch(1 0 0 / 10%);
   --ring: var(--gold);
 
-  --chart-1: oklch(0.84 0.16 90);
+  --chart-1: #FFD10C;
   --chart-2: oklch(0.74 0.17 150);
   --chart-3: oklch(0.65 0.22 25);
   --chart-4: oklch(0.7 0.14 200);
@@ -147,13 +142,13 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.22 0.04 165);
 
-  --gold: oklch(0.72 0.15 82);
-  --gold-deep: oklch(0.58 0.13 72);
-  --gold-soft: oklch(0.9 0.1 92);
+  --gold: #FFD10C;
+  --gold-deep: #E0B800;
+  --gold-soft: #FFE566;
   --emerald-ink: oklch(0.32 0.06 165);
 
-  --primary: var(--gold-deep);
-  --primary-foreground: oklch(1 0 0);
+  --primary: #FFD10C;
+  --primary-foreground: oklch(0.16 0.02 165);
 
   --secondary: oklch(0.96 0.008 165);
   --secondary-foreground: oklch(0.22 0.04 165);
@@ -173,9 +168,9 @@
 
   --border: oklch(0.9 0.012 165);
   --input: oklch(0.92 0.01 165);
-  --ring: var(--gold-deep);
+  --ring: #FFD10C;
 
-  --chart-1: oklch(0.72 0.15 82);
+  --chart-1: #FFD10C;
   --chart-2: oklch(0.52 0.16 150);
   --chart-3: oklch(0.55 0.2 25);
   --chart-4: oklch(0.55 0.12 200);
@@ -183,12 +178,12 @@
 
   --sidebar: oklch(0.985 0.005 165);
   --sidebar-foreground: oklch(0.22 0.04 165);
-  --sidebar-primary: var(--gold-deep);
-  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-primary: #FFD10C;
+  --sidebar-primary-foreground: oklch(0.16 0.02 165);
   --sidebar-accent: oklch(0.955 0.01 165);
   --sidebar-accent-foreground: oklch(0.22 0.04 165);
   --sidebar-border: oklch(0.9 0.012 165);
-  --sidebar-ring: var(--gold-deep);
+  --sidebar-ring: #FFD10C;
 }
 
 @utility glossy {
@@ -221,23 +216,42 @@
 }
 
 @utility gold-button {
-  background: linear-gradient(180deg, var(--gold-soft) 0%, var(--gold) 50%, var(--gold-deep) 100%);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--gold-soft) 65%, var(--gold-deep));
+  background:
+    linear-gradient(
+      155deg,
+      rgba(255, 255, 255, 0.7) 0%,
+      rgba(255, 255, 255, 0.22) 24%,
+      rgba(255, 255, 255, 0.05) 44%,
+      rgba(255, 255, 255, 0) 58%
+    ),
+    linear-gradient(180deg, var(--gold-soft) 0%, var(--gold) 50%, var(--gold-deep) 100%);
   color: var(--primary-foreground);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.15),
-    0 8px 24px -8px color-mix(in oklab, var(--gold) 60%, transparent);
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.14),
+    inset 0 0 14px rgba(255, 255, 255, 0.06),
+    0 6px 18px -6px color-mix(in oklab, var(--gold) 72%, transparent),
+    0 1px 0 rgba(255, 255, 255, 0.12);
   transition:
     transform 0.18s ease,
     box-shadow 0.18s ease,
-    filter 0.18s ease;
+    filter 0.18s ease,
+    border-color 0.18s ease;
 }
 @utility gold-button-hover {
-  filter: brightness(1.05);
+  filter: brightness(1.05) saturate(1.04);
   transform: translateY(-1px);
+  border-color: color-mix(in oklab, var(--gold-soft) 85%, white);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.6),
-    0 14px 36px -10px color-mix(in oklab, var(--gold) 70%, transparent);
+    inset 0 1px 0 rgba(255, 255, 255, 0.88),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 0 18px rgba(255, 255, 255, 0.1),
+    0 10px 28px -8px color-mix(in oklab, var(--gold) 82%, transparent),
+    0 2px 0 rgba(255, 255, 255, 0.18);
 }
 
 @utility ring-gold {
@@ -297,6 +311,26 @@
   animation: pulse-gold 2.2s ease-out infinite;
 }
 
+@layer components {
+  .gold-button:active:not(:disabled) {
+    transform: translateY(0);
+    filter: brightness(0.97);
+    box-shadow:
+      inset 0 2px 6px rgba(0, 0, 0, 0.16),
+      inset 0 1px 0 rgba(255, 255, 255, 0.35),
+      0 2px 8px -4px color-mix(in oklab, var(--gold) 55%, transparent);
+  }
+
+  .light .gold-button:active:not(:disabled) {
+    transform: translateY(1px);
+    filter: brightness(0.98);
+    box-shadow:
+      inset 0 3px 8px rgba(160, 120, 0, 0.22),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25),
+      0 2px 8px -4px color-mix(in oklab, var(--gold-deep) 45%, transparent);
+  }
+}
+
 @layer base {
   * {
     border-color: var(--color-border);
@@ -316,9 +350,21 @@
   h3,
   h4,
   h5,
+  h6,
+  button,
+  input,
+  select,
+  textarea {
+    font-family: inherit;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
   h6 {
-    font-family: var(--font-display);
-    letter-spacing: -0.015em;
+    letter-spacing: -0.02em;
   }
 
   ::selection {
@@ -363,16 +409,18 @@
   /* Light mode cards — clean elevation instead of dark glass */
   .light .glossy {
     background: var(--card);
-    border: 1px solid var(--border);
+    border: 1px solid oklch(0.9 0.012 165 / 90%);
     box-shadow:
-      0 1px 2px oklch(0.22 0.04 165 / 4%),
-      0 6px 20px oklch(0.22 0.04 165 / 5%);
+      0 1px 2px oklch(0.22 0.04 165 / 5%),
+      0 8px 24px oklch(0.22 0.04 165 / 6%);
   }
 
   .light .glossy-soft {
     background: var(--card);
-    border: 1px solid var(--border);
-    box-shadow: 0 1px 3px oklch(0.22 0.04 165 / 5%);
+    border: 1px solid oklch(0.9 0.012 165 / 85%);
+    box-shadow:
+      0 1px 2px oklch(0.22 0.04 165 / 4%),
+      0 4px 14px oklch(0.22 0.04 165 / 5%);
   }
 
   .light .gold-text {
@@ -383,9 +431,26 @@
   }
 
   .light .gold-button {
-    color: oklch(1 0 0);
+    font-weight: 600;
+    color: var(--primary-foreground);
+    border: 1px solid color-mix(in oklab, var(--gold-deep) 35%, var(--gold));
+    background: linear-gradient(180deg, var(--gold-soft) 0%, var(--gold) 55%, var(--gold-deep) 100%);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.35),
-      0 4px 14px -4px color-mix(in oklab, var(--gold-deep) 55%, transparent);
+      inset 0 -2px 4px rgba(160, 120, 0, 0.2),
+      0 2px 0 color-mix(in oklab, var(--gold-deep) 70%, black),
+      0 6px 16px -4px color-mix(in oklab, var(--gold) 50%, transparent);
+  }
+
+  .light .gold-button-hover,
+  .light .gold-button:hover {
+    filter: brightness(1.03) saturate(1.04);
+    transform: translateY(-1px);
+    border-color: color-mix(in oklab, var(--gold-deep) 30%, var(--gold-soft));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.45),
+      inset 0 -2px 4px rgba(160, 120, 0, 0.16),
+      0 3px 0 color-mix(in oklab, var(--gold-deep) 65%, black),
+      0 10px 24px -6px color-mix(in oklab, var(--gold) 58%, transparent);
   }
 }

@@ -18,7 +18,7 @@ const HOLDINGS = [
   { sym: "WTI", qty: 30, avg: 74.2, alloc: 10 },
 ];
 
-const COLORS = ["#FACC15", "#22c55e", "#60a5fa", "#f472b6", "#a78bfa", "#fb923c"];
+const COLORS = ["#FFD10C", "#22c55e", "#60a5fa", "#f472b6", "#a78bfa", "#fb923c"];
 
 export const Route = createFileRoute("/app/portfolio")({
   component: PortfolioPage,
