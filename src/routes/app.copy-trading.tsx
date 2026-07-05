@@ -11,7 +11,7 @@ import { StatusBadge } from "@/components/dashboard/status-badge";
 import {
   GatedNumber,
   PriceLockBanner,
-  usePriceAccess,
+  GatedChart,
 } from "@/components/pricing/price-gate";
 import { cn } from "@/lib/utils";
 
@@ -21,7 +21,6 @@ export const Route = createFileRoute("/app/copy-trading")({
 
 function CopyPage() {
   const [followed, setFollowed] = useState<Set<string>>(new Set());
-  const { canViewPrices } = usePriceAccess();
   const toggle = (t: TopTrader) => {
     setFollowed((p) => {
       const n = new Set(p);
@@ -70,18 +69,9 @@ function CopyPage() {
               </StatusBadge>
             </div>
 
-            <div className="relative mt-4 h-16 rounded-lg bg-surface/50 p-2">
-              <Sparkline
-                points={sparklineFor(t.id)}
-                up
-                className={cn("h-full w-full", !canViewPrices && "blur-md opacity-40")}
-              />
-              {!canViewPrices && (
-                <div className="absolute inset-0 flex items-center justify-center gap-1.5">
-                  <Lock className="h-4 w-4 text-[color:var(--gold)]" />
-                </div>
-              )}
-            </div>
+            <GatedChart className="mt-4 h-16 rounded-lg bg-surface/50 p-2">
+              <Sparkline points={sparklineFor(t.id)} up className="h-full w-full" />
+            </GatedChart>
 
             <dl className="mt-4 grid grid-cols-3 gap-2 text-center">
               <div className="rounded-lg border border-border/50 bg-surface/40 px-2 py-2">

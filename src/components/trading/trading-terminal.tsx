@@ -4,6 +4,7 @@ import { OrderPanel } from "@/components/trading/order-panel";
 import { OrdersTable, type OpenOrder } from "@/components/trading/orders-table";
 import { TradingChart } from "@/components/trading/chart";
 import { TradingDisabledOverlay } from "@/components/trading/trading-disabled-overlay";
+import { GatedChart } from "@/components/pricing/price-gate";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Maximize2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -99,7 +100,7 @@ export function TradingTerminal({ className }: { className?: string }) {
           </div>
         </div>
 
-        <div className="relative min-h-[300px] flex-1">
+        <GatedChart className="relative min-h-[300px] flex-1" lockSize="lg">
           {mounted ? (
             <TradingChart symbol={symbol} timeframe={tf} />
           ) : (
@@ -107,7 +108,7 @@ export function TradingTerminal({ className }: { className?: string }) {
               Loading chart…
             </div>
           )}
-        </div>
+        </GatedChart>
 
         <div className="h-64 border-t border-border/60">
           <Tabs defaultValue="open" className="flex h-full flex-col">

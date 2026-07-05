@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/site/logo";
 import { Button } from "@/components/ui/button";
-import { usePriceAccess } from "@/components/pricing/price-gate";
+import { depositUnlockText, usePriceAccess } from "@/components/pricing/price-gate";
 import { useWallet } from "@/hooks/use-wallet";
 import { cn } from "@/lib/utils";
 
@@ -83,12 +83,12 @@ function SidebarFooter() {
           Markets locked
         </div>
         <p className="mt-2 font-mono text-sm tabular-nums">
-          ₹{balance.toLocaleString()}
-          <span className="text-muted-foreground"> / ₹{minBalance.toLocaleString()}</span>
+         Balance: ₹{balance.toLocaleString()}
+          {/* <span className="text-muted-foreground"> / ₹{minBalance.toLocaleString()}</span> */}
         </p>
         {shortfall > 0 && (
-          <p className="mt-1 text-[11px] text-muted-foreground">
-            ₹{shortfall.toLocaleString()} more to unlock
+          <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
+            {depositUnlockText()}
           </p>
         )}
         <Button asChild size="sm" className="gold-button hover:gold-button-hover mt-3 h-8 w-full text-xs">

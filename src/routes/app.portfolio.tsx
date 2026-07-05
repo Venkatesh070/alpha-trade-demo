@@ -7,7 +7,7 @@ import { StatCard } from "@/components/dashboard/stat-card";
 import { DataPanel } from "@/components/dashboard/data-panel";
 import { DataTable, DataTableHead, DataTableRow, Th, Td } from "@/components/dashboard/data-table";
 import { ALL_ASSETS, sparklineFor } from "@/data/markets";
-import { GatedNumber, PriceLockBanner } from "@/components/pricing/price-gate";
+import { GatedNumber, PriceLockBanner, GatedChart } from "@/components/pricing/price-gate";
 
 const HOLDINGS = [
   { sym: "BTC/USD", qty: 0.18, avg: 64200, alloc: 28 },
@@ -113,7 +113,9 @@ function PortfolioPage() {
                     />
                   </Td>
                   <Td>
-                    <Sparkline points={sparklineFor(h.sym)} up={up} className="w-24" />
+                    <GatedChart className="w-24" showMessage>
+                      <Sparkline points={sparklineFor(h.sym)} up={up} className="h-8 w-24" />
+                    </GatedChart>
                   </Td>
                 </DataTableRow>
               );

@@ -19,7 +19,7 @@ import { StatusBadge } from "@/components/dashboard/status-badge";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { useLivePrices } from "@/hooks/use-live-prices";
-import { GatedPrice, GatedNumber, PriceLockBanner } from "@/components/pricing/price-gate";
+import { GatedPrice, GatedNumber, PriceLockBanner, GatedChart } from "@/components/pricing/price-gate";
 import { ALL_ASSETS, sparklineFor } from "@/data/markets";
 import { NEWS } from "@/data/content";
 import { cn } from "@/lib/utils";
@@ -232,14 +232,16 @@ function DashboardPage() {
                   </motion.div>
                 </div>
               </div>
-              <motion.div
-                className="h-56 px-4 py-5 sm:h-64 sm:px-6 sm:py-6"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.6, delay: 0.35 }}
-              >
-                <Sparkline points={portfolioPoints} up animated className="h-full w-full" />
-              </motion.div>
+              <GatedChart className="h-56 px-4 py-5 sm:h-64 sm:px-6 sm:py-6" lockSize="lg">
+                <motion.div
+                  className="h-full w-full"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.6, delay: 0.35 }}
+                >
+                  <Sparkline points={portfolioPoints} up animated className="h-full w-full" />
+                </motion.div>
+              </GatedChart>
             </DataPanel>
           </motion.div>
 

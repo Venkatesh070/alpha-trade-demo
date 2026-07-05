@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/accordion";
 import { ALL_ASSETS, sparklineFor } from "@/data/markets";
 import { FAQS, FEATURES, PRICING, TESTIMONIALS } from "@/data/content";
-import { GatedPrice, PriceLockBanner } from "@/components/pricing/price-gate";
+import { GatedPrice, PriceLockBanner, GatedChart } from "@/components/pricing/price-gate";
 
 const ICON_MAP = {
   Zap,
@@ -202,9 +202,9 @@ function LandingPage() {
                     changeClassName="text-xs"
                   />
                 </div>
-                <div className="mt-4">
+                <GatedChart className="mt-4 h-16">
                   <Sparkline points={points} up={up} className="h-16 w-full" />
-                </div>
+                </GatedChart>
                 <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
                   <span>
                     Spread {a.spread}p · 1:{a.leverage}
@@ -406,7 +406,7 @@ function HeroChartCard() {
           </div>
         </div>
       </div>
-      <div className="relative h-64 w-full rounded-xl bg-[color:var(--surface-2)]/60 p-2">
+      <GatedChart className="relative h-64 w-full rounded-xl bg-[color:var(--surface-2)]/60 p-2" lockSize="lg">
         <Sparkline points={points} up className="h-full w-full" />
         <div
           className="pointer-events-none absolute inset-0 rounded-xl"
@@ -415,7 +415,7 @@ function HeroChartCard() {
               "radial-gradient(60% 40% at 80% 20%, rgba(250,204,21,0.18), transparent 60%)",
           }}
         />
-      </div>
+      </GatedChart>
       <div className="mt-3 grid grid-cols-3 gap-2 px-2 text-[11px] text-muted-foreground">
         <div>
           Open<div className="font-mono text-foreground">67,210</div>
@@ -434,8 +434,8 @@ function HeroChartCard() {
 function FakeChartPreview() {
   const points = sparklineFor("PREVIEW", 60);
   return (
-    <div className="relative h-48 w-full rounded-xl bg-[color:var(--surface-2)]/60 p-3">
+    <GatedChart className="relative h-48 w-full rounded-xl bg-[color:var(--surface-2)]/60 p-3" lockSize="lg">
       <Sparkline points={points} up className="h-full w-full" />
-    </div>
+    </GatedChart>
   );
 }

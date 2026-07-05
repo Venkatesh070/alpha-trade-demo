@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Lock } from "lucide-react";
+import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/hooks/use-live-prices";
 import { MIN_TRADING_BALANCE, useWallet } from "@/hooks/use-wallet";
@@ -12,6 +13,96 @@ export function usePriceAccess() {
     balance,
     minBalance: MIN_TRADING_BALANCE,
   };
+}
+
+export const DEPOSIT_UNLOCK_MESSAGE =
+  "Deposit the amount to start trading and unlock all features.";
+
+export function depositUnlockText() {
+  return DEPOSIT_UNLOCK_MESSAGE;
+}
+
+export function DepositButton({
+  className,
+  size = "sm",
+  label = "Deposit",
+}: {
+  className?: string;
+  size?: "sm" | "default" | "lg";
+  label?: string;
+}) {
+  return (
+    <Button
+      asChild
+      size={size}
+      className={cn("gold-button hover:gold-button-hover shrink-0", className)}
+    >
+      <Link to="/app/wallet/deposit">{label}</Link>
+    </Button>
+  );
+}
+
+const LOCK_SIZES = {
+  sm: "h-3.5 w-3.5",
+  md: "h-4 w-4",
+  lg: "h-6 w-6",
+} as const;
+
+/** Blurs charts/sparklines when balance is below the minimum deposit. */
+export function GatedChart({
+  children,
+  className,
+  lockSize = "md",
+  showMessage,
+  showDepositButton,
+}: {
+  children: ReactNode;
+  className?: string;
+  lockSize?: keyof typeof LOCK_SIZES;
+  showMessage?: boolean;
+  showDepositButton?: boolean;
+}) {
+  const { canViewPrices } = usePriceAccess();
+  const messageVisible = showMessage ?? lockSize !== "sm";
+  const depositVisible = showDepositButton ?? messageVisible;
+
+  if (canViewPrices) {
+    return <div className={className}>{children}</div>;
+  }
+
+  return (
+    <div
+      className={cn(
+        "relative overflow-hidden",
+        depositVisible && lockSize === "lg" && "min-h-36 sm:min-h-40",
+        depositVisible && lockSize === "md" && "min-h-20 sm:min-h-24",
+        messageVisible && !depositVisible && "min-h-14 sm:min-h-16",
+        className,
+      )}
+    >
+      <div className="pointer-events-none h-full w-full select-none blur-md opacity-40">{children}</div>
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-3 py-2 text-center">
+        <Lock className={cn(LOCK_SIZES[lockSize], "shrink-0 text-[color:var(--gold)]")} />
+        {messageVisible && (
+          <p
+            className={cn(
+              "font-medium leading-snug text-foreground/90",
+              lockSize === "lg" ? "max-w-xs text-sm" : "max-w-[10rem] text-[10px] sm:max-w-xs sm:text-xs",
+            )}
+          >
+            {DEPOSIT_UNLOCK_MESSAGE}
+          </p>
+        )}
+        {depositVisible && (
+          <DepositButton
+            size={lockSize === "lg" ? "default" : "sm"}
+            label={lockSize === "lg" ? "Deposit funds" : "Deposit"}
+            className={lockSize === "lg" ? "mt-1 h-9 px-4 text-xs" : "h-7 px-3 text-[10px] sm:text-xs"}
+          />
+        )}
+      </div>
+    </div>
+  );
 }
 
 export function MaskedPriceValue({
@@ -185,7 +276,7 @@ export function GatedNumber({
 }
 
 export function PriceLockBanner({ className }: { className?: string }) {
-  const { canViewPrices, minBalance } = usePriceAccess();
+  const { canViewPrices } = usePriceAccess();
   if (canViewPrices) return null;
 
   return (
@@ -202,13 +293,10 @@ export function PriceLockBanner({ className }: { className?: string }) {
           <Lock className="h-4 w-4 text-[color:var(--gold-deep)] dark:text-[color:var(--gold)]" />
         </span>
         <span className="text-foreground/80 dark:text-muted-foreground">
-          Deposit <strong className="text-foreground">₹{minBalance.toLocaleString()}</strong> to
-          unlock live market prices
+          {depositUnlockText()}
         </span>
       </div>
-      <Button asChild size="sm" className="gold-button hover:gold-button-hover shrink-0">
-        <Link to="/app/wallet/deposit">Deposit funds</Link>
-      </Button>
+      <DepositButton size="sm" label="Deposit funds" />
     </div>
   );
 }
@@ -218,15 +306,10 @@ export function PriceLockInline({ className }: { className?: string }) {
   if (canViewPrices) return null;
 
   return (
-    <Button
-      asChild
+    <DepositButton
       size="sm"
       className={cn("h-7 gap-1.5 px-2.5 text-xs font-semibold", className)}
-    >
-      <Link to="/app/wallet/deposit">
-        <Lock className="h-3 w-3" />
-        Deposit
-      </Link>
-    </Button>
+      label="Deposit"
+    />
   );
 }

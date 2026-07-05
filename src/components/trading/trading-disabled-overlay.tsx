@@ -1,6 +1,5 @@
-import { Link } from "@tanstack/react-router";
 import { Lock } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { depositUnlockText, DepositButton } from "@/components/pricing/price-gate";
 import { MIN_TRADING_BALANCE } from "@/hooks/use-wallet";
 
 export function TradingDisabledOverlay({ balance }: { balance: number }) {
@@ -13,10 +12,7 @@ export function TradingDisabledOverlay({ balance }: { balance: number }) {
           <Lock className="h-6 w-6 text-[color:var(--gold)]" />
         </div>
         <h3 className="mt-4 font-display text-lg font-bold">Trading unavailable</h3>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Deposit ₹{MIN_TRADING_BALANCE.toLocaleString()} to unlock live prices and trading. You can
-          still browse symbols in the market list.
-        </p>
+        <p className="mt-2 text-sm text-muted-foreground">{depositUnlockText()}</p>
         <p className="mt-3 font-mono text-sm">
           Balance:{" "}
           <span className="text-[color:var(--destructive)]">₹{balance.toLocaleString()}</span>
@@ -27,9 +23,7 @@ export function TradingDisabledOverlay({ balance }: { balance: number }) {
             </span>
           )}
         </p>
-        <Button asChild className="gold-button hover:gold-button-hover mt-5 w-full">
-          <Link to="/app/wallet/deposit">Deposit funds</Link>
-        </Button>
+        <DepositButton size="default" label="Deposit funds" className="mt-5 w-full" />
       </div>
     </div>
   );

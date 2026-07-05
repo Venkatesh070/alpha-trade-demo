@@ -6,7 +6,7 @@ import { SiteFooter } from "@/components/site/footer";
 import { Sparkline } from "@/components/site/sparkline";
 import { ALL_ASSETS, ASSETS_BY_CATEGORY, type AssetCategory, sparklineFor } from "@/data/markets";
 import { useLivePrices } from "@/hooks/use-live-prices";
-import { GatedChange, GatedPriceText, PriceLockBanner } from "@/components/pricing/price-gate";
+import { GatedChange, GatedPriceText, PriceLockBanner, GatedChart } from "@/components/pricing/price-gate";
 import { cn } from "@/lib/utils";
 
 const TABS: { id: AssetCategory | "all"; label: string }[] = [
@@ -121,7 +121,9 @@ function MarketsPage() {
                       <td className="px-4 py-3 text-right">1:{a.leverage}</td>
                       <td className="px-4 py-3 text-right">{a.volume}</td>
                       <td className="px-4 py-3">
-                        <Sparkline points={sparklineFor(a.symbol)} up={up} />
+                        <GatedChart className="w-24" showMessage>
+                          <Sparkline points={sparklineFor(a.symbol)} up={up} className="h-8 w-24" />
+                        </GatedChart>
                       </td>
                     </tr>
                   );

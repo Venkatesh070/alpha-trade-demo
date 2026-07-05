@@ -1,12 +1,12 @@
 import { useLivePrices, formatPrice } from "@/hooks/use-live-prices";
 import { ALL_ASSETS } from "@/data/markets";
-import { usePriceAccess } from "@/components/pricing/price-gate";
+import { usePriceAccess, depositUnlockText } from "@/components/pricing/price-gate";
 import { ArrowDownRight, ArrowUpRight, Lock } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
 export function Ticker() {
   const live = useLivePrices(2500);
-  const { canViewPrices, minBalance } = usePriceAccess();
+  const { canViewPrices } = usePriceAccess();
   const items = ALL_ASSETS.slice(0, 16);
 
   if (!canViewPrices) {
@@ -15,9 +15,7 @@ export function Ticker() {
         {Array.from({ length: 6 }).map((_, i) => (
           <div key={i} className="flex items-center gap-2 text-sm">
             <Lock className="h-3.5 w-3.5 text-[color:var(--gold)]" />
-            <span className="text-muted-foreground">
-              Deposit ₹{minBalance.toLocaleString()} to unlock live prices
-            </span>
+            <span className="text-muted-foreground">{depositUnlockText()}</span>
             <Link
               to="/app/wallet/deposit"
               className="rounded-md bg-[color:var(--gold)]/15 px-2.5 py-0.5 text-xs font-semibold text-[color:var(--gold)] hover:bg-[color:var(--gold)]/25"

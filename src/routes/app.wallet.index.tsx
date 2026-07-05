@@ -55,7 +55,7 @@ function WalletPage() {
                 })}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
-                Demo funds · deposit ₹5,000+ to enable trading
+                Demo funds · deposit the amount to enable trading
               </p>
             </div>
             <span className="grid h-11 w-11 place-items-center rounded-xl bg-[color:var(--gold)]/10">
