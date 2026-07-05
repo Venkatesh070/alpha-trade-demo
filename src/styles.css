@@ -311,6 +311,70 @@
   animation: pulse-gold 2.2s ease-out infinite;
 }
 
+@keyframes sparkline-reveal {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes sparkline-dot-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes sparkline-pulse-ring {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.12;
+    transform: scale(1.8);
+  }
+}
+
+@keyframes sparkline-grid-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@layer components {
+  .sparkline-animated .sparkline-chart {
+    clip-path: inset(0 100% 0 0);
+    animation: sparkline-reveal 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  .sparkline-animated .sparkline-end-marker {
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: sparkline-dot-in 0.4s ease-out 1.35s forwards;
+  }
+
+  .sparkline-animated .sparkline-end-marker circle:first-child {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: sparkline-pulse-ring 2.4s ease-out 1.5s infinite;
+  }
+
+  .sparkline-animated .sparkline-grid-line {
+    opacity: 0;
+    animation: sparkline-grid-in 0.8s ease-out 0.2s forwards;
+  }
+}
+
 @layer components {
   .gold-button:active:not(:disabled) {
     transform: translateY(0);
