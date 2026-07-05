@@ -1,0 +1,33 @@
+import {
+  XM_CHART_BG,
+  XM_CHART_DRAWING_W,
+  XM_CHART_UTILITY_W,
+  XM_HEADER_ACTION_W,
+  XM_HEADER_BG,
+  XM_BORDER,
+  XM_ICON,
+  XM_ROW_ACCOUNT_H,
+  XM_ROW_SYMBOL_H,
+  XM_ROW_TOOLBAR_H,
+  XM_SHELL_BG,
+  XM_STATUS_PANEL_W,
+  XM_TEXT_MUTED,
+  XM_TEXT_SECONDARY,
+  XM_MARKET_W,
+} from "@/lib/xm-trading-tokens";
+
+/** Re-exported chart layout tokens (XM-aligned) */
+export const CHART_LEFT_RAIL_W = XM_CHART_DRAWING_W;
+export const CHART_RIGHT_RAIL_W = XM_CHART_UTILITY_W;
+export const CHART_STATUS_PANEL_W = XM_STATUS_PANEL_W;
+export const CHART_HEADER_ACTION_W = XM_HEADER_ACTION_W;
+export const CHART_HEADER_ROW1_H = XM_ROW_ACCOUNT_H;
+export const CHART_HEADER_ROW2_H = XM_ROW_SYMBOL_H;
+export const CHART_HEADER_ROW3_H = XM_ROW_TOOLBAR_H;
+export const CHART_BORDER = XM_BORDER;
+export const CHART_HEADER_BG = XM_HEADER_BG;
+export const CHART_BODY_BG = XM_CHART_BG;
+export const CHART_MUTED = XM_TEXT_MUTED;
+export const CHART_TEXT = XM_TEXT_SECONDARY;
+export const TRADING_SHELL_BG = XM_SHELL_BG;
+export const TRADING_MARKET_W = XM_MARKET_W;

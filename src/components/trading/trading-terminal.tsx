@@ -1,34 +1,82 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import { AnimatePresence } from "framer-motion";
 import { MarketWatch } from "@/components/trading/market-watch";
 import { OrderPanel } from "@/components/trading/order-panel";
 import { OrdersTable, type OpenOrder } from "@/components/trading/orders-table";
 import { TradingChart } from "@/components/trading/chart";
+import {
+  ExpandedChartShell,
+  type ChartRange,
+  type ChartTimeframe,
+  TIMEFRAMES,
+} from "@/components/trading/expanded-chart";
+import { ExpandedTradingView } from "@/components/trading/expanded/expanded-trading-view";
+import { FullscreenChartShell } from "@/components/trading/fullscreen-chart-view";
 import { TradingDisabledOverlay } from "@/components/trading/trading-disabled-overlay";
 import { GatedChart } from "@/components/pricing/price-gate";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Maximize2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLivePrices } from "@/hooks/use-live-prices";
 import { useWallet } from "@/hooks/use-wallet";
 import { getAsset } from "@/data/markets";
 import { randomId } from "@/lib/id";
 
-const TIMEFRAMES = ["1m", "5m", "15m", "30m", "1H", "4H", "1D"] as const;
-
-export function TradingTerminal({ className }: { className?: string }) {
-  const [symbol, setSymbol] = useState("BTC/USD");
-  const [tf, setTf] = useState<(typeof TIMEFRAMES)[number]>("15m");
+export function TradingTerminal({
+  className,
+  initialSymbol,
+  variant = "xm",
+  showNavRail = true,
+}: {
+  className?: string;
+  initialSymbol?: string;
+  variant?: "xm" | "classic";
+  /** Show built-in icon nav rail (off when app layout provides AppIconSidebar) */
+  showNavRail?: boolean;
+}) {
+  const [symbol, setSymbol] = useState(initialSymbol ?? "USD/JPY");
+  const [tf, setTf] = useState<ChartTimeframe>("1m");
+  const [range, setRange] = useState<ChartRange>("1D");
   const [favorites, setFavorites] = useState<Set<string>>(
-    new Set(["BTC/USD", "XAU/USD", "EUR/USD"]),
+    new Set(["BTC/USD", "XAU/USD", "EUR/USD", "USD/JPY"]),
   );
   const [orders, setOrders] = useState<OpenOrder[]>([]);
   const [mounted, setMounted] = useState(false);
+  const [fullscreen, setFullscreen] = useState(false);
+  const [marketsOpen, setMarketsOpen] = useState(true);
+
   useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    if (!fullscreen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setFullscreen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [fullscreen]);
+
+  useEffect(() => {
+    if (initialSymbol && getAsset(initialSymbol)) {
+      setSymbol(initialSymbol);
+    }
+  }, [initialSymbol]);
+
   const live = useLivePrices(2000);
   const { balance, canTrade, refresh } = useWallet();
   useEffect(() => {
     refresh();
   }, [refresh]);
+
+  const quote = live[symbol];
+  const asset = getAsset(symbol);
+  const price = quote?.price ?? asset?.price ?? 0;
+  const changePct = quote?.changePct ?? asset?.changePct ?? 0;
 
   const toggleFav = (s: string) =>
     setFavorites((prev) => {
@@ -59,55 +107,143 @@ export function TradingTerminal({ className }: { className?: string }) {
     setOrders((prev) => [{ id: randomId(), openedAt: Date.now(), pnl: 0, ...o }, ...prev]);
   };
 
+  const chartNode = mounted ? (
+    <TradingChart
+      key={`${variant}-${symbol}`}
+      symbol={symbol}
+      timeframe={tf}
+      variant="expanded"
+    />
+  ) : (
+    <div className="grid h-full place-items-center text-sm text-muted-foreground">
+      Loading chart…
+    </div>
+  );
+
+  const marketWatch = (
+    <MarketWatch
+      selected={symbol}
+      onSelect={setSymbol}
+      favorites={favorites}
+      toggleFav={toggleFav}
+      variant={variant === "xm" ? "terminal" : "default"}
+      onClose={() => setMarketsOpen(false)}
+    />
+  );
+
+  if (variant === "xm") {
+    const fullscreenOverlay =
+      mounted &&
+      createPortal(
+        <AnimatePresence mode="wait">
+          {fullscreen && (
+            <FullscreenChartShell
+              key="fullscreen-chart"
+              symbol={symbol}
+              asset={asset}
+              timeframe={tf}
+              onTimeframeChange={setTf}
+              range={range}
+              onRangeChange={setRange}
+              onClose={() => setFullscreen(false)}
+              onSymbolChange={setSymbol}
+              price={price}
+              changePct={changePct}
+              isFavorite={favorites.has(symbol)}
+              onToggleFavorite={() => toggleFav(symbol)}
+            >
+              <GatedChart className="absolute inset-0 h-full w-full" lockSize="lg">
+                <TradingChart
+                  key={`fullscreen-${symbol}`}
+                  symbol={symbol}
+                  timeframe={tf}
+                  variant="expanded"
+                />
+              </GatedChart>
+            </FullscreenChartShell>
+          )}
+        </AnimatePresence>,
+        document.body,
+      );
+
+    return (
+      <div className={cn("relative h-full min-h-0", className)}>
+        {fullscreenOverlay}
+        <ExpandedTradingView
+          embedded
+          showNavRail={showNavRail}
+          marketsOpen={marketsOpen}
+          onMarketsOpenChange={setMarketsOpen}
+          marketsPanel={marketWatch}
+          chart={
+            <>
+              {!canTrade && <TradingDisabledOverlay balance={balance} />}
+              <ExpandedChartShell
+                symbol={symbol}
+                onSymbolChange={setSymbol}
+                timeframe={tf}
+                onTimeframeChange={setTf}
+                range={range}
+                onRangeChange={setRange}
+                onExpand={() => setFullscreen(true)}
+                price={price}
+                changePct={changePct}
+                isFavorite={favorites.has(symbol)}
+                onToggleFavorite={() => toggleFav(symbol)}
+              >
+                <GatedChart className="absolute inset-0 h-full w-full" lockSize="lg">
+                  {chartNode}
+                </GatedChart>
+              </ExpandedChartShell>
+            </>
+          }
+        />
+      </div>
+    );
+  }
+
+  const orderPanel = (
+    <>
+      {!canTrade && <TradingDisabledOverlay balance={balance} />}
+      <OrderPanel symbol={symbol} onPlace={place} disabled={!canTrade} />
+    </>
+  );
+
   return (
     <div className={cn("grid min-h-0 flex-1 grid-cols-12 gap-px bg-border/60", className)}>
       <aside className="col-span-12 hidden min-h-0 bg-background lg:col-span-2 lg:block">
-        <MarketWatch
-          selected={symbol}
-          onSelect={setSymbol}
-          favorites={favorites}
-          toggleFav={toggleFav}
-        />
+        {marketWatch}
       </aside>
 
       <main className="relative col-span-12 flex min-h-0 flex-col bg-background lg:col-span-7">
         {!canTrade && <TradingDisabledOverlay balance={balance} />}
+
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 px-3 py-2">
           <div className="flex items-baseline gap-3">
             <div className="font-display text-lg font-bold">{symbol}</div>
-            <div className="font-mono text-sm text-muted-foreground">{getAsset(symbol)?.name}</div>
+            <div className="font-mono text-sm text-muted-foreground">{asset?.name}</div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="flex rounded-md border border-border bg-surface p-0.5 text-xs">
-              {TIMEFRAMES.map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setTf(t)}
-                  className={cn(
-                    "rounded px-2.5 py-1 font-mono",
-                    tf === t
-                      ? "bg-[color:var(--gold)] text-[color:var(--primary-foreground)]"
-                      : "text-muted-foreground hover:text-foreground",
-                  )}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
-            <button className="grid h-8 w-8 place-items-center rounded-md border border-border text-muted-foreground hover:text-foreground">
-              <Maximize2 className="h-3.5 w-3.5" />
-            </button>
+          <div className="flex rounded-md border border-border bg-surface p-0.5 text-xs">
+            {TIMEFRAMES.map((t) => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setTf(t)}
+                className={cn(
+                  "rounded px-2.5 py-1 font-mono",
+                  tf === t
+                    ? "bg-[color:var(--gold)] text-[color:var(--primary-foreground)]"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {t}
+              </button>
+            ))}
           </div>
         </div>
 
         <GatedChart className="relative min-h-[300px] flex-1" lockSize="lg">
-          {mounted ? (
-            <TradingChart symbol={symbol} timeframe={tf} />
-          ) : (
-            <div className="grid h-full place-items-center text-sm text-muted-foreground">
-              Loading chart…
-            </div>
-          )}
+          {chartNode}
         </GatedChart>
 
         <div className="h-64 border-t border-border/60">
@@ -132,18 +268,10 @@ export function TradingTerminal({ className }: { className?: string }) {
       </main>
 
       <aside className="relative col-span-12 min-h-0 bg-background lg:col-span-3">
-        {!canTrade && <TradingDisabledOverlay balance={balance} />}
-        <OrderPanel symbol={symbol} onPlace={place} disabled={!canTrade} />
+        {orderPanel}
       </aside>
 
-      <aside className="col-span-12 max-h-64 bg-background lg:hidden">
-        <MarketWatch
-          selected={symbol}
-          onSelect={setSymbol}
-          favorites={favorites}
-          toggleFav={toggleFav}
-        />
-      </aside>
+      <aside className="col-span-12 max-h-64 bg-background lg:hidden">{marketWatch}</aside>
     </div>
   );
 }

@@ -115,7 +115,9 @@ const MarketMovers = memo(function MarketMovers() {
                 variants={fadeUp}
                 whileHover={{ x: 4, transition: { duration: 0.2 } }}
               >
-                <div
+                <Link
+                  to="/app/trading"
+                  search={{ symbol: a.symbol }}
                   className={cn(
                     "flex items-center justify-between gap-4 rounded-xl px-3 py-3.5 transition-colors",
                     "hover:bg-accent/50",
@@ -129,7 +131,7 @@ const MarketMovers = memo(function MarketMovers() {
                     price={p?.price ?? a.price}
                     changePct={p?.changePct ?? a.changePct}
                   />
-                </div>
+                </Link>
               </motion.li>
             );
           })}
@@ -264,7 +266,13 @@ function DashboardPage() {
                     whileHover={{ x: 4, transition: { duration: 0.2 } }}
                   >
                     <div className="grid grid-cols-[minmax(0,1fr)_auto_auto_auto_auto] items-center gap-x-4 gap-y-1 rounded-xl px-3 py-3.5 font-mono text-xs transition-colors hover:bg-accent/50 sm:gap-x-5 sm:py-4">
-                      <span className="font-sans text-sm font-semibold">{t.sym}</span>
+                      <Link
+                        to="/app/trading"
+                        search={{ symbol: t.sym }}
+                        className="font-sans text-sm font-semibold hover:text-[color:var(--gold)]"
+                      >
+                        {t.sym}
+                      </Link>
                       <StatusBadge variant={t.side === "BUY" ? "buy" : "sell"}>{t.side}</StatusBadge>
                       <span className="text-muted-foreground tabular-nums">{t.qty}</span>
                       <GatedNumber value={t.px} />

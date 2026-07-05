@@ -184,9 +184,11 @@ function LandingPage() {
             const points = sparklineFor(sym);
             const up = a.changePct >= 0;
             return (
-              <div
+              <Link
                 key={sym}
-                className="glossy group rounded-2xl p-5 transition-transform hover:-translate-y-0.5"
+                to="/trading"
+                search={{ symbol: sym }}
+                className="glossy group block rounded-2xl p-5 transition-transform hover:-translate-y-0.5"
               >
                 <div className="flex items-center justify-between">
                   <div>
@@ -209,11 +211,9 @@ function LandingPage() {
                   <span>
                     Spread {a.spread}p · 1:{a.leverage}
                   </span>
-                  <Link to="/trading" className="text-[color:var(--gold)] hover:underline">
-                    Trade →
-                  </Link>
+                  <span className="text-[color:var(--gold)] group-hover:underline">Trade →</span>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>

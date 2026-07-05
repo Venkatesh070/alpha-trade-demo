@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Briefcase } from "lucide-react";
 import { Sparkline } from "@/components/site/sparkline";
 import { AnimatedNumber } from "@/components/site/animated-number";
@@ -87,7 +87,15 @@ function PortfolioPage() {
               const up = pnl >= 0;
               return (
                 <DataTableRow key={h.sym}>
-                  <Td className="font-sans font-semibold">{h.sym}</Td>
+                  <Td className="font-sans font-semibold">
+                    <Link
+                      to="/app/trading"
+                      search={{ symbol: h.sym }}
+                      className="hover:text-[color:var(--gold)]"
+                    >
+                      {h.sym}
+                    </Link>
+                  </Td>
                   <Td mono className="text-right">
                     {h.qty}
                   </Td>

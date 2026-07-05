@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { SiteHeader } from "@/components/site/header";
@@ -36,6 +36,7 @@ function MarketsPage() {
   const [tab, setTab] = useState<AssetCategory | "all">("all");
   const [q, setQ] = useState("");
   const live = useLivePrices(2000);
+  const navigate = useNavigate();
 
   const list = useMemo(() => {
     const base = tab === "all" ? ALL_ASSETS : ASSETS_BY_CATEGORY[tab];
@@ -104,7 +105,19 @@ function MarketsPage() {
                   const p = live[a.symbol];
                   const up = (p?.changePct ?? a.changePct) >= 0;
                   return (
-                    <tr key={a.symbol} className="border-t border-border/60 hover:bg-accent/40">
+                    <tr
+                      key={a.symbol}
+                      role="link"
+                      tabIndex={0}
+                      onClick={() => navigate({ to: "/trading", search: { symbol: a.symbol } })}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          navigate({ to: "/trading", search: { symbol: a.symbol } });
+                        }
+                      }}
+                      className="cursor-pointer border-t border-border/60 hover:bg-accent/40"
+                    >
                       <td className="px-4 py-3 font-semibold">{a.symbol}</td>
                       <td className="px-4 py-3 font-sans text-muted-foreground">{a.name}</td>
                       <td className="px-4 py-3 text-right">

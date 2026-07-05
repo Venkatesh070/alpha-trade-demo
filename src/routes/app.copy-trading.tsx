@@ -12,6 +12,7 @@ import {
   GatedNumber,
   PriceLockBanner,
   GatedChart,
+  usePriceAccess,
 } from "@/components/pricing/price-gate";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/app/copy-trading")({
 });
 
 function CopyPage() {
+  const { canViewPrices } = usePriceAccess();
   const [followed, setFollowed] = useState<Set<string>>(new Set());
   const toggle = (t: TopTrader) => {
     setFollowed((p) => {
