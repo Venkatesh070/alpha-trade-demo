@@ -16,12 +16,12 @@ export function TradingDisabledOverlay({ balance }: { balance: number }) {
         <p className="mt-3 font-mono text-sm">
           Balance:{" "}
           <span className="text-[color:var(--destructive)]">₹{balance.toLocaleString()}</span>
-          {shortfall > 0 && (
+          {/* {shortfall > 0 && (
             <span className="text-muted-foreground">
               {" "}
               · ₹{shortfall.toLocaleString()} more needed
             </span>
-          )}
+          )} */}
         </p>
         <DepositButton size="default" label="Deposit funds" className="mt-5 w-full" />
       </div>
