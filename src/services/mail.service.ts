@@ -1,3 +1,4 @@
+import "@/server/load-env";
 import { Resend } from "resend";
 import { passwordResetEmailHtml } from "@/services/email-templates/password-reset";
 import { verificationEmailHtml } from "@/services/email-templates/verification";
