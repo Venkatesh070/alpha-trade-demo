@@ -12,7 +12,6 @@ import { ChartRightRail } from "@/components/trading/chart-right-rail";
 import { MarketStatusSidePanel } from "@/components/trading/market-status-panel";
 import { CHART_BODY_BG } from "@/lib/chart-layout";
 import { XM_STATUS_PANEL_W } from "@/lib/xm-trading-tokens";
-import { getMarketStatus } from "@/lib/market-status";
 import { getAsset } from "@/data/markets";
 
 const TIMEFRAMES = ["1m", "5m", "15m", "30m", "1H", "4H", "1D"] as const;
@@ -82,18 +81,13 @@ function ExpandedChartContent({
   const drawing = useChartDrawing();
   const asset = getAsset(symbol);
   const changeAbs = asset ? (price * changePct) / 100 : 0;
-  const marketClosed = asset ? !getMarketStatus(asset).open : false;
   const { onOpenManage } = useExpandedTradingActions();
 
-  const [statusPanelOpen, setStatusPanelOpen] = useState(marketClosed && !hideSidePanel);
+  const [statusPanelOpen, setStatusPanelOpen] = useState(!hideSidePanel);
 
   useEffect(() => {
-    if (hideSidePanel) {
-      setStatusPanelOpen(false);
-      return;
-    }
-    if (marketClosed) setStatusPanelOpen(true);
-  }, [symbol, marketClosed, hideSidePanel]);
+    if (hideSidePanel) setStatusPanelOpen(false);
+  }, [hideSidePanel]);
 
   return (
     <div

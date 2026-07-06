@@ -1,4 +1,4 @@
-import { History, Maximize2, Radio, Star } from "lucide-react";
+import { BarChart2, Image, Maximize2, Radio, Sparkles, Star } from "lucide-react";
 import { motion } from "framer-motion";
 import {
   XM_BORDER,
@@ -84,6 +84,16 @@ export function ChartRightRail({
 
         <button
           type="button"
+          title="Insights"
+          className={railBtn}
+          style={{ width: XM_ICON_BTN, height: XM_ICON_BTN, color: XM_ICON }}
+          aria-label="Insights"
+        >
+          <Sparkles className={iconClass} style={iconStyle} />
+        </button>
+
+        <button
+          type="button"
           title="Trading signals"
           className={railBtn}
           style={{ width: XM_ICON_BTN, height: XM_ICON_BTN, color: XM_ICON }}
@@ -94,12 +104,22 @@ export function ChartRightRail({
 
         <button
           type="button"
-          title="History"
+          title="Market analysis"
           className={railBtn}
           style={{ width: XM_ICON_BTN, height: XM_ICON_BTN, color: XM_ICON }}
-          aria-label="History"
+          aria-label="Market analysis"
         >
-          <History className={iconClass} style={iconStyle} />
+          <BarChart2 className={iconClass} style={iconStyle} />
+        </button>
+
+        <button
+          type="button"
+          title="Chart gallery"
+          className={railBtn}
+          style={{ width: XM_ICON_BTN, height: XM_ICON_BTN, color: XM_ICON }}
+          aria-label="Chart gallery"
+        >
+          <Image className={iconClass} style={iconStyle} />
         </button>
       </div>
     </aside>

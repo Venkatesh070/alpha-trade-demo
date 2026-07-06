@@ -7,7 +7,7 @@ export const XM_NAV_W = 50;
 export const XM_MARKET_W = 280;
 export const XM_CHART_DRAWING_W = 40;
 export const XM_CHART_UTILITY_W = 40;
-export const XM_STATUS_PANEL_W = 220;
+export const XM_STATUS_PANEL_W = 300;
 export const XM_HEADER_ACTION_W = 156;
 
 export const XM_ROW_ACCOUNT_H = 50;
