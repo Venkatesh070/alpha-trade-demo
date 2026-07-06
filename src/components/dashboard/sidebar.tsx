@@ -19,6 +19,7 @@ import {
 import { Logo } from "@/components/site/logo";
 import { Button } from "@/components/ui/button";
 import { depositUnlockText, usePriceAccess } from "@/components/pricing/price-gate";
+import { useDepositPrompt } from "@/hooks/use-deposit-prompt";
 import { useWallet } from "@/hooks/use-wallet";
 import { cn } from "@/lib/utils";
 
@@ -52,6 +53,108 @@ function isNavActive(path: string, to: string, exact?: boolean): boolean {
   const t = to.replace(/\/$/, "") || "/";
   if (exact) return p === t;
   return p === t || p.startsWith(`${t}/`);
+}
+
+function SidebarNavItem({
+  to,
+  label,
+  icon: Icon,
+  exact,
+  locked,
+  active,
+  showLock,
+  onNavigate,
+  variant,
+}: {
+  to: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+  exact?: boolean;
+  locked?: boolean;
+  active: boolean;
+  showLock: boolean;
+  onNavigate?: () => void;
+  variant: "full" | "icon";
+}) {
+  const { openDepositPrompt } = useDepositPrompt();
+
+  const handleLockedClick = () => {
+    openDepositPrompt(label);
+    onNavigate?.();
+  };
+
+  if (variant === "icon") {
+    if (showLock) {
+      return (
+        <button
+          type="button"
+          title={label}
+          onClick={handleLockedClick}
+          className={cn(
+            "relative grid h-9 w-9 place-items-center rounded-lg transition-colors",
+            "text-sidebar-foreground/70 hover:bg-[color:var(--gold)]/6 hover:text-foreground dark:hover:bg-sidebar-accent/60",
+          )}
+        >
+          <Icon className="h-4 w-4" />
+          <Lock className="absolute bottom-1 right-1 h-2 w-2 text-[color:var(--gold)]" />
+        </button>
+      );
+    }
+
+    return (
+      <Link
+        to={to as never}
+        title={label}
+        onClick={onNavigate}
+        className={cn(
+          "relative grid h-9 w-9 place-items-center rounded-lg transition-colors",
+          active
+            ? "border-l-2 border-[color:var(--gold)] bg-[color:var(--gold)]/12 text-[color:var(--gold)]"
+            : "text-sidebar-foreground/70 hover:bg-[color:var(--gold)]/6 hover:text-foreground dark:hover:bg-sidebar-accent/60 dark:hover:text-sidebar-foreground",
+        )}
+      >
+        <Icon className="h-4 w-4" />
+      </Link>
+    );
+  }
+
+  if (showLock) {
+    return (
+      <button
+        type="button"
+        onClick={handleLockedClick}
+        className={cn(
+          "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
+          "border-l-2 border-transparent text-sidebar-foreground/70 hover:bg-[color:var(--gold)]/6 hover:text-foreground dark:hover:bg-sidebar-accent/60 dark:hover:text-sidebar-foreground",
+        )}
+      >
+        <Icon className="h-4 w-4 shrink-0" />
+        <span className="min-w-0 flex-1 truncate text-left">{label}</span>
+        <Lock className="h-3.5 w-3.5 shrink-0 text-[color:var(--gold)]/80" />
+      </button>
+    );
+  }
+
+  return (
+    <Link
+      to={to as never}
+      onClick={onNavigate}
+      className={cn(
+        "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
+        active
+          ? "border-l-2 border-[color:var(--gold)] bg-[color:var(--gold)]/12 pl-[10px] font-semibold text-foreground shadow-sm dark:bg-sidebar-accent dark:text-sidebar-foreground dark:shadow-none"
+          : "border-l-2 border-transparent text-sidebar-foreground/70 hover:bg-[color:var(--gold)]/6 hover:text-foreground dark:hover:bg-sidebar-accent/60 dark:hover:text-sidebar-foreground",
+      )}
+    >
+      <Icon
+        className={cn(
+          "h-4 w-4 shrink-0",
+          active && "text-[color:var(--gold-deep)] dark:text-[color:var(--gold)]",
+        )}
+      />
+      <span className="min-w-0 flex-1 truncate">{label}</span>
+    </Link>
+  );
 }
 
 function SidebarFooter() {
@@ -148,30 +251,23 @@ export function AppIconSidebar({
       </div>
 
       <nav className="flex min-h-0 flex-1 flex-col items-center gap-0.5 overflow-y-auto py-2 scrollbar-thin">
-        {ITEMS.map(({ to, label, icon: Icon, exact, locked }) => {
+        {ITEMS.map(({ to, label, icon, exact, locked }) => {
           const active = isNavActive(path, to, exact);
-          const showLock = locked && !canViewPrices;
+          const showLock = Boolean(locked && !canViewPrices);
 
           return (
-            <Link
+            <SidebarNavItem
               key={to}
-              to={to as never}
-              title={label}
-              onClick={onNavigate}
-              className={cn(
-                "relative grid h-9 w-9 place-items-center rounded-lg transition-colors",
-                active
-                  ? expanded
-                    ? "border-l-2 border-[color:var(--gold)] bg-[color:var(--gold)]/12 text-[color:var(--gold)]"
-                    : "bg-[color:var(--gold)]/12 text-[color:var(--gold-deep)] dark:bg-sidebar-accent dark:text-[color:var(--gold)]"
-                  : "text-sidebar-foreground/70 hover:bg-[color:var(--gold)]/6 hover:text-foreground dark:hover:bg-sidebar-accent/60 dark:hover:text-sidebar-foreground",
-              )}
-            >
-              <Icon className="h-4 w-4" />
-              {showLock && (
-                <Lock className="absolute bottom-1 right-1 h-2 w-2 text-[color:var(--gold)]" />
-              )}
-            </Link>
+              to={to}
+              label={label}
+              icon={icon}
+              exact={exact}
+              locked={locked}
+              active={active}
+              showLock={showLock}
+              onNavigate={onNavigate}
+              variant="icon"
+            />
           );
         })}
       </nav>
@@ -195,33 +291,23 @@ export function AppSidebar({ onNavigate }: { onNavigate?: () => void }) {
 
       <nav className="min-h-0 flex-1 overflow-y-auto px-3 py-4">
         <ul className="space-y-0.5">
-          {ITEMS.map(({ to, label, icon: Icon, exact, locked }) => {
+          {ITEMS.map(({ to, label, icon, exact, locked }) => {
             const active = isNavActive(path, to, exact);
-            const showLock = locked && !canViewPrices;
+            const showLock = Boolean(locked && !canViewPrices);
 
             return (
               <li key={to}>
-                <Link
-                  to={to as never}
-                  onClick={onNavigate}
-                  className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
-                    active
-                      ? "border-l-2 border-[color:var(--gold)] bg-[color:var(--gold)]/12 pl-[10px] font-semibold text-foreground shadow-sm dark:bg-sidebar-accent dark:text-sidebar-foreground dark:shadow-none"
-                      : "border-l-2 border-transparent text-sidebar-foreground/70 hover:bg-[color:var(--gold)]/6 hover:text-foreground dark:hover:bg-sidebar-accent/60 dark:hover:text-sidebar-foreground",
-                  )}
-                >
-                  <Icon
-                    className={cn(
-                      "h-4 w-4 shrink-0",
-                      active && "text-[color:var(--gold-deep)] dark:text-[color:var(--gold)]",
-                    )}
-                  />
-                  <span className="min-w-0 flex-1 truncate">{label}</span>
-                  {showLock && (
-                    <Lock className="h-3.5 w-3.5 shrink-0 text-[color:var(--gold)]/80" />
-                  )}
-                </Link>
+                <SidebarNavItem
+                  to={to}
+                  label={label}
+                  icon={icon}
+                  exact={exact}
+                  locked={locked}
+                  active={active}
+                  showLock={showLock}
+                  onNavigate={onNavigate}
+                  variant="full"
+                />
               </li>
             );
           })}

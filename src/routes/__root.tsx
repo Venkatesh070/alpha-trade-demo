@@ -16,6 +16,7 @@ import { AuthProvider } from "@/hooks/use-auth";
 import { AdminAuthProvider } from "@/hooks/use-admin-auth";
 import { WalletProvider } from "@/hooks/use-wallet";
 import { TradingProvider } from "@/hooks/use-trading";
+import { DepositPromptProvider } from "@/hooks/use-deposit-prompt";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -144,8 +145,10 @@ function RootComponent() {
           <AdminAuthProvider>
             <WalletProvider>
               <TradingProvider>
-                <Outlet />
-                <Toaster position="top-right" theme="dark" />
+                <DepositPromptProvider>
+                  <Outlet />
+                  <Toaster position="top-right" theme="dark" />
+                </DepositPromptProvider>
               </TradingProvider>
             </WalletProvider>
           </AdminAuthProvider>
