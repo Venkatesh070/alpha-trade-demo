@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from "react";
 import { Lock } from "lucide-react";
-import { DEPOSIT_UNLOCK_MESSAGE, DepositButton, WithdrawButton } from "@/components/pricing/price-gate";
+import { DEPOSIT_UNLOCK_MESSAGE, DepositButton } from "@/components/pricing/price-gate";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -84,7 +84,6 @@ export function DepositPromptProvider({ children }: { children: ReactNode }) {
               Not now
             </Button>
             <DepositButton size="default" label="Deposit funds" className="h-10" />
-            <WithdrawButton size="default" className="h-10" />
           </DialogFooter>
         </DialogContent>
       </Dialog>
