@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { Gift, Wallet } from "lucide-react";
 import { DepositButton, WithdrawButton } from "@/components/pricing/price-gate";
+import { Button } from "@/components/ui/button";
 import { useWallet } from "@/hooks/use-wallet";
 import { PageShell } from "@/components/dashboard/page-shell";
 import { DataPanel } from "@/components/dashboard/data-panel";
