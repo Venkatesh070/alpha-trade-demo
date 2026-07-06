@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { ArrowDownToLine, ArrowUpFromLine, Gift, Wallet } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Gift, Wallet } from "lucide-react";
+import { DepositButton, WithdrawButton } from "@/components/pricing/price-gate";
 import { useWallet } from "@/hooks/use-wallet";
 import { PageShell } from "@/components/dashboard/page-shell";
 import { DataPanel } from "@/components/dashboard/data-panel";
@@ -27,16 +27,8 @@ function WalletPage() {
       width="xl"
       actions={
         <div className="flex gap-2">
-          <Button asChild className="gold-button hover:gold-button-hover">
-            <Link to="/app/wallet/deposit">
-              <ArrowDownToLine className="mr-2 h-4 w-4" /> Deposit
-            </Link>
-          </Button>
-          <Button asChild variant="outline">
-            <Link to="/app/wallet/withdraw">
-              <ArrowUpFromLine className="mr-2 h-4 w-4" /> Withdraw
-            </Link>
-          </Button>
+          <DepositButton size="default" label="Deposit" />
+          <WithdrawButton size="default" label="Withdraw" />
         </div>
       }
     >
@@ -91,11 +83,7 @@ function WalletPage() {
             icon={Wallet}
             title="No transactions yet"
             description="Fund your account via UPI to start trading."
-            action={
-              <Button asChild className="gold-button hover:gold-button-hover">
-                <Link to="/app/wallet/deposit">Make a deposit</Link>
-              </Button>
-            }
+            action={<DepositButton label="Make a deposit" />}
           />
         ) : (
           <DataTable>

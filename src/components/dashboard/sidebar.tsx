@@ -17,8 +17,7 @@ import {
   Lock,
 } from "lucide-react";
 import { Logo } from "@/components/site/logo";
-import { Button } from "@/components/ui/button";
-import { depositUnlockText, usePriceAccess } from "@/components/pricing/price-gate";
+import { depositUnlockText, DepositButton, usePriceAccess } from "@/components/pricing/price-gate";
 import { useDepositPrompt } from "@/hooks/use-deposit-prompt";
 import { useWallet } from "@/hooks/use-wallet";
 import { cn } from "@/lib/utils";
@@ -193,9 +192,7 @@ function SidebarFooter() {
             {depositUnlockText()}
           </p>
         )}
-        <Button asChild size="sm" className="gold-button hover:gold-button-hover mt-3 h-8 w-full text-xs">
-          <Link to="/app/wallet/deposit">Deposit funds</Link>
-        </Button>
+        <DepositButton size="sm" label="Deposit funds" className="mt-3 h-8 w-full text-xs" />
       </div>
     </div>
   );

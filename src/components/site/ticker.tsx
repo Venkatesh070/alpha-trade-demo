@@ -1,7 +1,7 @@
 import { useLivePrices, formatPrice } from "@/hooks/use-live-prices";
 import { ALL_ASSETS } from "@/data/markets";
 import { usePriceAccess, depositUnlockText } from "@/components/pricing/price-gate";
-import { ArrowDownRight, ArrowUpRight, Lock } from "lucide-react";
+import { ArrowDownToLine, ArrowDownRight, ArrowUpRight, Lock } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
 export function Ticker() {
@@ -18,8 +18,9 @@ export function Ticker() {
             <span className="text-muted-foreground">{depositUnlockText()}</span>
             <Link
               to="/app/wallet/deposit"
-              className="rounded-md bg-[color:var(--gold)]/15 px-2.5 py-0.5 text-xs font-semibold text-[color:var(--gold)] hover:bg-[color:var(--gold)]/25"
+              className="inline-flex items-center gap-1 rounded-md bg-[color:var(--gold)]/15 px-2.5 py-0.5 text-xs font-semibold text-[color:var(--gold)] hover:bg-[color:var(--gold)]/25"
             >
+              <ArrowDownToLine className="h-3 w-3" />
               Deposit
             </Link>
           </div>

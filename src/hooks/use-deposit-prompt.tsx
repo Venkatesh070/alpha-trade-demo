@@ -6,9 +6,8 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { Link } from "@tanstack/react-router";
 import { Lock } from "lucide-react";
-import { DEPOSIT_UNLOCK_MESSAGE } from "@/components/pricing/price-gate";
+import { DEPOSIT_UNLOCK_MESSAGE, DepositButton, WithdrawButton } from "@/components/pricing/price-gate";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -84,13 +83,8 @@ export function DepositPromptProvider({ children }: { children: ReactNode }) {
             <Button type="button" variant="outline" onClick={closeDepositPrompt}>
               Not now
             </Button>
-            <Button
-              asChild
-              className="gold-button hover:gold-button-hover"
-              onClick={closeDepositPrompt}
-            >
-              <Link to="/app/wallet/deposit">Deposit funds</Link>
-            </Button>
+            <DepositButton size="default" label="Deposit funds" className="h-10" />
+            <WithdrawButton size="default" className="h-10" />
           </DialogFooter>
         </DialogContent>
       </Dialog>

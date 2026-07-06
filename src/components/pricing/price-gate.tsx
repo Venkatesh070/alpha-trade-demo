@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Lock } from "lucide-react";
+import { ArrowDownToLine, ArrowUpFromLine, Lock } from "lucide-react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/hooks/use-live-prices";
@@ -26,10 +26,12 @@ export function DepositButton({
   className,
   size = "sm",
   label = "Deposit",
+  showIcon = true,
 }: {
   className?: string;
   size?: "sm" | "default" | "lg";
   label?: string;
+  showIcon?: boolean;
 }) {
   return (
     <Button
@@ -37,7 +39,35 @@ export function DepositButton({
       size={size}
       className={cn("gold-button hover:gold-button-hover shrink-0", className)}
     >
-      <Link to="/app/wallet/deposit">{label}</Link>
+      <Link to="/app/wallet/deposit" className="inline-flex items-center gap-1.5">
+        {showIcon && <ArrowDownToLine className="h-4 w-4 shrink-0" aria-hidden />}
+        {label}
+      </Link>
+    </Button>
+  );
+}
+
+export function WithdrawButton({
+  className,
+  size = "sm",
+  label = "Withdraw",
+  showIcon = true,
+  variant = "outline",
+}: {
+  className?: string;
+  size?: "sm" | "default" | "lg";
+  label?: string;
+  showIcon?: boolean;
+  variant?: "outline" | "ghost";
+}) {
+  return (
+    <Button asChild size={size} variant={variant} className={cn("shrink-0", className)}>
+      <Link to="/app/wallet/withdraw" className="inline-flex items-center gap-1.5">
+        {showIcon && (
+          <ArrowUpFromLine className="h-4 w-4 shrink-0 text-[color:var(--gold)]" aria-hidden />
+        )}
+        {label}
+      </Link>
     </Button>
   );
 }
@@ -306,10 +336,9 @@ export function PriceLockInline({ className }: { className?: string }) {
   if (canViewPrices) return null;
 
   return (
-    <DepositButton
-      size="sm"
-      className={cn("h-7 gap-1.5 px-2.5 text-xs font-semibold", className)}
-      label="Deposit"
-    />
+    <div className={cn("flex items-center gap-2", className)}>
+      <DepositButton size="sm" className="h-8 px-3 text-xs font-semibold" />
+      <WithdrawButton size="sm" className="h-8 px-3 text-xs font-semibold" />
+    </div>
   );
 }

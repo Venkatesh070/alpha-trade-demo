@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import {
-  ArrowDown,
+  ArrowDownToLine,
   ArrowLeftRight,
-  ArrowUp,
+  ArrowUpFromLine,
   ChevronDown,
   ChevronRight,
   Clock,
@@ -15,7 +15,7 @@ import {
   X,
 } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { DepositButton } from "@/components/pricing/price-gate";
 import { useAuth } from "@/hooks/use-auth";
 import { useWallet } from "@/hooks/use-wallet";
 import { useTrading } from "@/hooks/use-trading";
@@ -149,19 +149,36 @@ export function AccountManagePanel({ onClose }: { onClose: () => void }) {
 
         <div className="mt-6 grid grid-cols-3 gap-3">
           {[
-            { icon: ArrowUp, label: "Deposit", to: "/app/wallet/deposit" as const },
-            { icon: ArrowDown, label: "Withdraw", to: "/app/wallet" as const },
-            { icon: ArrowLeftRight, label: "Transfer", to: "/app/wallet" as const },
-          ].map(({ icon: Icon, label, to }) => (
+            {
+              icon: ArrowDownToLine,
+              label: "Deposit",
+              to: "/app/wallet/deposit" as const,
+              iconClassName: "text-foreground",
+            },
+            {
+              icon: ArrowUpFromLine,
+              label: "Withdraw",
+              to: "/app/wallet/withdraw" as const,
+              iconClassName: "text-[color:var(--gold)]",
+            },
+            {
+              icon: ArrowLeftRight,
+              label: "Transfer",
+              to: "/app/wallet" as const,
+              iconClassName: "text-foreground",
+            },
+          ].map(({ icon: Icon, label, to, iconClassName }) => (
             <Link
               key={label}
               to={to}
               className="flex flex-col items-center gap-2 rounded-xl py-2 transition hover:bg-accent/50"
             >
               <span className="grid h-12 w-12 place-items-center rounded-full bg-surface ring-1 ring-border/60">
-                <Icon className="h-5 w-5 text-foreground" />
+                <Icon className={cn("h-5 w-5", iconClassName)} />
               </span>
-              <span className="text-xs font-medium text-foreground">{label}</span>
+              <span className="text-[10px] font-semibold uppercase tracking-wide text-foreground">
+                {label}
+              </span>
             </Link>
           ))}
         </div>
@@ -213,9 +230,7 @@ export function AccountManagePanel({ onClose }: { onClose: () => void }) {
       </div>
 
       <div className="shrink-0 border-t border-border/60 p-4">
-        <Button asChild className="gold-button hover:gold-button-hover h-11 w-full text-sm font-semibold">
-          <Link to="/app/wallet/deposit">Deposit</Link>
-        </Button>
+        <DepositButton size="default" className="h-11 w-full text-sm font-semibold" />
       </div>
     </aside>
   );

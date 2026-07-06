@@ -2,7 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { Bell, LogOut, Menu, Moon, Search, Sun, User2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/use-theme";
-import { PriceLockInline } from "@/components/pricing/price-gate";
+import { DepositButton, WithdrawButton } from "@/components/pricing/price-gate";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,7 +34,8 @@ export function AppTopbar({ onMenu }: { onMenu: () => void }) {
         />
       </div>
       <div className="ml-auto flex items-center gap-2">
-        <PriceLockInline className="hidden sm:inline-flex" />
+        <DepositButton size="sm" className="h-8 px-3 text-xs font-semibold" />
+        <WithdrawButton size="sm" className="h-8 px-3 text-xs font-semibold" />
         <button
           onClick={toggle}
           aria-label="Theme"
