@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import type { Asset } from "@/data/markets";
 import { formatPrice } from "@/hooks/use-live-prices";
 import { useWallet } from "@/hooks/use-wallet";
+import { useTrading } from "@/hooks/use-trading";
 import { usePriceAccess } from "@/components/pricing/price-gate";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
@@ -58,6 +59,7 @@ function Segmented({
 export function MarketStatusSidePanel({ asset, price }: { asset: Asset; price: number }) {
   const { canViewPrices } = usePriceAccess();
   const { canTrade, balance } = useWallet();
+  const { placeOrder } = useTrading();
   const spread = asset.spread ?? 2;
   const pip = asset.category === "crypto" ? price * 0.0001 : 0.0001;
   const ask = price + spread * pip;
@@ -120,6 +122,15 @@ export function MarketStatusSidePanel({ asset, price }: { asset: Asset; price: n
         : conditionalOrder
           ? orderPrice
           : bid;
+    placeOrder({
+      symbol: asset.symbol,
+      side: orderSide,
+      qty: q,
+      type: conditionalOrder ? "limit" : "market",
+      price: px,
+      sl: slAmount ? Number(slAmount) : undefined,
+      tp: tpAmount ? Number(tpAmount) : undefined,
+    });
     toast.success(`${orderSide.toUpperCase()} ${amountLabel(asset, qtyTab, qty)} @ ${fmt(px)}`);
   };
 

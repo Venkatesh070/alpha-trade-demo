@@ -15,6 +15,7 @@ import { ThemeProvider } from "@/hooks/use-theme";
 import { AuthProvider } from "@/hooks/use-auth";
 import { AdminAuthProvider } from "@/hooks/use-admin-auth";
 import { WalletProvider } from "@/hooks/use-wallet";
+import { TradingProvider } from "@/hooks/use-trading";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -142,8 +143,10 @@ function RootComponent() {
         <AuthProvider>
           <AdminAuthProvider>
             <WalletProvider>
-              <Outlet />
-              <Toaster position="top-right" theme="dark" />
+              <TradingProvider>
+                <Outlet />
+                <Toaster position="top-right" theme="dark" />
+              </TradingProvider>
             </WalletProvider>
           </AdminAuthProvider>
         </AuthProvider>

@@ -19,8 +19,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { useLivePrices } from "@/hooks/use-live-prices";
 import { useWallet } from "@/hooks/use-wallet";
+import { useTrading } from "@/hooks/use-trading";
 import { getAsset } from "@/data/markets";
-import { randomId } from "@/lib/id";
 
 export function TradingTerminal({
   className,
@@ -40,7 +40,6 @@ export function TradingTerminal({
   const [favorites, setFavorites] = useState<Set<string>>(
     new Set(["BTC/USD", "XAU/USD", "EUR/USD", "USD/JPY"]),
   );
-  const [orders, setOrders] = useState<OpenOrder[]>([]);
   const [mounted, setMounted] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
   const [marketsOpen, setMarketsOpen] = useState(true);
@@ -69,6 +68,7 @@ export function TradingTerminal({
 
   const live = useLivePrices(2000);
   const { balance, canTrade, refresh } = useWallet();
+  const { openPositions, placeOrder, closePosition, syncLivePnl } = useTrading();
   useEffect(() => {
     refresh();
   }, [refresh]);
@@ -87,14 +87,23 @@ export function TradingTerminal({
     });
 
   useEffect(() => {
-    setOrders((prev) =>
-      prev.map((o) => {
-        const cur = live[o.symbol]?.price ?? o.price;
-        const diff = (cur - o.price) * (o.side === "buy" ? 1 : -1) * o.qty * 100;
-        return { ...o, pnl: diff };
-      }),
-    );
-  }, [live]);
+    const prices: Record<string, number> = {};
+    for (const [symbol, quote] of Object.entries(live)) {
+      if (quote?.price !== undefined) prices[symbol] = quote.price;
+    }
+    syncLivePnl(prices);
+  }, [live, syncLivePnl]);
+
+  const orders: OpenOrder[] = openPositions.map((position) => ({
+    id: position.id,
+    symbol: position.symbol,
+    side: position.side,
+    qty: position.qty,
+    type: position.type,
+    price: position.price,
+    pnl: position.pnl,
+    openedAt: position.openedAt,
+  }));
 
   const place = (o: {
     side: "buy" | "sell";
@@ -104,7 +113,14 @@ export function TradingTerminal({
     symbol: string;
   }) => {
     if (!canTrade) return;
-    setOrders((prev) => [{ id: randomId(), openedAt: Date.now(), pnl: 0, ...o }, ...prev]);
+    placeOrder(o);
+  };
+
+  const handleClose = (id: string) => {
+    const position = openPositions.find((item) => item.id === id);
+    if (!position) return;
+    const closePrice = live[position.symbol]?.price ?? position.price;
+    closePosition(id, closePrice);
   };
 
   const chartNode = mounted ? (
@@ -253,10 +269,7 @@ export function TradingTerminal({
               <TabsTrigger value="history">History</TabsTrigger>
             </TabsList>
             <TabsContent value="open" className="min-h-0 flex-1">
-              <OrdersTable
-                orders={orders}
-                onClose={(id) => setOrders((p) => p.filter((o) => o.id !== id))}
-              />
+              <OrdersTable orders={orders} onClose={handleClose} />
             </TabsContent>
             <TabsContent value="history" className="min-h-0 flex-1">
               <div className="grid h-full place-items-center p-6 text-sm text-muted-foreground">

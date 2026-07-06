@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useMemo } from "react";
 import { Plus } from "lucide-react";
 import { PageShell } from "@/components/dashboard/page-shell";
 import { DataPanel } from "@/components/dashboard/data-panel";
@@ -6,59 +7,35 @@ import { DataTable, DataTableHead, DataTableRow, Th, Td } from "@/components/das
 import { StatusBadge } from "@/components/dashboard/status-badge";
 import { Button } from "@/components/ui/button";
 import { GatedNumber, PriceLockBanner } from "@/components/pricing/price-gate";
+import { useTrading } from "@/hooks/use-trading";
+import { useLivePrices } from "@/hooks/use-live-prices";
+import { relativeTime } from "@/lib/account-metrics";
 
 export const Route = createFileRoute("/app/orders")({
   component: OrdersPage,
 });
 
-const OPEN = [
-  {
-    id: "o1",
-    sym: "XAU/USD",
-    side: "BUY" as const,
-    qty: 0.1,
-    price: 2412.55,
-    sl: 2400,
-    tp: 2440,
-    pnl: 18.42,
-    opened: "2m ago",
-  },
-  {
-    id: "o2",
-    sym: "EUR/USD",
-    side: "SELL" as const,
-    qty: 0.5,
-    price: 1.0842,
-    sl: 1.089,
-    tp: 1.078,
-    pnl: -6.2,
-    opened: "14m ago",
-  },
-  {
-    id: "o3",
-    sym: "BTC/USD",
-    side: "BUY" as const,
-    qty: 0.01,
-    price: 68420,
-    sl: 67800,
-    tp: 69500,
-    pnl: 84.1,
-    opened: "1h ago",
-  },
-  {
-    id: "o4",
-    sym: "NAS100",
-    side: "BUY" as const,
-    qty: 1.0,
-    price: 19542,
-    sl: 19400,
-    tp: 19800,
-    pnl: 24.0,
-    opened: "3h ago",
-  },
-];
-
 function OrdersPage() {
+  const { openPositions, syncLivePnl } = useTrading();
+  const live = useLivePrices(4000);
+
+  useEffect(() => {
+    const prices: Record<string, number> = {};
+    for (const [symbol, quote] of Object.entries(live)) {
+      if (quote?.price !== undefined) prices[symbol] = quote.price;
+    }
+    syncLivePnl(prices);
+  }, [live, syncLivePnl]);
+
+  const open = useMemo(
+    () =>
+      openPositions.map((position) => ({
+        ...position,
+        opened: relativeTime(position.openedAt),
+      })),
+    [openPositions],
+  );
+
   return (
     <PageShell
       eyebrow="Execution"
@@ -76,62 +53,70 @@ function OrdersPage() {
       <PriceLockBanner />
 
       <DataPanel
-        title={`${OPEN.length} active positions`}
+        title={`${open.length} active positions`}
         description="Updated in real time"
         padding={false}
       >
-        <DataTable>
-          <DataTableHead>
-            <tr>
-              <Th>Symbol</Th>
-              <Th>Side</Th>
-              <Th className="text-right">Qty</Th>
-              <Th className="text-right">Open</Th>
-              <Th className="text-right">SL</Th>
-              <Th className="text-right">TP</Th>
-              <Th className="text-right">P&L</Th>
-              <Th>Opened</Th>
-            </tr>
-          </DataTableHead>
-          <tbody>
-            {OPEN.map((o) => (
-              <DataTableRow key={o.id}>
-                <Td className="font-sans font-semibold">{o.sym}</Td>
-                <Td>
-                  <StatusBadge variant={o.side === "BUY" ? "buy" : "sell"}>{o.side}</StatusBadge>
-                </Td>
-                <Td mono className="text-right">
-                  {o.qty}
-                </Td>
-                <Td mono className="text-right">
-                  <GatedNumber value={o.price} />
-                </Td>
-                <Td mono className="text-right text-muted-foreground">
-                  <GatedNumber value={o.sl} />
-                </Td>
-                <Td mono className="text-right text-muted-foreground">
-                  <GatedNumber value={o.tp} />
-                </Td>
-                <Td
-                  mono
-                  className={
-                    "text-right font-medium " +
-                    (o.pnl >= 0 ? "text-[color:var(--success)]" : "text-[color:var(--destructive)]")
-                  }
-                >
-                  <GatedNumber
-                    value={o.pnl.toFixed(2)}
-                    prefix={o.pnl >= 0 ? "+" : ""}
+        {open.length === 0 ? (
+          <div className="px-6 py-12 text-center text-sm text-muted-foreground">
+            No open positions. Place a trade from the terminal.
+          </div>
+        ) : (
+          <DataTable>
+            <DataTableHead>
+              <tr>
+                <Th>Symbol</Th>
+                <Th>Side</Th>
+                <Th className="text-right">Qty</Th>
+                <Th className="text-right">Open</Th>
+                <Th className="text-right">SL</Th>
+                <Th className="text-right">TP</Th>
+                <Th className="text-right">P&L</Th>
+                <Th>Opened</Th>
+              </tr>
+            </DataTableHead>
+            <tbody>
+              {open.map((o) => (
+                <DataTableRow key={o.id}>
+                  <Td className="font-sans font-semibold">{o.symbol}</Td>
+                  <Td>
+                    <StatusBadge variant={o.side === "buy" ? "buy" : "sell"}>
+                      {o.side.toUpperCase()}
+                    </StatusBadge>
+                  </Td>
+                  <Td mono className="text-right">
+                    {o.qty}
+                  </Td>
+                  <Td mono className="text-right">
+                    <GatedNumber value={o.price} />
+                  </Td>
+                  <Td mono className="text-right text-muted-foreground">
+                    <GatedNumber value={o.sl ?? "—"} />
+                  </Td>
+                  <Td mono className="text-right text-muted-foreground">
+                    <GatedNumber value={o.tp ?? "—"} />
+                  </Td>
+                  <Td
+                    mono
                     className={
-                      o.pnl >= 0 ? "text-[color:var(--success)]" : "text-[color:var(--destructive)]"
+                      "text-right font-medium " +
+                      (o.pnl >= 0 ? "text-[color:var(--success)]" : "text-[color:var(--destructive)]")
                     }
-                  />
-                </Td>
-                <Td className="font-sans text-muted-foreground">{o.opened}</Td>
-              </DataTableRow>
-            ))}
-          </tbody>
-        </DataTable>
+                  >
+                    <GatedNumber
+                      value={o.pnl.toFixed(2)}
+                      prefix={o.pnl >= 0 ? "+" : ""}
+                      className={
+                        o.pnl >= 0 ? "text-[color:var(--success)]" : "text-[color:var(--destructive)]"
+                      }
+                    />
+                  </Td>
+                  <Td className="font-sans text-muted-foreground">{o.opened}</Td>
+                </DataTableRow>
+              ))}
+            </tbody>
+          </DataTable>
+        )}
       </DataPanel>
     </PageShell>
   );

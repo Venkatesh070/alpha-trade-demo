@@ -18,11 +18,20 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { useWallet } from "@/hooks/use-wallet";
+import { useTrading } from "@/hooks/use-trading";
+import { useLivePrices } from "@/hooks/use-live-prices";
+import { ALL_ASSETS } from "@/data/markets";
+import {
+  ACCOUNT_LEVERAGE,
+  calcAccountMetrics,
+  formatInr,
+  formatSignedInr,
+} from "@/lib/account-metrics";
 import { cn } from "@/lib/utils";
 
 const ACCOUNT_TYPE = "Ultra Low Standard";
 const PLATFORM = "MT5 Ultra Low Standard";
-const LEVERAGE = "1:1000";
+const LEVERAGE = `1:${ACCOUNT_LEVERAGE}`;
 
 function demoAccountId(email?: string) {
   if (!email) return "430395642";
@@ -54,8 +63,21 @@ const MENU_ITEMS = [
 export function AccountManagePanel({ onClose }: { onClose: () => void }) {
   const { balance } = useWallet();
   const { user } = useAuth();
+  const { openPositions, closedTrades } = useTrading();
+  const live = useLivePrices(4000);
   const accountId = demoAccountId(user?.email);
-  const formatted = `₹${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+  const prices = Object.fromEntries(
+    ALL_ASSETS.map((asset) => [asset.symbol, live[asset.symbol]?.price ?? asset.price]),
+  );
+  const metrics = calcAccountMetrics({
+    balance,
+    openPositions,
+    closedTrades,
+    prices,
+  });
+  const marginLevel =
+    metrics.margin > 0 ? `${((metrics.equity / metrics.margin) * 100).toFixed(0)}%` : "—";
 
   const copyId = async () => {
     try {
@@ -115,13 +137,13 @@ export function AccountManagePanel({ onClose }: { onClose: () => void }) {
         </div>
 
         <div className="mt-4 divide-y divide-border/60 border-t border-border/40">
-          <MetricRow label="Equity" value={formatted} bold />
-          <MetricRow label="Unrealized P/L" value="₹0.00" />
-          <MetricRow label="Balance" value={formatted} />
-          <MetricRow label="Margin" value="₹0.00" />
-          <MetricRow label="Free Margin" value={formatted} />
-          <MetricRow label="Margin Level" value="—" />
-          <MetricRow label="Credit" value="₹0.00" />
+          <MetricRow label="Equity" value={formatInr(metrics.equity)} bold />
+          <MetricRow label="Unrealized P/L" value={formatSignedInr(metrics.unrealizedPnl)} />
+          <MetricRow label="Balance" value={formatInr(metrics.balance)} />
+          <MetricRow label="Margin" value={formatInr(metrics.margin)} />
+          <MetricRow label="Free Margin" value={formatInr(metrics.freeMargin)} />
+          <MetricRow label="Margin Level" value={marginLevel} />
+          <MetricRow label="Credit" value={formatInr(0)} />
           <MetricRow label="Leverage" value={LEVERAGE} />
         </div>
 

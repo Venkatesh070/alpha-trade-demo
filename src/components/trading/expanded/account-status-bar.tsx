@@ -1,4 +1,8 @@
 import { useWallet } from "@/hooks/use-wallet";
+import { useTrading } from "@/hooks/use-trading";
+import { useLivePrices } from "@/hooks/use-live-prices";
+import { ALL_ASSETS } from "@/data/markets";
+import { calcAccountMetrics, formatInr } from "@/lib/account-metrics";
 import {
   XM_BORDER,
   XM_ROW_STATUS_BAR_H,
@@ -10,13 +14,27 @@ import {
 
 export function AccountStatusBar() {
   const { balance } = useWallet();
+  const { openPositions, closedTrades } = useTrading();
+  const live = useLivePrices(4000);
+
+  const prices = Object.fromEntries(
+    ALL_ASSETS.map((asset) => [asset.symbol, live[asset.symbol]?.price ?? asset.price]),
+  );
+  const metrics = calcAccountMetrics({
+    balance,
+    openPositions,
+    closedTrades,
+    prices,
+  });
+  const marginLevel =
+    metrics.margin > 0 ? `${((metrics.equity / metrics.margin) * 100).toFixed(0)}%` : "—";
 
   const items = [
-    { label: "Balance", value: `$${balance.toFixed(2)}` },
-    { label: "Equity", value: `$${balance.toFixed(2)}` },
-    { label: "Free Margin", value: `$${balance.toFixed(2)}` },
-    { label: "Margin", value: "—" },
-    { label: "Margin Level", value: "—" },
+    { label: "Balance", value: formatInr(metrics.balance) },
+    { label: "Equity", value: formatInr(metrics.equity) },
+    { label: "Free Margin", value: formatInr(metrics.freeMargin) },
+    { label: "Margin", value: formatInr(metrics.margin) },
+    { label: "Margin Level", value: marginLevel },
   ];
 
   return (
