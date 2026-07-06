@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { ShieldCheck, KeyRound, Monitor } from "lucide-react";
 import { accountIdFromEmail } from "@/lib/account-id";
 import { DataPanel } from "@/components/dashboard/data-panel";
+import { PageShell } from "@/components/dashboard/page-shell";
 
 export const Route = createFileRoute("/app/profile")({
   component: ProfilePage,
