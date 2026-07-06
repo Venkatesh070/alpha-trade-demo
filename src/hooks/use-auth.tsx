@@ -7,14 +7,9 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import {
-  onAuthStateChanged,
-  sendPasswordResetEmail,
-  signInWithEmailAndPassword,
-  signOut,
-  type User as FirebaseUser,
-} from "firebase/auth";
+import { onAuthStateChanged, signInWithEmailAndPassword, signOut, type User as FirebaseUser } from "firebase/auth";
 import { type UserProfile, userMe, userRegister, userVerifyEmail, adminMe } from "@/lib/auth-api";
+import { mailSendPasswordReset, mailSendWelcome } from "@/lib/mail-api";
 import { sendUserVerificationEmail } from "@/lib/email-verification";
 import { mapFirebaseAuthError } from "@/lib/firebase-errors";
 import { auth } from "@/lib/firebase";
@@ -140,6 +135,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const idToken = await firebaseUser.getIdToken(true);
     const { user: profile } = await userVerifyEmail(idToken);
     setUser(profile);
+    await mailSendWelcome(idToken, profile.name).catch((err) => {
+      console.error("Failed to send welcome email:", err);
+    });
     return true;
   }, []);
 
@@ -150,7 +148,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const resetPassword = useCallback(async (email: string, _newPassword: string) => {
-    await sendPasswordResetEmail(auth, email);
+    await mailSendPasswordReset(email);
   }, []);
 
   const updateUser = useCallback((patch: Partial<DemoUser>) => {

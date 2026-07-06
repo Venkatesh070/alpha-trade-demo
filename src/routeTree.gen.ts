@@ -58,6 +58,9 @@ import { Route as AdminCmsRouteImport } from './routes/admin.cms'
 import { Route as AppWalletIndexRouteImport } from './routes/app.wallet.index'
 import { Route as AppWalletWithdrawRouteImport } from './routes/app.wallet.withdraw'
 import { Route as AppWalletDepositRouteImport } from './routes/app.wallet.deposit'
+import { Route as ApiEmailSendWelcomeRouteImport } from './routes/api/email/send-welcome'
+import { Route as ApiEmailSendVerificationRouteImport } from './routes/api/email/send-verification'
+import { Route as ApiEmailSendPasswordResetRouteImport } from './routes/api/email/send-password-reset'
 
 const VerifyRoute = VerifyRouteImport.update({
   id: '/verify',
@@ -304,6 +307,23 @@ const AppWalletDepositRoute = AppWalletDepositRouteImport.update({
   path: '/deposit',
   getParentRoute: () => AppWalletRoute,
 } as any)
+const ApiEmailSendWelcomeRoute = ApiEmailSendWelcomeRouteImport.update({
+  id: '/api/email/send-welcome',
+  path: '/api/email/send-welcome',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiEmailSendVerificationRoute =
+  ApiEmailSendVerificationRouteImport.update({
+    id: '/api/email/send-verification',
+    path: '/api/email/send-verification',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiEmailSendPasswordResetRoute =
+  ApiEmailSendPasswordResetRouteImport.update({
+    id: '/api/email/send-password-reset',
+    path: '/api/email/send-password-reset',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -352,6 +372,9 @@ export interface FileRoutesByFullPath {
   '/app/wallet': typeof AppWalletRouteWithChildren
   '/admin/': typeof AdminIndexRoute
   '/app/': typeof AppIndexRoute
+  '/api/email/send-password-reset': typeof ApiEmailSendPasswordResetRoute
+  '/api/email/send-verification': typeof ApiEmailSendVerificationRoute
+  '/api/email/send-welcome': typeof ApiEmailSendWelcomeRoute
   '/app/wallet/deposit': typeof AppWalletDepositRoute
   '/app/wallet/withdraw': typeof AppWalletWithdrawRoute
   '/app/wallet/': typeof AppWalletIndexRoute
@@ -400,6 +423,9 @@ export interface FileRoutesByTo {
   '/app/verification': typeof AppVerificationRoute
   '/admin': typeof AdminIndexRoute
   '/app': typeof AppIndexRoute
+  '/api/email/send-password-reset': typeof ApiEmailSendPasswordResetRoute
+  '/api/email/send-verification': typeof ApiEmailSendVerificationRoute
+  '/api/email/send-welcome': typeof ApiEmailSendWelcomeRoute
   '/app/wallet/deposit': typeof AppWalletDepositRoute
   '/app/wallet/withdraw': typeof AppWalletWithdrawRoute
   '/app/wallet': typeof AppWalletIndexRoute
@@ -452,6 +478,9 @@ export interface FileRoutesById {
   '/app/wallet': typeof AppWalletRouteWithChildren
   '/admin/': typeof AdminIndexRoute
   '/app/': typeof AppIndexRoute
+  '/api/email/send-password-reset': typeof ApiEmailSendPasswordResetRoute
+  '/api/email/send-verification': typeof ApiEmailSendVerificationRoute
+  '/api/email/send-welcome': typeof ApiEmailSendWelcomeRoute
   '/app/wallet/deposit': typeof AppWalletDepositRoute
   '/app/wallet/withdraw': typeof AppWalletWithdrawRoute
   '/app/wallet/': typeof AppWalletIndexRoute
@@ -505,6 +534,9 @@ export interface FileRouteTypes {
     | '/app/wallet'
     | '/admin/'
     | '/app/'
+    | '/api/email/send-password-reset'
+    | '/api/email/send-verification'
+    | '/api/email/send-welcome'
     | '/app/wallet/deposit'
     | '/app/wallet/withdraw'
     | '/app/wallet/'
@@ -553,6 +585,9 @@ export interface FileRouteTypes {
     | '/app/verification'
     | '/admin'
     | '/app'
+    | '/api/email/send-password-reset'
+    | '/api/email/send-verification'
+    | '/api/email/send-welcome'
     | '/app/wallet/deposit'
     | '/app/wallet/withdraw'
     | '/app/wallet'
@@ -604,6 +639,9 @@ export interface FileRouteTypes {
     | '/app/wallet'
     | '/admin/'
     | '/app/'
+    | '/api/email/send-password-reset'
+    | '/api/email/send-verification'
+    | '/api/email/send-welcome'
     | '/app/wallet/deposit'
     | '/app/wallet/withdraw'
     | '/app/wallet/'
@@ -629,6 +667,9 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TradingRoute: typeof TradingRoute
   VerifyRoute: typeof VerifyRoute
+  ApiEmailSendPasswordResetRoute: typeof ApiEmailSendPasswordResetRoute
+  ApiEmailSendVerificationRoute: typeof ApiEmailSendVerificationRoute
+  ApiEmailSendWelcomeRoute: typeof ApiEmailSendWelcomeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -976,6 +1017,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppWalletDepositRouteImport
       parentRoute: typeof AppWalletRoute
     }
+    '/api/email/send-welcome': {
+      id: '/api/email/send-welcome'
+      path: '/api/email/send-welcome'
+      fullPath: '/api/email/send-welcome'
+      preLoaderRoute: typeof ApiEmailSendWelcomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/email/send-verification': {
+      id: '/api/email/send-verification'
+      path: '/api/email/send-verification'
+      fullPath: '/api/email/send-verification'
+      preLoaderRoute: typeof ApiEmailSendVerificationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/email/send-password-reset': {
+      id: '/api/email/send-password-reset'
+      path: '/api/email/send-password-reset'
+      fullPath: '/api/email/send-password-reset'
+      preLoaderRoute: typeof ApiEmailSendPasswordResetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1085,6 +1147,9 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TradingRoute: TradingRoute,
   VerifyRoute: VerifyRoute,
+  ApiEmailSendPasswordResetRoute: ApiEmailSendPasswordResetRoute,
+  ApiEmailSendVerificationRoute: ApiEmailSendVerificationRoute,
+  ApiEmailSendWelcomeRoute: ApiEmailSendWelcomeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

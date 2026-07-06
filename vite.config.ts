@@ -18,7 +18,8 @@ export default defineConfig({
   vite: {
     server: {
       proxy: {
-        "/api": {
+        // Auth API lives on the external server; mail routes are served by this app.
+        "/api/auth": {
           target: "http://localhost:4000",
           changeOrigin: true,
         },

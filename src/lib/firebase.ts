@@ -1,5 +1,5 @@
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getApps, initializeApp, type FirebaseApp } from "firebase/app";
+import { getAuth, type Auth } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -11,8 +11,32 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-const app = initializeApp(firebaseConfig);
+let app: FirebaseApp | undefined;
+let authInstance: Auth | undefined;
 
-export const auth = getAuth(app);
+function ensureFirebaseAuth(): Auth {
+  if (typeof window === "undefined") {
+    throw new Error("Firebase Auth is only available in the browser.");
+  }
 
-export default app;
+  if (!authInstance) {
+    app = getApps()[0] ?? initializeApp(firebaseConfig);
+    authInstance = getAuth(app);
+  }
+
+  return authInstance;
+}
+
+/** Lazy auth — safe to import during SSR; initializes only on the client. */
+export const auth: Auth = new Proxy({} as Auth, {
+  get(_target, prop, receiver) {
+    const instance = ensureFirebaseAuth();
+    const value = Reflect.get(instance, prop, receiver);
+    return typeof value === "function" ? value.bind(instance) : value;
+  },
+});
+
+export default function getFirebaseApp(): FirebaseApp {
+  ensureFirebaseAuth();
+  return app!;
+}

@@ -1,4 +1,5 @@
-import { applyActionCode, sendEmailVerification, type ActionCodeSettings, type User } from "firebase/auth";
+import { applyActionCode, type ActionCodeSettings, type User } from "firebase/auth";
+import { mailSendVerification } from "@/lib/mail-api";
 import { auth } from "@/lib/firebase";
 
 /** Base URL for email verification redirects — must match a Firebase Authorized domain. */
@@ -33,7 +34,9 @@ export async function sendUserVerificationEmail(user: User): Promise<void> {
   if (!email) {
     throw new Error("No email address on this account.");
   }
-  await sendEmailVerification(user, verificationActionCodeSettings(email));
+
+  const idToken = await user.getIdToken();
+  await mailSendVerification(idToken);
 }
 
 export async function applyEmailVerificationFromUrl(): Promise<boolean> {
