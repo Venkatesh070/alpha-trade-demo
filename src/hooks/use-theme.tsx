@@ -6,7 +6,7 @@ const ThemeContext = createContext<{
   toggle: () => void;
   setTheme: (t: Theme) => void;
 }>({
-  theme: "dark",
+  theme: "light",
   toggle: () => {},
   setTheme: () => {},
 });
@@ -15,10 +15,11 @@ const STORAGE_KEY = "exness-theme";
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof document === "undefined") return "dark";
+    if (typeof document === "undefined") return "light";
     if (document.documentElement.classList.contains("light")) return "light";
+    if (document.documentElement.classList.contains("dark")) return "dark";
     const saved = window.localStorage.getItem(STORAGE_KEY) as Theme | null;
-    return saved === "light" || saved === "dark" ? saved : "dark";
+    return saved === "light" || saved === "dark" ? saved : "light";
   });
 
   useEffect(() => {

@@ -14,7 +14,7 @@ const HOLDINGS = [
   { sym: "XAU/USD", qty: 5, avg: 2380, alloc: 22 },
   { sym: "EUR/USD", qty: 12, avg: 1.08, alloc: 14 },
   { sym: "AAPL", qty: 25, avg: 198, alloc: 12 },
-  { sym: "NIFTY50", qty: 3, avg: 23800, alloc: 14 },
+  { sym: "US500", qty: 3, avg: 5280, alloc: 14 },
   { sym: "WTI", qty: 30, avg: 74.2, alloc: 10 },
 ];
 

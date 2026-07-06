@@ -41,7 +41,7 @@ function SettingRow({
 function SettingsPage() {
   const { theme, setTheme } = useTheme();
   const [lang, setLang] = useState("en-IN");
-  const [ccy, setCcy] = useState("INR");
+  const [ccy, setCcy] = useState("USD");
   const [emailN, setEmailN] = useState(true);
   const [pushN, setPushN] = useState(true);
   const [smsN, setSmsN] = useState(false);
@@ -83,10 +83,10 @@ function SettingsPage() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="INR">INR · ₹</SelectItem>
                 <SelectItem value="USD">USD · $</SelectItem>
                 <SelectItem value="EUR">EUR · €</SelectItem>
                 <SelectItem value="GBP">GBP · £</SelectItem>
+                <SelectItem value="INR">INR · ₹</SelectItem>
               </SelectContent>
             </Select>
           </SettingRow>

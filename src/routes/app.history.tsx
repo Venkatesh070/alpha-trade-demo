@@ -9,7 +9,7 @@ export const Route = createFileRoute("/app/history")({
 });
 
 const HIST = Array.from({ length: 18 }, (_, i) => {
-  const syms = ["XAU/USD", "BTC/USD", "EUR/USD", "AAPL", "NIFTY50", "WTI"];
+  const syms = ["XAU/USD", "BTC/USD", "EUR/USD", "AAPL", "US500", "WTI"];
   const sides = ["BUY", "SELL"] as const;
   const seed = (i + 1) * 9301;
   const r = (seed % 233280) / 233280;

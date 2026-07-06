@@ -25,9 +25,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ALL_ASSETS, sparklineFor } from "@/data/markets";
+import { GatedPrice, GatedChange, GatedNumber, PriceLockBanner, GatedChart } from "@/components/pricing/price-gate";
+import { ALL_ASSETS, getAsset, sparklineFor } from "@/data/markets";
 import { FAQS, FEATURES, PRICING, TESTIMONIALS } from "@/data/content";
-import { GatedPrice, PriceLockBanner, GatedChart } from "@/components/pricing/price-gate";
 
 const ICON_MAP = {
   Zap,
@@ -61,7 +61,7 @@ export const Route = createFileRoute("/")({
 });
 
 function LandingPage() {
-  const featured = ["XAU/USD", "BTC/USD", "EUR/USD", "NAS100", "AAPL", "NIFTY50"];
+  const featured = ["XAU/USD", "BTC/USD", "EUR/USD", "NAS100", "AAPL", "US500"];
 
   return (
     <div className="relative min-h-screen">
@@ -390,21 +390,27 @@ function BentoCard({
 }
 
 function HeroChartCard() {
+  const asset = getAsset("BTC/USD")!;
   const points = sparklineFor("BTC/USD", 80);
   return (
     <div className="glossy relative rounded-3xl p-4">
       <div className="flex items-center justify-between p-2">
         <div>
           <div className="text-xs text-muted-foreground">BTC / USD · 4H</div>
-          <div className="font-display text-2xl font-bold">
-            $68,420.<span className="text-muted-foreground">50</span>
-          </div>
+          <GatedPrice
+            asset={asset}
+            price={asset.price}
+            changePct={asset.changePct}
+            showChange={false}
+            align="left"
+            className="mt-0.5"
+            priceClassName="font-display text-2xl font-bold"
+          />
         </div>
-        <div className="text-right text-xs">
-          <div className="rounded-md bg-[color:var(--success)]/20 px-2 py-1 font-mono text-[color:var(--success)]">
-            +2.41%
-          </div>
-        </div>
+        <GatedChange
+          changePct={asset.changePct}
+          className="rounded-md bg-[color:var(--success)]/20 px-2 py-1 text-xs"
+        />
       </div>
       <GatedChart className="relative h-64 w-full rounded-xl bg-[color:var(--surface-2)]/60 p-2" lockSize="lg">
         <Sparkline points={points} up className="h-full w-full" />
@@ -418,13 +424,22 @@ function HeroChartCard() {
       </GatedChart>
       <div className="mt-3 grid grid-cols-3 gap-2 px-2 text-[11px] text-muted-foreground">
         <div>
-          Open<div className="font-mono text-foreground">67,210</div>
+          Open
+          <div className="font-mono text-foreground">
+            <GatedNumber value="67,210" />
+          </div>
         </div>
         <div>
-          High<div className="font-mono text-foreground">68,612</div>
+          High
+          <div className="font-mono text-foreground">
+            <GatedNumber value="68,612" />
+          </div>
         </div>
         <div>
-          Low<div className="font-mono text-foreground">66,940</div>
+          Low
+          <div className="font-mono text-foreground">
+            <GatedNumber value="66,940" />
+          </div>
         </div>
       </div>
     </div>

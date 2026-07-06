@@ -83,7 +83,7 @@ const RECENT_TRADES = [
   { sym: "XAU/USD", side: "BUY" as const, qty: 0.1, px: 2412.55, pnl: 18.42 },
   { sym: "EUR/USD", side: "SELL" as const, qty: 0.5, px: 1.0842, pnl: -6.2 },
   { sym: "BTC/USD", side: "BUY" as const, qty: 0.01, px: 68420, pnl: 84.1 },
-  { sym: "NIFTY50", side: "BUY" as const, qty: 1, px: 24412, pnl: 42.0 },
+  { sym: "US500", side: "BUY" as const, qty: 1, px: 5432, pnl: 42.0 },
 ];
 
 function formatInr(n: number) {

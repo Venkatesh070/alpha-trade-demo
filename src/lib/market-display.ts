@@ -31,8 +31,7 @@ export const POPULAR_MARKET_SYMBOLS = [
   "USD/CHF",
   "AUD/USD",
   "DAX40",
-  "USD/INR",
-  "NIFTY50",
+  "US500",
   "WTI",
 ] as const;
 

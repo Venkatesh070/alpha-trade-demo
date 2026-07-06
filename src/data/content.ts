@@ -27,19 +27,19 @@ export const NEWS: NewsItem[] = [
   },
   {
     id: "n3",
-    title: "Rupee firms vs dollar on RBI intervention",
-    source: "DalalStreet",
+    title: "Euro holds firm as ECB signals patience on cuts",
+    source: "FX Wire",
     category: "Forex",
     time: "1h ago",
-    excerpt: "USD/INR slipped from session highs as state-run banks were spotted selling dollars.",
+    excerpt: "EUR/USD steadied near session highs as traders priced a slower easing path from Frankfurt.",
   },
   {
     id: "n4",
-    title: "Nifty 50 prints fresh all-time high led by IT pack",
-    source: "DalalStreet",
+    title: "S&P 500 extends rally on mega-cap earnings beat",
+    source: "WallStreet",
     category: "Indices",
     time: "2h ago",
-    excerpt: "Index heavyweights TCS and Infosys lifted the benchmark to a new record.",
+    excerpt: "US500 pushed higher as technology and financials led broad risk-on flows.",
   },
   {
     id: "n5",
@@ -77,7 +77,7 @@ export const TESTIMONIALS: Testimonial[] = [
     city: "Mumbai",
     rating: 5,
     quote:
-      "Tight spreads on USD/INR and instant withdrawals. The terminal is faster than anything else I've used in India.",
+      "Tight spreads on EUR/USD and gold. The terminal is faster than anything else I've used for global markets.",
   },
   {
     id: "t2",
@@ -206,9 +206,9 @@ export interface BlogPost {
 
 export const BLOGS: BlogPost[] = [
   {
-    slug: "rbi-rate-decision",
-    title: "Decoding the RBI rate decision: what it means for INR pairs",
-    excerpt: "Three scenarios for USD/INR, EUR/INR and GBP/INR after the upcoming MPC meeting.",
+    slug: "fed-rate-decision",
+    title: "Decoding the Fed rate decision: what it means for USD pairs",
+    excerpt: "Three scenarios for EUR/USD, GBP/USD and USD/JPY after the upcoming FOMC meeting.",
     author: "Arjun Mehta",
     date: "Jun 24, 2026",
     category: "Macro",
