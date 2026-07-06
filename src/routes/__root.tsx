@@ -18,6 +18,12 @@ import { WalletProvider } from "@/hooks/use-wallet";
 import { TradingProvider } from "@/hooks/use-trading";
 import { DepositPromptProvider } from "@/hooks/use-deposit-prompt";
 import { Toaster } from "@/components/ui/sonner";
+import { useTheme } from "@/hooks/use-theme";
+
+function ThemedToaster() {
+  const { theme } = useTheme();
+  return <Toaster position="top-right" theme={theme} />;
+}
 
 function NotFoundComponent() {
   return (
@@ -87,19 +93,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Exness India — Premium Trading Platform (Demo)" },
+      { title: "Exness India — Premium Trading Platform" },
       {
         name: "description",
         content:
-          "Exness India demo trading platform — forex, crypto, gold, oil, indices and global stocks with ultra-fast execution, low spreads and copy trading.",
+          "Exness India trading platform — forex, crypto, gold, oil, indices and global stocks with ultra-fast execution, low spreads and copy trading.",
       },
       { name: "author", content: "Exness India" },
-      { name: "theme-color", content: "#0F1A15" },
-      { property: "og:title", content: "Exness India — Premium Trading Platform (Demo)" },
+      { name: "theme-color", content: "#ffffff" },
+      { property: "og:title", content: "Exness India — Premium Trading Platform" },
       {
         property: "og:description",
         content:
-          "Trade 200+ markets with razor-thin spreads, 2000:1 leverage and instant UPI deposits — fully simulated demo.",
+          "Trade 200+ markets with razor-thin spreads, 2000:1 leverage and instant UPI deposits.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -147,7 +153,7 @@ function RootComponent() {
               <TradingProvider>
                 <DepositPromptProvider>
                   <Outlet />
-                  <Toaster position="top-right" theme="dark" />
+                  <ThemedToaster />
                 </DepositPromptProvider>
               </TradingProvider>
             </WalletProvider>

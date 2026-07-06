@@ -54,14 +54,9 @@ export function SiteHeader() {
               <Link to="/app">Dashboard</Link>
             </Button>
           ) : (
-            <>
-              <Button asChild variant="ghost" className="hidden sm:inline-flex">
-                <Link to="/login">Login</Link>
-              </Button>
-              <Button asChild className="gold-button hover:gold-button-hover">
-                <Link to="/register">Open Account</Link>
-              </Button>
-            </>
+            <Button asChild className="gold-button hover:gold-button-hover">
+              <Link to="/register">Get Started</Link>
+            </Button>
           )}
           <button
             onClick={() => setOpen((v) => !v)}

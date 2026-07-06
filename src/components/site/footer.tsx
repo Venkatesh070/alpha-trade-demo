@@ -36,13 +36,13 @@ export function SiteFooter() {
         <div className="lg:col-span-2">
           <Logo />
           <p className="mt-4 max-w-sm text-sm text-muted-foreground">
-            Exness India — a premium demonstration trading platform showcasing forex, crypto,
-            metals, indices and global equities. All trades and balances are simulated.
+            Exness India — a premium trading platform for forex, crypto, metals, indices and
+            global equities.
           </p>
           <p className="mt-6 text-xs text-muted-foreground/70">
             <strong className="text-foreground/80">Risk warning:</strong> Trading derivatives
-            carries substantial risk. This is a demo product and not a solicitation. Past
-            performance is not indicative of future results.
+            carries substantial risk and is not suitable for all investors. Past performance is
+            not indicative of future results.
           </p>
         </div>
         {COLS.map((c) => (
@@ -68,13 +68,10 @@ export function SiteFooter() {
       <div className="border-t border-border/60">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-6 text-xs text-muted-foreground sm:flex-row sm:px-6">
           <div>
-            © {new Date().getFullYear()} Exness India — Demo Platform. Not affiliated with any real
-            broker.
+            © {new Date().getFullYear()} Exness India. All rights reserved.
           </div>
           <div className="flex items-center gap-4">
-            <span>SEBI guidance simulated</span>
-            <span>•</span>
-            <span>v1.0 demo</span>
+            <span>v1.0</span>
           </div>
         </div>
       </div>

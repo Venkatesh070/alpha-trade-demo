@@ -52,7 +52,7 @@ function MarketsPage() {
           Trade <span className="gold-text">200+ instruments</span>
         </h1>
         <p className="mt-2 max-w-2xl text-muted-foreground">
-          Live demo prices, updated every two seconds. Click any symbol to open it in the terminal.
+          Live prices, updated every two seconds. Click any symbol to open it in the terminal.
         </p>
 
         <PriceLockBanner className="mt-6" />

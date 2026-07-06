@@ -19,7 +19,7 @@ function CompetitionsPage() {
     <PageShell
       eyebrow="Events"
       title="Competitions"
-      description="Join live trading contests, climb the ranks, and win demo prizes."
+      description="Join live trading contests, climb the ranks, and win prizes."
       width="xl"
     >
       <PriceLockBanner />

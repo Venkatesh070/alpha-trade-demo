@@ -8,7 +8,7 @@ export function welcomeEmailHtml(userName: string, appUrl: string): string {
       Your email has been verified and your Exness India account is now active.
     </p>
     <p style="margin:0;font-size:15px;line-height:1.6;color:#b0b0b0;">
-      Explore markets, manage your portfolio, and experience our premium demo trading platform.
+      Explore markets, manage your portfolio, and experience our premium trading platform.
     </p>
     ${primaryButton(appUrl, "Go to Dashboard")}
     <p style="margin:28px 0 0;font-size:12px;line-height:1.6;color:#666666;">

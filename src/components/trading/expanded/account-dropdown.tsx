@@ -12,19 +12,13 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAuth } from "@/hooks/use-auth";
 import { useWallet } from "@/hooks/use-wallet";
+import { accountIdFromEmail } from "@/lib/account-id";
 import { cn } from "@/lib/utils";
 import { XM_BORDER, XM_CHART_BG, XM_REAL_DOT, XM_TEXT } from "@/lib/xm-trading-tokens";
 
 const ACCOUNT_TYPE = "Ultra Low Standard";
 const PLATFORM = "MT5 Ultra Low Standard";
 const LEVERAGE = "1:1000";
-
-function demoAccountId(email?: string) {
-  if (!email) return "430395642";
-  let hash = 0;
-  for (let i = 0; i < email.length; i++) hash = (hash * 31 + email.charCodeAt(i)) >>> 0;
-  return String(430000000 + (hash % 999999));
-}
 
 function MetricRow({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
   return (
@@ -51,7 +45,7 @@ export function AccountDropdown({
   const [open, setOpen] = useState(false);
   const { balance } = useWallet();
   const { user } = useAuth();
-  const accountId = demoAccountId(user?.email);
+  const accountId = accountIdFromEmail(user?.email);
   const sym = currency === "usd" ? "$" : "₹";
   const formatted = `${sym}${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 

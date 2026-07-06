@@ -11,7 +11,7 @@ function AdminMedia() {
       <div className="glossy rounded-2xl p-8 text-center">
         <Upload className="mx-auto h-10 w-10 text-[color:var(--gold)]" />
         <p className="mt-3 text-sm text-muted-foreground">
-          Drop files here or click to upload (demo only).
+          Drop files here or click to upload (admin only).
         </p>
         <Button className="mt-4 gold-button hover:gold-button-hover">Choose files</Button>
       </div>

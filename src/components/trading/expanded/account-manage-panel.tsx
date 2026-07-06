@@ -27,18 +27,12 @@ import {
   formatInr,
   formatSignedInr,
 } from "@/lib/account-metrics";
+import { accountIdFromEmail } from "@/lib/account-id";
 import { cn } from "@/lib/utils";
 
 const ACCOUNT_TYPE = "Ultra Low Standard";
 const PLATFORM = "MT5 Ultra Low Standard";
 const LEVERAGE = `1:${ACCOUNT_LEVERAGE}`;
-
-function demoAccountId(email?: string) {
-  if (!email) return "430395642";
-  let hash = 0;
-  for (let i = 0; i < email.length; i++) hash = (hash * 31 + email.charCodeAt(i)) >>> 0;
-  return String(430000000 + (hash % 999999));
-}
 
 function MetricRow({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
   return (
@@ -65,7 +59,7 @@ export function AccountManagePanel({ onClose }: { onClose: () => void }) {
   const { user } = useAuth();
   const { openPositions, closedTrades } = useTrading();
   const live = useLivePrices(4000);
-  const accountId = demoAccountId(user?.email);
+  const accountId = accountIdFromEmail(user?.email);
 
   const prices = Object.fromEntries(
     ALL_ASSETS.map((asset) => [asset.symbol, live[asset.symbol]?.price ?? asset.price]),

@@ -23,7 +23,7 @@ function WalletPage() {
     <PageShell
       eyebrow="Funds"
       title="Wallet"
-      description="Manage your demo balance, deposits, withdrawals, and transaction history."
+      description="Manage your balance, deposits, withdrawals, and transaction history."
       width="xl"
       actions={
         <div className="flex gap-2">
@@ -47,7 +47,7 @@ function WalletPage() {
                 })}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
-                Demo funds · deposit the amount to enable trading
+                Available funds · deposit the amount to enable trading
               </p>
             </div>
             <span className="grid h-11 w-11 place-items-center rounded-xl bg-[color:var(--gold)]/10">

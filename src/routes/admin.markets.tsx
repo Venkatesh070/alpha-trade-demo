@@ -8,7 +8,7 @@ function AdminMarkets() {
     <div className="space-y-4 p-6">
       <h1 className="font-display text-2xl font-bold">Markets · Price manager</h1>
       <p className="text-sm text-muted-foreground">
-        Override seed prices for the simulated feed. Demo only.
+        Override seed prices for the simulated feed. Admin only.
       </p>
       <div className="glossy overflow-hidden rounded-2xl">
         <table className="w-full text-sm">

@@ -39,7 +39,7 @@ function ContactPage() {
               <Phone className="h-5 w-5 text-[color:var(--gold)]" /> +91 80 4567 8900
             </li>
             <li className="flex items-center gap-3">
-              <Mail className="h-5 w-5 text-[color:var(--gold)]" /> support@exness-india-demo.test
+              <Mail className="h-5 w-5 text-[color:var(--gold)]" /> support@exness-india.com
             </li>
             <li className="flex items-center gap-3">
               <MessageCircle className="h-5 w-5 text-[color:var(--gold)]" /> Live chat —

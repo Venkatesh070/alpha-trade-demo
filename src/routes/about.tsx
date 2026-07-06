@@ -10,7 +10,7 @@ export const Route = createFileRoute("/about")({
       {
         name: "description",
         content:
-          "Who we are, what we believe, and how we built India's most modern demo trading experience.",
+          "Who we are, what we believe, and how we built India's most modern trading experience.",
       },
     ],
   }),
@@ -27,7 +27,7 @@ function AboutPage() {
           Built for serious <span className="gold-text">Indian traders.</span>
         </h1>
         <p className="mt-4 text-muted-foreground">
-          Exness India (demo) is a showcase of what a modern, fast, premium retail brokerage can
+          Exness India is a showcase of what a modern, fast, premium retail brokerage can
           feel like. Our mission is simple: give every trader in India access to institutional-grade
           tools without the complexity.
         </p>

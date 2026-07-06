@@ -3,6 +3,7 @@ import { Bell, LogOut, Menu, Moon, Search, Sun, User2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/use-theme";
 import { DepositButton, WithdrawButton } from "@/components/pricing/price-gate";
+import { accountIdFromEmail } from "@/lib/account-id";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +17,7 @@ export function AppTopbar({ onMenu }: { onMenu: () => void }) {
   const { user, logout } = useAuth();
   const { theme, toggle } = useTheme();
   const nav = useNavigate();
+  const accountId = accountIdFromEmail(user?.email);
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border/60 bg-background/95 px-4 backdrop-blur-xl light:shadow-sm light:shadow-black/[0.03]">
@@ -62,7 +64,10 @@ export function AppTopbar({ onMenu }: { onMenu: () => void }) {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>
               <div className="font-medium">{user?.name}</div>
-              <div className="text-xs text-muted-foreground">{user?.email}</div>
+              <div className="text-xs text-muted-foreground">
+                Account ID{" "}
+                <span className="font-mono tabular-nums text-foreground/80">{accountId}</span>
+              </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => nav({ to: "/app/profile" })}>

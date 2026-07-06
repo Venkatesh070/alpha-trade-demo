@@ -1,10 +1,10 @@
 const FIREBASE_AUTH_ERRORS: Record<string, string> = {
   "auth/api-key-not-valid.-please-pass-a-valid-api-key.":
-    "Firebase API key is invalid. Copy the real key from Firebase Console → Project settings → Your apps → Web app config → apiKey, then update alpha-trade-demo/.env and restart the dev server.",
+    "Firebase API key is invalid. Copy the real key from Firebase Console → Project settings → Your apps → Web app config → apiKey, then update .env and restart the dev server.",
   "auth/api-key-not-valid":
-    "Firebase API key is invalid. Update VITE_FIREBASE_API_KEY in alpha-trade-demo/.env from Firebase Console.",
+    "Firebase API key is invalid. Update VITE_FIREBASE_API_KEY in .env from Firebase Console.",
   "auth/invalid-api-key":
-    "Firebase API key is invalid. Update VITE_FIREBASE_API_KEY in alpha-trade-demo/.env from Firebase Console.",
+    "Firebase API key is invalid. Update VITE_FIREBASE_API_KEY in .env from Firebase Console.",
   "auth/email-already-in-use": "An account with that email already exists.",
   "auth/invalid-email": "Enter a valid email address.",
   "auth/user-not-found": "No account found for that email.",

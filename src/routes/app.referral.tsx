@@ -27,7 +27,7 @@ function ReferralPage() {
   const link =
     typeof window !== "undefined"
       ? `${window.location.origin}/register?ref=${code}`
-      : `https://exness-india.demo/register?ref=${code}`;
+      : `https://exness-india.com/register?ref=${code}`;
 
   return (
     <PageShell

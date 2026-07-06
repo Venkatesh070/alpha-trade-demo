@@ -104,7 +104,7 @@ function VerificationPage() {
       <div className="glossy-soft flex items-start gap-3 rounded-2xl p-4 text-sm text-muted-foreground">
         <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[color:var(--gold)]" />
         <p>
-          Documents are encrypted at rest. Demo KYC is simulated — no real identity data is
+          Documents are encrypted at rest. KYC review is handled securely — no identity data is
           transmitted.
         </p>
       </div>

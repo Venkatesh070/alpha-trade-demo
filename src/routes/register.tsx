@@ -1,15 +1,15 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { SiteHeader } from "@/components/site/header";
+import { Eye, EyeOff } from "lucide-react";
+import { AuthGate } from "@/components/auth/auth-gate";
+import { AuthShell, GoogleAuthButton, authInputClass, authLabelClass } from "@/components/auth/auth-shell";
 import { RedirectIfAuthed } from "@/components/auth/redirect-if-authed";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/use-auth";
+import { cn } from "@/lib/utils";
 
 const schema = z.object({
   name: z.string().trim().min(2, "Enter your full name").max(80),
@@ -20,14 +20,19 @@ const schema = z.object({
 type FormVals = z.infer<typeof schema>;
 
 export const Route = createFileRoute("/register")({
-  head: () => ({ meta: [{ title: "Open Account — Exness India" }] }),
+  validateSearch: (s) => ({
+    step: (s.step as string) === "form" ? ("form" as const) : undefined,
+  }),
+  head: () => ({ meta: [{ title: "Create an account — Exness India" }] }),
   component: RegisterPage,
 });
 
 function RegisterPage() {
+  const { step } = useSearch({ from: "/register" });
+
   return (
     <RedirectIfAuthed>
-      <RegisterForm />
+      {step === "form" ? <RegisterForm /> : <AuthGate />}
     </RedirectIfAuthed>
   );
 }
@@ -35,6 +40,7 @@ function RegisterPage() {
 function RegisterForm() {
   const { register } = useAuth();
   const nav = useNavigate();
+  const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const form = useForm<FormVals>({
@@ -56,69 +62,90 @@ function RegisterForm() {
   };
 
   return (
-    <div className="min-h-screen">
-      <SiteHeader />
-      <div className="mx-auto grid max-w-md gap-6 px-4 py-12">
+    <AuthShell active="signup">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
         <div>
-          <h1 className="font-display text-3xl font-extrabold">
-            Open an <span className="gold-text">account</span>
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            We&apos;ll send a verification link to your email to activate your account.
-          </p>
-        </div>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="glossy space-y-4 rounded-2xl p-6">
-          <div>
-            <Label htmlFor="name">Full name</Label>
-            <Input id="name" {...form.register("name")} />
-            {form.formState.errors.name && (
-              <p className="mt-1 text-xs text-[color:var(--destructive)]">
-                {form.formState.errors.name.message}
-              </p>
-            )}
-          </div>
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" {...form.register("email")} />
-            {form.formState.errors.email && (
-              <p className="mt-1 text-xs text-[color:var(--destructive)]">
-                {form.formState.errors.email.message}
-              </p>
-            )}
-          </div>
-          <div>
-            <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" {...form.register("password")} />
-            {form.formState.errors.password && (
-              <p className="mt-1 text-xs text-[color:var(--destructive)]">
-                {form.formState.errors.password.message}
-              </p>
-            )}
-          </div>
-          <label className="flex items-start gap-2 text-xs text-muted-foreground">
-            <input
-              type="checkbox"
-              {...form.register("accept")}
-              className="mt-0.5 accent-[color:var(--gold)]"
-            />
-            <span>I confirm I am 18+ and accept the Terms & Risk Disclosure.</span>
+          <label htmlFor="name" className={authLabelClass}>
+            Your full name
           </label>
-          {form.formState.errors.accept && (
-            <p className="text-xs text-[color:var(--destructive)]">
-              {form.formState.errors.accept.message}
-            </p>
+          <input id="name" autoComplete="name" className={authInputClass} {...form.register("name")} />
+          {form.formState.errors.name && (
+            <p className="mt-1 text-xs text-[#e5494d]">{form.formState.errors.name.message}</p>
           )}
-          <Button disabled={loading} className="gold-button hover:gold-button-hover w-full">
-            {loading ? "Creating…" : "Create account"}
-          </Button>
-          <p className="text-center text-sm text-muted-foreground">
-            Already a member?{" "}
-            <Link to="/login" className="text-[color:var(--gold)] hover:underline">
-              Sign in
-            </Link>
-          </p>
-        </form>
-      </div>
-    </div>
+        </div>
+        <div>
+          <label htmlFor="email" className={authLabelClass}>
+            Your email address
+          </label>
+          <input
+            id="email"
+            type="email"
+            autoComplete="email"
+            className={authInputClass}
+            {...form.register("email")}
+          />
+          {form.formState.errors.email && (
+            <p className="mt-1 text-xs text-[#e5494d]">{form.formState.errors.email.message}</p>
+          )}
+        </div>
+        <div>
+          <label htmlFor="password" className={authLabelClass}>
+            Password
+          </label>
+          <div className="relative">
+            <input
+              id="password"
+              type={showPw ? "text" : "password"}
+              autoComplete="new-password"
+              className={cn(authInputClass, "pr-10")}
+              {...form.register("password")}
+            />
+            <button
+              type="button"
+              aria-label={showPw ? "Hide password" : "Show password"}
+              onClick={() => setShowPw((v) => !v)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#141d22]/40 hover:text-[#141d22]"
+            >
+              {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
+          {form.formState.errors.password && (
+            <p className="mt-1 text-xs text-[#e5494d]">{form.formState.errors.password.message}</p>
+          )}
+        </div>
+
+        <label className="flex items-start gap-2 text-xs leading-relaxed text-[#141d22]/60">
+          <input
+            type="checkbox"
+            {...form.register("accept")}
+            className="mt-0.5 accent-[#ffde02]"
+          />
+          <span>I confirm I am 18+ and accept the Terms &amp; Risk Disclosure.</span>
+        </label>
+        {form.formState.errors.accept && (
+          <p className="text-xs text-[#e5494d]">{form.formState.errors.accept.message}</p>
+        )}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className={cn(
+            "mt-1 inline-flex h-11 w-full items-center justify-center rounded",
+            "bg-[#ffde02] text-sm font-semibold text-black",
+            "transition-colors hover:bg-[#ffe535] active:bg-[#d1b500] disabled:opacity-60",
+          )}
+        >
+          {loading ? "Creating account…" : "Continue"}
+        </button>
+
+        <div className="flex items-center gap-3 py-1">
+          <span className="h-px flex-1 bg-[#141d22]/10" />
+          <span className="text-xs text-[#141d22]/50">Or sign up with</span>
+          <span className="h-px flex-1 bg-[#141d22]/10" />
+        </div>
+
+        <GoogleAuthButton label="Google" />
+      </form>
+    </AuthShell>
   );
 }

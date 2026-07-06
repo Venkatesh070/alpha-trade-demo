@@ -24,7 +24,7 @@ export interface DepositRequest {
   reviewedAt?: number;
 }
 
-const DEMO_QR_PLACEHOLDER =
+const DEFAULT_QR_PLACEHOLDER =
   "data:image/svg+xml," +
   encodeURIComponent(
     `<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240">
@@ -49,14 +49,14 @@ const DEMO_QR_PLACEHOLDER =
         <rect x="100" y="180" width="10" height="10"/><rect x="130" y="180" width="10" height="10"/><rect x="170" y="180" width="10" height="10"/>
         <rect x="100" y="200" width="10" height="10"/><rect x="140" y="200" width="10" height="10"/><rect x="180" y="200" width="10" height="10"/>
       </g>
-      <text x="120" y="235" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#666">Demo QR · admin can replace</text>
+      <text x="120" y="235" text-anchor="middle" font-family="sans-serif" font-size="9" fill="#666">Scan to pay · UPI</text>
     </svg>`,
   );
 
 const DEFAULT_SETTINGS: PaymentSettings = {
-  qrImage: DEMO_QR_PLACEHOLDER,
-  upiId: "exness.demo@upi",
-  accountName: "Exness India Demo",
+  qrImage: DEFAULT_QR_PLACEHOLDER,
+  upiId: "exness-india@upi",
+  accountName: "Exness India",
   updatedAt: 0,
 };
 

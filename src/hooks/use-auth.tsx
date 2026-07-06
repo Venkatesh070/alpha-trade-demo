@@ -14,10 +14,8 @@ import { sendUserVerificationEmail } from "@/lib/email-verification";
 import { mapFirebaseAuthError } from "@/lib/firebase-errors";
 import { auth } from "@/lib/firebase";
 
-export type DemoUser = UserProfile;
-
 interface AuthCtx {
-  user: DemoUser | null;
+  user: UserProfile | null;
   emailVerified: boolean;
   isAuthenticated: boolean;
   needsEmailVerification: boolean;
@@ -28,7 +26,7 @@ interface AuthCtx {
   resendVerificationEmail: () => Promise<void>;
   confirmEmailVerified: () => Promise<boolean>;
   resetPassword: (email: string, newPassword: string) => Promise<void>;
-  updateUser: (patch: Partial<DemoUser>) => void;
+  updateUser: (patch: Partial<UserProfile>) => void;
 }
 
 const AuthContext = createContext<AuthCtx | null>(null);
@@ -40,7 +38,7 @@ async function loadProfile(firebaseUser: FirebaseUser): Promise<UserProfile> {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<DemoUser | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [emailVerified, setEmailVerified] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -151,7 +149,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await mailSendPasswordReset(email);
   }, []);
 
-  const updateUser = useCallback((patch: Partial<DemoUser>) => {
+  const updateUser = useCallback((patch: Partial<UserProfile>) => {
     setUser((prev) => (prev ? { ...prev, ...patch } : null));
   }, []);
 

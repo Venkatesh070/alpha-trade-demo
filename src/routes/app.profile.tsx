@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ShieldCheck, KeyRound, Monitor } from "lucide-react";
-import { PageShell } from "@/components/dashboard/page-shell";
+import { accountIdFromEmail } from "@/lib/account-id";
 import { DataPanel } from "@/components/dashboard/data-panel";
 
 export const Route = createFileRoute("/app/profile")({
@@ -17,6 +17,8 @@ function ProfilePage() {
   const { user, updateUser } = useAuth();
   const [name, setName] = useState(user?.name ?? "");
   const [country, setCountry] = useState(user?.country ?? "India");
+
+  const accountId = accountIdFromEmail(user?.email);
 
   const save = (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,9 +51,9 @@ function ProfilePage() {
             <div className="space-y-2">
               <Label>Account ID</Label>
               <Input
-                value={user?.id ?? ""}
+                value={accountId}
                 readOnly
-                className="bg-surface/50 font-mono text-xs opacity-80"
+                className="bg-surface/50 font-mono opacity-80"
               />
             </div>
           </div>

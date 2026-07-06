@@ -43,13 +43,13 @@ const ICON_MAP = {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Exness India — Trade Forex, Crypto, Gold & Stocks (Demo)" },
+      { title: "Exness India — Trade Forex, Crypto, Gold & Stocks" },
       {
         name: "description",
         content:
-          "Premium demo trading platform. Razor-thin spreads from 0.0 pips, 2000:1 leverage, instant UPI deposits, and copy trading.",
+          "Premium trading platform. Razor-thin spreads from 0.0 pips, 2000:1 leverage, instant UPI deposits, and copy trading.",
       },
-      { property: "og:title", content: "Exness India — Premium Demo Trading Platform" },
+      { property: "og:title", content: "Exness India — Premium Trading Platform" },
       {
         property: "og:description",
         content:
@@ -74,7 +74,7 @@ function LandingPage() {
             <div>
               <span className="inline-flex items-center gap-2 rounded-full border border-[color:var(--gold)]/30 bg-[color:var(--gold)]/10 px-3 py-1 text-xs font-medium text-[color:var(--gold)]">
                 <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--gold)] pulse-gold" />
-                Live demo · India edition
+                Live · India edition
               </span>
               <h1 className="mt-6 font-display text-5xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
                 Trade <span className="gold-text">200+ markets</span>
@@ -83,8 +83,7 @@ function LandingPage() {
               </h1>
               <p className="mt-6 max-w-xl text-base text-muted-foreground sm:text-lg">
                 Sub-15ms execution, spreads from 0.0 pips, instant UPI deposits and full copy
-                trading — all in a polished terminal built for the Indian market.{" "}
-                <strong className="text-foreground">100% simulated demo.</strong>
+                trading — all in a polished terminal built for the Indian market.
               </p>
               <div className="mt-8 flex flex-wrap items-center gap-3">
                 <Button
@@ -93,7 +92,7 @@ function LandingPage() {
                   className="gold-button hover:gold-button-hover h-12 px-6 text-sm font-semibold"
                 >
                   <Link to="/register">
-                    Open Account <ArrowRight className="ml-2 h-4 w-4" />
+                    Get Started <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
                 <Button
@@ -334,7 +333,7 @@ function LandingPage() {
             Ready to <span className="gold-text">trade smarter?</span>
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
-            Open an account in 30 seconds. ₹10,00,000 virtual balance, instant access to every
+            Open an account in 30 seconds. Instant UPI deposits, instant access to every
             market.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
@@ -343,7 +342,7 @@ function LandingPage() {
               size="lg"
               className="gold-button hover:gold-button-hover h-12 px-6 text-sm font-semibold"
             >
-              <Link to="/register">Open Account</Link>
+              <Link to="/register">Get Started</Link>
             </Button>
             <Button
               asChild

@@ -135,7 +135,7 @@ export const FAQS: FaqItem[] = [
   {
     category: "Account",
     q: "How do I open an account?",
-    a: "Click 'Open Account' on the landing page. You'll receive a virtual ₹10,00,000 balance instantly — no KYC required.",
+    a: "Click 'Get Started' on the landing page. Fund your account via UPI to begin trading.",
   },
   {
     category: "Account",
@@ -401,7 +401,7 @@ export const COMPETITIONS: Competition[] = [
     participants: 0,
     endsIn: "Starts Aug 15",
     status: "upcoming",
-    description: "India's biggest demo-trading event. Open to verified residents.",
+    description: "India's biggest trading event. Open to verified residents.",
   },
 ];
 
