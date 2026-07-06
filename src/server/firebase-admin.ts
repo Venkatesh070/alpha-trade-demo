@@ -1,4 +1,4 @@
-import "./load-env";
+import { loadServerEnv } from "./load-env";
 import { cert, getApps, initializeApp, type App } from "firebase-admin/app";
 import { getAuth, type Auth } from "firebase-admin/auth";
 
@@ -7,6 +7,8 @@ function getServiceAccount(): {
   clientEmail: string;
   privateKey: string;
 } {
+  loadServerEnv();
+
   const json = process.env.FIREBASE_SERVICE_ACCOUNT_JSON?.trim();
   if (json) {
     const parsed = JSON.parse(json) as {
@@ -38,8 +40,13 @@ export function getAdminAuth(): Auth {
   if (!adminAuth) {
     const account = getServiceAccount();
     if (!account.projectId || !account.clientEmail || !account.privateKey) {
+      const missing = [
+        !account.projectId && "FIREBASE_PROJECT_ID",
+        !account.clientEmail && "FIREBASE_CLIENT_EMAIL",
+        !account.privateKey && "FIREBASE_PRIVATE_KEY",
+      ].filter(Boolean);
       throw new Error(
-        "Firebase Admin credentials missing. Set FIREBASE_SERVICE_ACCOUNT_JSON or FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, and FIREBASE_PRIVATE_KEY.",
+        `Firebase Admin credentials missing (${missing.join(", ")}). Set FIREBASE_SERVICE_ACCOUNT_JSON or the individual env vars in .env at the project root.`,
       );
     }
 

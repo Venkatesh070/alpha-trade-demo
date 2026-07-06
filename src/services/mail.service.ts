@@ -1,4 +1,4 @@
-import "@/server/load-env";
+import { loadServerEnv } from "@/server/load-env";
 import { Resend } from "resend";
 import { passwordResetEmailHtml } from "@/services/email-templates/password-reset";
 import { verificationEmailHtml } from "@/services/email-templates/verification";
@@ -11,6 +11,7 @@ let resendClient: Resend | undefined;
 
 function getResend(): Resend {
   if (!resendClient) {
+    loadServerEnv();
     const apiKey = process.env.RESEND_API_KEY?.trim();
     if (!apiKey) {
       throw new Error("RESEND_API_KEY is not configured.");

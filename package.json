@@ -1,7 +1,10 @@
 {
   "name": "tanstack_start_ts",
   "private": true,
-  "sideEffects": false,
+  "sideEffects": [
+    "src/server/load-env.ts",
+    "src/server.ts"
+  ],
   "type": "module",
   "engines": {
     "node": ">=20"
@@ -11,7 +14,7 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
-    "start": "node .output/server/index.mjs",
+    "start": "node --env-file=.env .output/server/index.mjs",
     "lint": "eslint .",
     "format": "prettier --write ."
   },

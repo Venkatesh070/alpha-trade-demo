@@ -1,3 +1,5 @@
+import { loadServerEnv } from "@/server/load-env";
+
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 interface EmailActionCodeSettings {
@@ -55,6 +57,8 @@ export async function verifyBearerToken(
       headers: { "Content-Type": "application/json" },
     });
   }
+
+  loadServerEnv();
 
   const { getAdminAuth } = await import("@/server/firebase-admin");
   const decoded = await getAdminAuth().verifyIdToken(token);
