@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import type { Asset } from "@/data/markets";
 import { formatPrice } from "@/hooks/use-live-prices";
 import { useWallet } from "@/hooks/use-wallet";
+import { usePriceAccess } from "@/components/pricing/price-gate";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -55,13 +56,14 @@ function Segmented({
 }
 
 export function MarketStatusSidePanel({ asset, price }: { asset: Asset; price: number }) {
+  const { canViewPrices } = usePriceAccess();
   const { canTrade, balance } = useWallet();
   const spread = asset.spread ?? 2;
   const pip = asset.category === "crypto" ? price * 0.0001 : 0.0001;
   const ask = price + spread * pip;
   const bid = price - spread * pip;
   const spreadDisplay = spread * pip;
-  const fmt = (n: number) => formatPrice(asset, n);
+  const fmt = (n: number) => (canViewPrices ? formatPrice(asset, n) : "—.—");
 
   const [oneClick, setOneClick] = useState(false);
   const [side, setSide] = useState<"buy" | "sell">("buy");
@@ -175,7 +177,7 @@ export function MarketStatusSidePanel({ asset, price }: { asset: Asset; price: n
 
           <div className="flex min-w-[2.75rem] flex-col items-center justify-center rounded-md border bg-background px-1.5 py-2">
             <span className="font-mono text-[11px] font-semibold tabular-nums text-muted-foreground">
-              {spreadDisplay.toFixed(2)}
+              {canViewPrices ? spreadDisplay.toFixed(2) : "—.—"}
             </span>
           </div>
 

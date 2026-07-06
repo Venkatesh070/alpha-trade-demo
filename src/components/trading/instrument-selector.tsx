@@ -3,6 +3,7 @@ import { ArrowDown, ArrowUp, Check, X } from "lucide-react";
 import { ALL_ASSETS, type Asset } from "@/data/markets";
 import { AssetIcon, terminalSymbol } from "@/components/trading/asset-icon";
 import { displayMarketSymbol } from "@/lib/market-display";
+import { usePriceAccess } from "@/components/pricing/price-gate";
 import { cn } from "@/lib/utils";
 
 const QUICK_PICKS = ["XAU/USD", "BTC/USD", "USD/JPY", "EUR/USD", "GBP/USD", "ETH/USD"];
@@ -26,6 +27,7 @@ export function InstrumentSelector({
 }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
+  const { canViewPrices } = usePriceAccess();
   const up = changePct >= 0;
   const decimals = Math.abs(changeAbs) >= 1 ? 2 : Math.abs(changeAbs) >= 0.01 ? 3 : 5;
   const displayAsset = asset ?? ALL_ASSETS.find((a) => a.symbol === symbol);
@@ -66,23 +68,29 @@ export function InstrumentSelector({
             {displayMarketSymbol(displayAsset)}
           </div>
           <div className="mt-0.5 flex items-center gap-1.5 text-[12px]">
-            <span
-              className={cn("font-mono tabular-nums", up ? "text-success" : "text-destructive")}
-            >
-              {up ? "+" : ""}
-              {changeAbs.toFixed(decimals)}
-            </span>
-            {up ? (
-              <ArrowUp className="h-3 w-3 text-success" />
+            {canViewPrices ? (
+              <>
+                <span
+                  className={cn("font-mono tabular-nums", up ? "text-success" : "text-destructive")}
+                >
+                  {up ? "+" : ""}
+                  {changeAbs.toFixed(decimals)}
+                </span>
+                {up ? (
+                  <ArrowUp className="h-3 w-3 text-success" />
+                ) : (
+                  <ArrowDown className="h-3 w-3 text-destructive" />
+                )}
+                <span
+                  className={cn("font-mono tabular-nums", up ? "text-success" : "text-destructive")}
+                >
+                  {up ? "+" : ""}
+                  {changePct.toFixed(2)}%
+                </span>
+              </>
             ) : (
-              <ArrowDown className="h-3 w-3 text-destructive" />
+              <span className="font-mono text-muted-foreground">—.— (—.—%)</span>
             )}
-            <span
-              className={cn("font-mono tabular-nums", up ? "text-success" : "text-destructive")}
-            >
-              {up ? "+" : ""}
-              {changePct.toFixed(2)}%
-            </span>
             <span className="text-muted-foreground">• {periodLabel}</span>
           </div>
         </div>

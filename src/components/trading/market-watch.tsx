@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { ALL_ASSETS, ASSETS_BY_CATEGORY, type Asset } from "@/data/markets";
-import { useLivePrices, formatPrice } from "@/hooks/use-live-prices";
+import { useLivePrices } from "@/hooks/use-live-prices";
 import { GatedPrice } from "@/components/pricing/price-gate";
 import { getMarketStatus } from "@/lib/market-status";
 import {
@@ -144,7 +144,6 @@ export function MarketWatch({
               const p = live[a.symbol];
               const price = p?.price ?? a.price;
               const changePct = p?.changePct ?? a.changePct;
-              const up = changePct >= 0;
               const isSel = selected === a.symbol;
               const subtitle = rowSubtitle(a);
 
@@ -182,21 +181,14 @@ export function MarketWatch({
                       {subtitle}
                     </div>
                   </div>
-                  <div className="shrink-0 text-right">
-                    <div
-                      className="font-mono text-[13px] font-medium tabular-nums leading-tight"
-                      style={{ color: MARKET_SIDEBAR.text }}
-                    >
-                      {formatPrice(a, price)}
-                    </div>
-                    <div
-                      className="font-mono text-[11px] tabular-nums leading-snug"
-                      style={{ color: up ? MARKET_SIDEBAR.up : MARKET_SIDEBAR.down }}
-                    >
-                      {up ? "+" : ""}
-                      {changePct.toFixed(2)}%
-                    </div>
-                  </div>
+                  <GatedPrice
+                    asset={a}
+                    price={price}
+                    changePct={changePct}
+                    align="right"
+                    priceClassName="text-[13px] font-medium leading-tight"
+                    changeClassName="text-[11px] leading-snug"
+                  />
                 </li>
               );
             })}
