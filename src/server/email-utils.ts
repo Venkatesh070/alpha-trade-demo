@@ -1,6 +1,9 @@
-import type { ActionCodeSettings } from "firebase-admin/auth";
-
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+interface EmailActionCodeSettings {
+  url: string;
+  handleCodeInApp: boolean;
+}
 
 export function isValidEmail(email: string): boolean {
   const trimmed = email.trim();
@@ -19,7 +22,7 @@ export function getAppBaseUrl(): string {
   return "http://localhost:8080";
 }
 
-export function verificationActionCodeSettings(email: string): ActionCodeSettings {
+export function verificationActionCodeSettings(email: string): EmailActionCodeSettings {
   const base = getAppBaseUrl();
   return {
     url: `${base}/verify?email=${encodeURIComponent(email)}`,
@@ -27,7 +30,7 @@ export function verificationActionCodeSettings(email: string): ActionCodeSetting
   };
 }
 
-export function passwordResetActionCodeSettings(email: string): ActionCodeSettings {
+export function passwordResetActionCodeSettings(email: string): EmailActionCodeSettings {
   const base = getAppBaseUrl();
   return {
     url: `${base}/reset-password?email=${encodeURIComponent(email)}`,
