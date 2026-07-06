@@ -151,7 +151,7 @@ export function OrderPanel({
         </Button>
         <Button
           onClick={() => submit("buy")}
-          className="bg-[color:var(--success)] text-[color:var(--success-foreground)] hover:brightness-110"
+          className="bg-[color:var(--buy)] text-[color:var(--buy-foreground)] hover:brightness-110"
         >
           Buy
         </Button>

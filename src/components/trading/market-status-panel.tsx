@@ -80,7 +80,7 @@ export function MarketStatusSidePanel({ asset, price }: { asset: Asset; price: n
   const [slAmount, setSlAmount] = useState("");
 
   const isBuy = side === "buy";
-  const accentClass = isBuy ? "bg-[color:var(--success)]" : "bg-[color:var(--destructive)]";
+  const accentClass = isBuy ? "bg-[color:var(--buy)]" : "bg-[color:var(--destructive)]";
   const switchChecked = "data-[state=checked]:bg-[color:var(--success)]";
   const marketPrice = isBuy ? ask : bid;
 
@@ -199,7 +199,7 @@ export function MarketStatusSidePanel({ asset, price }: { asset: Asset; price: n
             className={cn(
               "flex flex-col items-center justify-center rounded-r-xl px-2 py-3 transition disabled:opacity-50",
               side === "buy"
-                ? "bg-[color:var(--success)] text-white hover:brightness-110"
+                ? "bg-[color:var(--buy)] text-white hover:brightness-110"
                 : "bg-muted/50 hover:bg-muted",
             )}
           >

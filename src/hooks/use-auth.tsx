@@ -13,6 +13,7 @@ import { mailSendPasswordReset, mailSendWelcome } from "@/lib/mail-api";
 import { sendUserVerificationEmail } from "@/lib/email-verification";
 import { mapFirebaseAuthError } from "@/lib/firebase-errors";
 import { auth } from "@/lib/firebase";
+import { clearReferralCode, markReferralVerified, recordReferralSignup } from "@/lib/referral-db";
 
 interface AuthCtx {
   user: UserProfile | null;
@@ -21,7 +22,7 @@ interface AuthCtx {
   needsEmailVerification: boolean;
   loading: boolean;
   login: (email: string, password: string) => Promise<boolean>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string, refCode?: string) => Promise<void>;
   logout: () => void;
   resendVerificationEmail: () => Promise<void>;
   confirmEmailVerified: () => Promise<boolean>;
@@ -92,7 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const register = useCallback(async (name: string, email: string, password: string) => {
+  const register = useCallback(async (name: string, email: string, password: string, refCode?: string) => {
     try {
       const { user: profile } = await userRegister({ name, email, password });
       setUser(profile);
@@ -100,6 +101,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const cred = await signInWithEmailAndPassword(auth, email, password);
       await sendUserVerificationEmail(cred.user);
+
+      if (refCode) {
+        recordReferralSignup(refCode, { name, email });
+        clearReferralCode();
+      }
     } catch (err) {
       if (err instanceof Error && err.message.includes("already exists")) {
         throw err;
@@ -133,6 +139,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const idToken = await firebaseUser.getIdToken(true);
     const { user: profile } = await userVerifyEmail(idToken);
     setUser(profile);
+    if (firebaseUser.email) {
+      markReferralVerified(firebaseUser.email);
+    }
     await mailSendWelcome(idToken, profile.name).catch((err) => {
       console.error("Failed to send welcome email:", err);
     });

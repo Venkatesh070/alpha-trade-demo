@@ -2,7 +2,7 @@ import type { Asset } from "@/data/markets";
 import { formatPrice } from "@/hooks/use-live-prices";
 import { usePriceAccess } from "@/components/pricing/price-gate";
 import { cn } from "@/lib/utils";
-import { XM_DOWN, XM_ICON, XM_TEXT, XM_UP } from "@/lib/xm-trading-tokens";
+import { XM_BUY, XM_DOWN, XM_ICON, XM_TEXT } from "@/lib/xm-trading-tokens";
 import { Lock } from "lucide-react";
 
 export function ChartOhlcOverlay({
@@ -84,7 +84,7 @@ export function ChartOhlcOverlay({
         <button
           type="button"
           className="flex min-w-[88px] flex-col items-center px-3 py-1 text-white"
-          style={{ background: XM_UP }}
+          style={{ background: XM_BUY }}
         >
           <span className="text-[10px] font-semibold uppercase tracking-wide opacity-90">Buy</span>
           <span className="font-mono text-[13px] font-bold tabular-nums">{fmt(ask)}</span>

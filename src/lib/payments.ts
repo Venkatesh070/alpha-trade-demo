@@ -1,4 +1,5 @@
 import { creditWallet, updateWallet, type WalletTxn } from "@/lib/wallet-db";
+import { applyReferralDepositReward } from "@/lib/referral-db";
 import { randomId } from "@/lib/id";
 
 const SETTINGS_KEY = "exness-payment-settings";
@@ -146,6 +147,7 @@ export function approveDepositRequest(requestId: string) {
     depositRequestId: req.id,
     referenceId: req.referenceId,
   });
+  applyReferralDepositReward(req.userEmail, req.amount);
 
   return requests[idx];
 }

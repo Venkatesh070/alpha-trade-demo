@@ -95,12 +95,12 @@ export function ExpandedOrderPanel({
             type="button"
             disabled={disabled}
             onClick={() => place("buy")}
-            className="flex flex-col items-center justify-center rounded-lg border border-[color:var(--success)]/25 bg-[color:var(--success)]/10 px-2 py-3.5 transition hover:bg-[color:var(--success)]/18 disabled:opacity-50"
+            className="flex flex-col items-center justify-center rounded-lg border border-[color:var(--buy)]/25 bg-[color:var(--buy)]/10 px-2 py-3.5 transition hover:bg-[color:var(--buy)]/18 disabled:opacity-50"
           >
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[color:var(--success)]">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[color:var(--buy)]">
               Buy
             </span>
-            <span className="mt-1 font-mono text-base font-bold tabular-nums text-[color:var(--success)]">
+            <span className="mt-1 font-mono text-base font-bold tabular-nums text-[color:var(--buy)]">
               {formatPrice(asset, ask)}
             </span>
           </button>
@@ -158,7 +158,7 @@ export function ExpandedOrderPanel({
           type="button"
           disabled={disabled || insufficientMargin}
           onClick={() => place("buy")}
-          className="gold-button hover:gold-button-hover mt-auto h-11 w-full gap-2 text-sm font-bold"
+          className="mt-auto h-11 w-full gap-2 bg-[color:var(--buy)] text-sm font-bold text-[color:var(--buy-foreground)] hover:brightness-110"
         >
           Place Order at {formatPrice(asset, ask)}
           <ArrowRight className="h-4 w-4" />

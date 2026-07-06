@@ -1,9 +1,16 @@
 import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
+import { readReferralCode } from "@/lib/referral-db";
 
 const SUPPORT_EMAIL = "support@exness.com";
 
+function registerSearch() {
+  const ref = readReferralCode();
+  return ref ? { step: "form" as const, ref } : { step: "form" as const };
+}
+
 export function AuthGate({ className }: { className?: string }) {
+  const registerLinkSearch = registerSearch();
   return (
     <div className={cn("flex min-h-screen flex-col bg-white text-[#141d22]", className)}>
       <main className="flex flex-1 flex-col items-center justify-center px-6 py-10 text-center">
@@ -31,7 +38,7 @@ export function AuthGate({ className }: { className?: string }) {
             </Link>
             <Link
               to="/register"
-              search={{ step: "form" }}
+              search={registerLinkSearch}
               className={cn(
                 "inline-flex min-h-12 w-full items-center justify-center rounded px-6",
                 "bg-[#6c8595]/[0.08] text-base font-semibold text-[#141d22]",

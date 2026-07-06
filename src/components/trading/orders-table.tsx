@@ -49,7 +49,7 @@ export function OrdersTable({
                 className={cn(
                   "px-3 py-2 uppercase",
                   o.side === "buy"
-                    ? "text-[color:var(--success)]"
+                    ? "text-[color:var(--buy)]"
                     : "text-[color:var(--destructive)]",
                 )}
               >

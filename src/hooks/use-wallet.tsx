@@ -9,6 +9,7 @@ import {
 } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { addDepositRequest } from "@/lib/payments";
+import { applyReferralDepositReward } from "@/lib/referral-db";
 import { emptyWallet, getWallet, updateWallet, type WalletState } from "@/lib/wallet-db";
 
 export const MIN_TRADING_BALANCE = 5000;
@@ -74,6 +75,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           ...prev.transactions,
         ],
       }));
+      if (user.email) {
+        applyReferralDepositReward(user.email, amount);
+      }
     },
     [persist, user?.email],
   );

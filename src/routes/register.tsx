@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,6 +10,7 @@ import { AuthShell, GoogleAuthButton, authInputClass, authLabelClass } from "@/c
 import { RedirectIfAuthed } from "@/components/auth/redirect-if-authed";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
+import { readReferralCode } from "@/lib/referral-db";
 
 const schema = z.object({
   name: z.string().trim().min(2, "Enter your full name").max(80),
@@ -22,13 +23,18 @@ type FormVals = z.infer<typeof schema>;
 export const Route = createFileRoute("/register")({
   validateSearch: (s) => ({
     step: (s.step as string) === "form" ? ("form" as const) : undefined,
+    ref: typeof s.ref === "string" && s.ref.trim() ? s.ref.trim() : undefined,
   }),
   head: () => ({ meta: [{ title: "Create an account — Exness India" }] }),
   component: RegisterPage,
 });
 
 function RegisterPage() {
-  const { step } = useSearch({ from: "/register" });
+  const { step, ref } = useSearch({ from: "/register" });
+
+  useEffect(() => {
+    readReferralCode(ref);
+  }, [ref]);
 
   return (
     <RedirectIfAuthed>
@@ -40,6 +46,8 @@ function RegisterPage() {
 function RegisterForm() {
   const { register } = useAuth();
   const nav = useNavigate();
+  const { ref } = useSearch({ from: "/register" });
+  const refCode = readReferralCode(ref);
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -51,7 +59,7 @@ function RegisterForm() {
   const onSubmit = async (vals: FormVals) => {
     setLoading(true);
     try {
-      await register(vals.name, vals.email, vals.password);
+      await register(vals.name, vals.email, vals.password, refCode);
       toast.success("Verification link sent to your email");
       nav({ to: "/verify", search: { email: vals.email } });
     } catch (e) {

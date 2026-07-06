@@ -4,6 +4,7 @@ import { Gift, Wallet } from "lucide-react";
 import { DepositButton, WithdrawButton } from "@/components/pricing/price-gate";
 import { Button } from "@/components/ui/button";
 import { useWallet } from "@/hooks/use-wallet";
+import { useReferral } from "@/hooks/use-referral";
 import { PageShell } from "@/components/dashboard/page-shell";
 import { DataPanel } from "@/components/dashboard/data-panel";
 import { DataTable, DataTableHead, DataTableRow, Th, Td } from "@/components/dashboard/data-table";
@@ -16,6 +17,7 @@ export const Route = createFileRoute("/app/wallet/")({
 
 function WalletPage() {
   const { balance, transactions, refresh } = useWallet();
+  const { stats } = useReferral();
   useEffect(() => {
     refresh();
   }, [refresh]);
@@ -60,7 +62,9 @@ function WalletPage() {
           <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
             Bonus credit
           </p>
-          <p className="mt-2 font-display text-2xl font-bold">₹2,500</p>
+          <p className="mt-2 font-display text-2xl font-bold">
+            ₹{stats.totalEarned.toLocaleString("en-IN")}
+          </p>
           <p className="mt-1 text-xs text-muted-foreground">Earn more through referrals.</p>
           <Button
             asChild

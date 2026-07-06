@@ -1,33 +1,43 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useEffect } from "react";
 import { toast } from "sonner";
 import { Copy, Gift, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/use-auth";
+import { useReferral } from "@/hooks/use-referral";
 import { PageShell } from "@/components/dashboard/page-shell";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { DataPanel } from "@/components/dashboard/data-panel";
 import { DataTable, DataTableHead, DataTableRow, Th, Td } from "@/components/dashboard/data-table";
 import { StatusBadge } from "@/components/dashboard/status-badge";
+import { EmptyState } from "@/components/dashboard/empty-state";
 
 export const Route = createFileRoute("/app/referral")({
   component: ReferralPage,
 });
 
-const HISTORY = [
-  { name: "Rohit B.", joined: "Jun 24, 2026", earned: 1250, status: "Active" },
-  { name: "Liya C.", joined: "Jun 18, 2026", earned: 980, status: "Active" },
-  { name: "Mihir D.", joined: "Jun 12, 2026", earned: 540, status: "Pending KYC" },
-  { name: "Nisha P.", joined: "Jun 05, 2026", earned: 2100, status: "Active" },
-];
-
 function ReferralPage() {
-  const { user } = useAuth();
-  const code = useMemo(() => "EX" + (user?.id ?? "GUEST").slice(0, 6).toUpperCase(), [user]);
-  const link =
-    typeof window !== "undefined"
-      ? `${window.location.origin}/register?ref=${code}`
-      : `https://exness-india.com/register?ref=${code}`;
+  const { code, link, stats, history, refresh } = useReferral();
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  const share = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Join Exness India",
+          text: "Trade forex, crypto, and more with Exness India.",
+          url: link,
+        });
+        return;
+      } catch {
+        // fall through to copy
+      }
+    }
+    await navigator.clipboard?.writeText(link);
+    toast.success("Link copied");
+  };
 
   return (
     <PageShell
@@ -50,45 +60,57 @@ function ReferralPage() {
           >
             <Copy className="mr-2 h-4 w-4" /> Copy
           </Button>
-          <Button variant="outline" className="shrink-0">
+          <Button variant="outline" className="shrink-0" onClick={share}>
             <Share2 className="mr-2 h-4 w-4" /> Share
           </Button>
         </div>
       </DataPanel>
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <StatCard label="Referrals" value="12" icon={Gift} />
-        <StatCard label="Active" value="9" />
-        <StatCard label="Total earned" value="₹14,820" accent="var(--gold)" />
+        <StatCard label="Referrals" value={String(stats.referrals)} icon={Gift} />
+        <StatCard label="Active" value={String(stats.active)} />
+        <StatCard
+          label="Total earned"
+          value={`₹${stats.totalEarned.toLocaleString("en-IN")}`}
+          accent="var(--gold)"
+        />
       </div>
 
       <DataPanel title="Commission history" padding={false}>
-        <DataTable>
-          <DataTableHead>
-            <tr>
-              <Th>Friend</Th>
-              <Th>Joined</Th>
-              <Th className="text-right">Earned</Th>
-              <Th>Status</Th>
-            </tr>
-          </DataTableHead>
-          <tbody>
-            {HISTORY.map((h, i) => (
-              <DataTableRow key={i}>
-                <Td className="font-sans font-medium">{h.name}</Td>
-                <Td className="font-sans text-muted-foreground">{h.joined}</Td>
-                <Td mono className="text-right font-medium">
-                  ₹{h.earned.toLocaleString()}
-                </Td>
-                <Td>
-                  <StatusBadge variant={h.status === "Active" ? "success" : "warning"}>
-                    {h.status}
-                  </StatusBadge>
-                </Td>
-              </DataTableRow>
-            ))}
-          </tbody>
-        </DataTable>
+        {history.length === 0 ? (
+          <EmptyState
+            icon={Gift}
+            title="No referrals yet"
+            description="Share your link. You earn ₹500 plus 10% commission when friends fund their account."
+          />
+        ) : (
+          <DataTable>
+            <DataTableHead>
+              <tr>
+                <Th>Friend</Th>
+                <Th>Joined</Th>
+                <Th className="text-right">Earned</Th>
+                <Th>Status</Th>
+              </tr>
+            </DataTableHead>
+            <tbody>
+              {history.map((h) => (
+                <DataTableRow key={h.id}>
+                  <Td className="font-sans font-medium">{h.name}</Td>
+                  <Td className="font-sans text-muted-foreground">{h.joined}</Td>
+                  <Td mono className="text-right font-medium">
+                    ₹{h.earned.toLocaleString("en-IN")}
+                  </Td>
+                  <Td>
+                    <StatusBadge variant={h.status === "Active" ? "success" : "warning"}>
+                      {h.status}
+                    </StatusBadge>
+                  </Td>
+                </DataTableRow>
+              ))}
+            </tbody>
+          </DataTable>
+        )}
       </DataPanel>
     </PageShell>
   );

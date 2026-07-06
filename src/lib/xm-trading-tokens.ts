@@ -39,6 +39,7 @@ export const XM_ICON = "var(--muted-foreground)";
 export const XM_ICON_HOVER = "var(--foreground)";
 
 export const XM_UP = "var(--success)";
+export const XM_BUY = "var(--buy)";
 export const XM_DOWN = "var(--destructive)";
 export const XM_ACTIVE = "var(--gold)";
 export const XM_REAL_DOT = "var(--success)";
