@@ -142,7 +142,7 @@ function DepositPage() {
               required
             />
             <div className="mt-3 flex flex-wrap gap-2 text-xs">
-              {[1000, MIN_TRADING_BALANCE, 10000, 25000, 50000].map((v) => (
+              {[MIN_TRADING_BALANCE, 10000, 25000, 50000].map((v) => (
                 <button
                   key={v}
                   type="button"

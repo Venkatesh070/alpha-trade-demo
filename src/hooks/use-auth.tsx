@@ -14,7 +14,7 @@ import {
   signOut,
   type User as FirebaseUser,
 } from "firebase/auth";
-import { type UserProfile, userMe, userRegister, userVerifyEmail } from "@/lib/auth-api";
+import { type UserProfile, userMe, userRegister, userVerifyEmail, adminMe } from "@/lib/auth-api";
 import { sendUserVerificationEmail } from "@/lib/email-verification";
 import { mapFirebaseAuthError } from "@/lib/firebase-errors";
 import { auth } from "@/lib/firebase";
@@ -61,11 +61,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setEmailVerified(firebaseUser.emailVerified);
 
       try {
+        const idToken = await firebaseUser.getIdToken();
+        const adminCheck = await adminMe(idToken).catch(() => null);
+        if (adminCheck?.admin) {
+          setUser(null);
+          setEmailVerified(false);
+          setLoading(false);
+          return;
+        }
+
         const profile = await loadProfile(firebaseUser);
         setUser(profile);
         if (firebaseUser.emailVerified && !profile.verified) {
-          const idToken = await firebaseUser.getIdToken(true);
-          const { user: verifiedProfile } = await userVerifyEmail(idToken);
+          const freshToken = await firebaseUser.getIdToken(true);
+          const { user: verifiedProfile } = await userVerifyEmail(freshToken);
           setUser(verifiedProfile);
         }
       } catch (err) {

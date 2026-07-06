@@ -10,7 +10,10 @@ import { RedirectIfAuthed } from "@/components/auth/redirect-if-authed";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth, getAuthIdToken } from "@/hooks/use-auth";
+import { adminMe } from "@/lib/auth-api";
+import { signOut } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 
 const schema = z.object({
   email: z.string().email("Enter a valid email"),
@@ -49,6 +52,20 @@ function LoginForm() {
     try {
       const verified = await login(vals.email, vals.password);
       if (!verified) {
+        const idToken = await getAuthIdToken();
+        if (idToken) {
+          try {
+            const { admin } = await adminMe(idToken);
+            if (admin) {
+              await signOut(auth);
+              toast.message("This is an admin account — use the admin sign-in page");
+              nav({ to: "/admin/login" });
+              return;
+            }
+          } catch {
+            // not an admin — continue to email verification
+          }
+        }
         toast.message("Verify your email to continue");
         nav({ to: "/verify", search: { email: vals.email } });
         return;

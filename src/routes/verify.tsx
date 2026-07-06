@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/site/header";
 import { AuthLoading } from "@/components/auth/auth-loading";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
+import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { applyEmailVerificationFromUrl } from "@/lib/email-verification";
 import { mapFirebaseAuthError } from "@/lib/firebase-errors";
 
@@ -18,15 +19,21 @@ export const Route = createFileRoute("/verify")({
 function VerifyPage() {
   const { email } = useSearch({ from: "/verify" });
   const { loading, isAuthenticated, needsEmailVerification, user } = useAuth();
+  const { isAuthenticated: isAdmin } = useAdminAuth();
   const nav = useNavigate();
 
   useEffect(() => {
+    if (!loading && isAdmin) {
+      nav({ to: "/admin" });
+      return;
+    }
     if (!loading && isAuthenticated) {
       nav({ to: "/app" });
     }
-  }, [loading, isAuthenticated, nav]);
+  }, [loading, isAuthenticated, isAdmin, nav]);
 
   if (loading) return <AuthLoading />;
+  if (isAdmin) return null;
 
   const displayEmail = email || user?.email || "your inbox";
 
