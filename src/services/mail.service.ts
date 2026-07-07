@@ -1,6 +1,7 @@
 import { loadServerEnv } from "@/server/load-env";
 import { Resend } from "resend";
 import { loginOtpEmailHtml } from "@/services/email-templates/login-otp";
+import { registrationOtpEmailHtml } from "@/services/email-templates/registration-otp";
 import { passwordResetEmailHtml } from "@/services/email-templates/password-reset";
 import { verificationEmailHtml } from "@/services/email-templates/verification";
 import { welcomeEmailHtml } from "@/services/email-templates/welcome";
@@ -45,6 +46,24 @@ export async function sendVerificationEmail(to: string, verificationLink: string
 
   if (error) {
     throw new Error(error.message ?? "Failed to send verification email.");
+  }
+}
+
+export async function sendRegistrationOtpEmail(to: string, code: string): Promise<void> {
+  const email = assertValidRecipient(to);
+  if (!/^\d{6}$/.test(code)) {
+    throw new Error("Invalid OTP code.");
+  }
+
+  const { error } = await getResend().emails.send({
+    from: SENDER,
+    to: email,
+    subject: `${code} is your Exness India verification code`,
+    html: registrationOtpEmailHtml(code),
+  });
+
+  if (error) {
+    throw new Error(error.message ?? "Failed to send verification code.");
   }
 }
 

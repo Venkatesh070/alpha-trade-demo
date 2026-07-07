@@ -115,9 +115,17 @@ async function createMysqlDatabase(): Promise<SqlDatabase> {
 
 export async function getDatabase(): Promise<SqlDatabase> {
   if (dbInstance) return dbInstance;
-  dbInstance = await createMysqlDatabase();
-  await runMigrations(dbInstance);
-  return dbInstance;
+
+  const db = await createMysqlDatabase();
+  try {
+    await runMigrations(db);
+    dbInstance = db;
+    return dbInstance;
+  } catch (err) {
+    await db.close();
+    migratePromise = null;
+    throw err;
+  }
 }
 
 export async function runMigrations(db: SqlDatabase): Promise<void> {
@@ -125,7 +133,13 @@ export async function runMigrations(db: SqlDatabase): Promise<void> {
     migratePromise = (async () => {
       const statements = splitStatements(migrationSql());
       for (const statement of statements) {
-        await db.execute(statement);
+        try {
+          await db.execute(statement);
+        } catch (err) {
+          console.error("[db] Migration failed:", statement.slice(0, 80), err);
+          migratePromise = null;
+          throw err;
+        }
       }
     })();
   }

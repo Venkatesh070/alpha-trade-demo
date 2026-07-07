@@ -72,6 +72,35 @@ export async function mailSendWelcome(
   });
 }
 
+export async function mailSendRegistrationOtp(
+  idToken: string,
+): Promise<{ message: string; resendInSeconds: number }> {
+  return requestMail("/api/email/send-registration-otp", {
+    method: "POST",
+    idToken,
+  });
+}
+
+export async function mailGetRegistrationOtpResend(
+  idToken: string,
+): Promise<{ resendInSeconds: number }> {
+  return requestMail("/api/email/send-registration-otp", {
+    method: "GET",
+    idToken,
+  });
+}
+
+export async function mailVerifyRegistrationOtp(
+  idToken: string,
+  code: string,
+): Promise<{ message: string; verified: boolean }> {
+  return requestMail("/api/email/verify-registration-otp", {
+    method: "POST",
+    idToken,
+    body: JSON.stringify({ code }),
+  });
+}
+
 export async function mailSendLoginOtp(
   idToken: string,
 ): Promise<{ message: string; resendInSeconds: number }> {

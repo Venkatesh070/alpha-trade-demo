@@ -63,9 +63,11 @@ import { Route as ApiSessionStatusRouteImport } from './routes/api/session/statu
 import { Route as ApiSessionLogoutRouteImport } from './routes/api/session/logout'
 import { Route as ApiSessionCompleteOtpRouteImport } from './routes/api/session/complete-otp'
 import { Route as ApiSessionAdminRouteImport } from './routes/api/session/admin'
+import { Route as ApiEmailVerifyRegistrationOtpRouteImport } from './routes/api/email/verify-registration-otp'
 import { Route as ApiEmailVerifyLoginOtpRouteImport } from './routes/api/email/verify-login-otp'
 import { Route as ApiEmailSendWelcomeRouteImport } from './routes/api/email/send-welcome'
 import { Route as ApiEmailSendVerificationRouteImport } from './routes/api/email/send-verification'
+import { Route as ApiEmailSendRegistrationOtpRouteImport } from './routes/api/email/send-registration-otp'
 import { Route as ApiEmailSendPasswordResetRouteImport } from './routes/api/email/send-password-reset'
 import { Route as ApiEmailSendLoginOtpRouteImport } from './routes/api/email/send-login-otp'
 
@@ -339,6 +341,12 @@ const ApiSessionAdminRoute = ApiSessionAdminRouteImport.update({
   path: '/api/session/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiEmailVerifyRegistrationOtpRoute =
+  ApiEmailVerifyRegistrationOtpRouteImport.update({
+    id: '/api/email/verify-registration-otp',
+    path: '/api/email/verify-registration-otp',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiEmailVerifyLoginOtpRoute = ApiEmailVerifyLoginOtpRouteImport.update({
   id: '/api/email/verify-login-otp',
   path: '/api/email/verify-login-otp',
@@ -353,6 +361,12 @@ const ApiEmailSendVerificationRoute =
   ApiEmailSendVerificationRouteImport.update({
     id: '/api/email/send-verification',
     path: '/api/email/send-verification',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiEmailSendRegistrationOtpRoute =
+  ApiEmailSendRegistrationOtpRouteImport.update({
+    id: '/api/email/send-registration-otp',
+    path: '/api/email/send-registration-otp',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiEmailSendPasswordResetRoute =
@@ -417,9 +431,11 @@ export interface FileRoutesByFullPath {
   '/app/': typeof AppIndexRoute
   '/api/email/send-login-otp': typeof ApiEmailSendLoginOtpRoute
   '/api/email/send-password-reset': typeof ApiEmailSendPasswordResetRoute
+  '/api/email/send-registration-otp': typeof ApiEmailSendRegistrationOtpRoute
   '/api/email/send-verification': typeof ApiEmailSendVerificationRoute
   '/api/email/send-welcome': typeof ApiEmailSendWelcomeRoute
   '/api/email/verify-login-otp': typeof ApiEmailVerifyLoginOtpRoute
+  '/api/email/verify-registration-otp': typeof ApiEmailVerifyRegistrationOtpRoute
   '/api/session/admin': typeof ApiSessionAdminRoute
   '/api/session/complete-otp': typeof ApiSessionCompleteOtpRoute
   '/api/session/logout': typeof ApiSessionLogoutRoute
@@ -475,9 +491,11 @@ export interface FileRoutesByTo {
   '/app': typeof AppIndexRoute
   '/api/email/send-login-otp': typeof ApiEmailSendLoginOtpRoute
   '/api/email/send-password-reset': typeof ApiEmailSendPasswordResetRoute
+  '/api/email/send-registration-otp': typeof ApiEmailSendRegistrationOtpRoute
   '/api/email/send-verification': typeof ApiEmailSendVerificationRoute
   '/api/email/send-welcome': typeof ApiEmailSendWelcomeRoute
   '/api/email/verify-login-otp': typeof ApiEmailVerifyLoginOtpRoute
+  '/api/email/verify-registration-otp': typeof ApiEmailVerifyRegistrationOtpRoute
   '/api/session/admin': typeof ApiSessionAdminRoute
   '/api/session/complete-otp': typeof ApiSessionCompleteOtpRoute
   '/api/session/logout': typeof ApiSessionLogoutRoute
@@ -537,9 +555,11 @@ export interface FileRoutesById {
   '/app/': typeof AppIndexRoute
   '/api/email/send-login-otp': typeof ApiEmailSendLoginOtpRoute
   '/api/email/send-password-reset': typeof ApiEmailSendPasswordResetRoute
+  '/api/email/send-registration-otp': typeof ApiEmailSendRegistrationOtpRoute
   '/api/email/send-verification': typeof ApiEmailSendVerificationRoute
   '/api/email/send-welcome': typeof ApiEmailSendWelcomeRoute
   '/api/email/verify-login-otp': typeof ApiEmailVerifyLoginOtpRoute
+  '/api/email/verify-registration-otp': typeof ApiEmailVerifyRegistrationOtpRoute
   '/api/session/admin': typeof ApiSessionAdminRoute
   '/api/session/complete-otp': typeof ApiSessionCompleteOtpRoute
   '/api/session/logout': typeof ApiSessionLogoutRoute
@@ -600,9 +620,11 @@ export interface FileRouteTypes {
     | '/app/'
     | '/api/email/send-login-otp'
     | '/api/email/send-password-reset'
+    | '/api/email/send-registration-otp'
     | '/api/email/send-verification'
     | '/api/email/send-welcome'
     | '/api/email/verify-login-otp'
+    | '/api/email/verify-registration-otp'
     | '/api/session/admin'
     | '/api/session/complete-otp'
     | '/api/session/logout'
@@ -658,9 +680,11 @@ export interface FileRouteTypes {
     | '/app'
     | '/api/email/send-login-otp'
     | '/api/email/send-password-reset'
+    | '/api/email/send-registration-otp'
     | '/api/email/send-verification'
     | '/api/email/send-welcome'
     | '/api/email/verify-login-otp'
+    | '/api/email/verify-registration-otp'
     | '/api/session/admin'
     | '/api/session/complete-otp'
     | '/api/session/logout'
@@ -719,9 +743,11 @@ export interface FileRouteTypes {
     | '/app/'
     | '/api/email/send-login-otp'
     | '/api/email/send-password-reset'
+    | '/api/email/send-registration-otp'
     | '/api/email/send-verification'
     | '/api/email/send-welcome'
     | '/api/email/verify-login-otp'
+    | '/api/email/verify-registration-otp'
     | '/api/session/admin'
     | '/api/session/complete-otp'
     | '/api/session/logout'
@@ -753,9 +779,11 @@ export interface RootRouteChildren {
   VerifyRoute: typeof VerifyRoute
   ApiEmailSendLoginOtpRoute: typeof ApiEmailSendLoginOtpRoute
   ApiEmailSendPasswordResetRoute: typeof ApiEmailSendPasswordResetRoute
+  ApiEmailSendRegistrationOtpRoute: typeof ApiEmailSendRegistrationOtpRoute
   ApiEmailSendVerificationRoute: typeof ApiEmailSendVerificationRoute
   ApiEmailSendWelcomeRoute: typeof ApiEmailSendWelcomeRoute
   ApiEmailVerifyLoginOtpRoute: typeof ApiEmailVerifyLoginOtpRoute
+  ApiEmailVerifyRegistrationOtpRoute: typeof ApiEmailVerifyRegistrationOtpRoute
   ApiSessionAdminRoute: typeof ApiSessionAdminRoute
   ApiSessionCompleteOtpRoute: typeof ApiSessionCompleteOtpRoute
   ApiSessionLogoutRoute: typeof ApiSessionLogoutRoute
@@ -1142,6 +1170,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSessionAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/email/verify-registration-otp': {
+      id: '/api/email/verify-registration-otp'
+      path: '/api/email/verify-registration-otp'
+      fullPath: '/api/email/verify-registration-otp'
+      preLoaderRoute: typeof ApiEmailVerifyRegistrationOtpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/email/verify-login-otp': {
       id: '/api/email/verify-login-otp'
       path: '/api/email/verify-login-otp'
@@ -1161,6 +1196,13 @@ declare module '@tanstack/react-router' {
       path: '/api/email/send-verification'
       fullPath: '/api/email/send-verification'
       preLoaderRoute: typeof ApiEmailSendVerificationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/email/send-registration-otp': {
+      id: '/api/email/send-registration-otp'
+      path: '/api/email/send-registration-otp'
+      fullPath: '/api/email/send-registration-otp'
+      preLoaderRoute: typeof ApiEmailSendRegistrationOtpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/email/send-password-reset': {
@@ -1290,9 +1332,11 @@ const rootRouteChildren: RootRouteChildren = {
   VerifyRoute: VerifyRoute,
   ApiEmailSendLoginOtpRoute: ApiEmailSendLoginOtpRoute,
   ApiEmailSendPasswordResetRoute: ApiEmailSendPasswordResetRoute,
+  ApiEmailSendRegistrationOtpRoute: ApiEmailSendRegistrationOtpRoute,
   ApiEmailSendVerificationRoute: ApiEmailSendVerificationRoute,
   ApiEmailSendWelcomeRoute: ApiEmailSendWelcomeRoute,
   ApiEmailVerifyLoginOtpRoute: ApiEmailVerifyLoginOtpRoute,
+  ApiEmailVerifyRegistrationOtpRoute: ApiEmailVerifyRegistrationOtpRoute,
   ApiSessionAdminRoute: ApiSessionAdminRoute,
   ApiSessionCompleteOtpRoute: ApiSessionCompleteOtpRoute,
   ApiSessionLogoutRoute: ApiSessionLogoutRoute,

@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Eye, EyeOff } from "lucide-react";
 import { AuthGate } from "@/components/auth/auth-gate";
 import { AuthShell, GoogleAuthButton, authInputClass, authLabelClass } from "@/components/auth/auth-shell";
+import { EmailVerifyOtpStep } from "@/components/auth/email-verify-otp-step";
 import { RedirectIfAuthed } from "@/components/auth/redirect-if-authed";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
@@ -22,7 +23,13 @@ type FormVals = z.infer<typeof schema>;
 
 export const Route = createFileRoute("/register")({
   validateSearch: (s) => ({
-    step: (s.step as string) === "form" ? ("form" as const) : undefined,
+    step:
+      (s.step as string) === "form"
+        ? ("form" as const)
+        : (s.step as string) === "otp"
+          ? ("otp" as const)
+          : undefined,
+    email: typeof s.email === "string" ? s.email : undefined,
     ref: typeof s.ref === "string" && s.ref.trim() ? s.ref.trim() : undefined,
   }),
   head: () => ({ meta: [{ title: "Create an account — Exness India" }] }),
@@ -38,8 +45,41 @@ function RegisterPage() {
 
   return (
     <RedirectIfAuthed>
-      {step === "form" ? <RegisterForm /> : <AuthGate />}
+      {step === "otp" ? (
+        <RegisterOtpStep />
+      ) : step === "form" ? (
+        <RegisterForm />
+      ) : (
+        <AuthGate />
+      )}
     </RedirectIfAuthed>
+  );
+}
+
+function RegisterOtpStep() {
+  const { email } = useSearch({ from: "/register" });
+  const { sendLoginOtp } = useAuth();
+  const nav = useNavigate();
+
+  return (
+    <EmailVerifyOtpStep
+      email={email ?? ""}
+      backTo={{ to: "/register", search: { step: "form" } }}
+      onVerified={() => {
+        void (async () => {
+          try {
+            await sendLoginOtp();
+            toast.message("Enter the sign-in code sent to your email");
+          } catch {
+            // user can resend from the login OTP screen
+          }
+          nav({
+            to: "/login",
+            search: { step: "otp", email: email ?? "", redirect: "/app" },
+          });
+        })();
+      }}
+    />
   );
 }
 
@@ -60,8 +100,8 @@ function RegisterForm() {
     setLoading(true);
     try {
       await register(vals.name, vals.email, vals.password, refCode);
-      toast.success("Verification link sent to your email");
-      nav({ to: "/verify", search: { email: vals.email } });
+      toast.message("Enter the 6-digit code sent to your email");
+      nav({ to: "/register", search: { step: "otp", email: vals.email } });
     } catch (e) {
       toast.error((e as Error).message);
     } finally {

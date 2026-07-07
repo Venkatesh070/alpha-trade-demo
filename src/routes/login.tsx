@@ -16,6 +16,7 @@ import { adminMe } from "@/lib/auth-api";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { mailGetLoginOtpResend } from "@/lib/mail-api";
+import { sanitizeAuthRedirect } from "@/lib/auth-redirect";
 
 const schema = z.object({
   email: z.string().email("Enter a valid email"),
@@ -25,7 +26,7 @@ type FormVals = z.infer<typeof schema>;
 
 export const Route = createFileRoute("/login")({
   validateSearch: (s) => ({
-    redirect: (s.redirect as string) ?? "/app",
+    redirect: sanitizeAuthRedirect(typeof s.redirect === "string" ? s.redirect : undefined),
     step:
       (s.step as string) === "form"
         ? ("form" as const)
@@ -80,7 +81,7 @@ function LoginForm() {
           }
         }
         toast.message("Verify your email to continue");
-        nav({ to: "/verify", search: { email: vals.email } });
+        nav({ to: "/verify", search: { step: "otp", email: vals.email } });
         return;
       }
 

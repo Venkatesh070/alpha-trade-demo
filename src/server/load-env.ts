@@ -34,14 +34,19 @@ export function loadServerEnv(): void {
 
   const root = findProjectRoot();
   const envPath = resolve(root, ".env");
-  if (!existsSync(envPath)) {
+  if (existsSync(envPath)) {
+    config({ path: envPath });
+  } else {
     console.warn(`[load-env] No .env file at ${envPath} (cwd=${process.cwd()})`);
-    return;
   }
 
-  config({ path: envPath });
+  // Fall back to backend/.env for shared MySQL credentials (GoDaddy cPanel).
+  const backendEnvPath = resolve(root, "backend/.env");
+  if (existsSync(backendEnvPath)) {
+    config({ path: backendEnvPath });
+  }
 
-  if (!process.env.FIREBASE_PRIVATE_KEY?.includes("BEGIN PRIVATE KEY")) {
+  if (!process.env.FIREBASE_PRIVATE_KEY?.includes("BEGIN PRIVATE KEY") && existsSync(envPath)) {
     const fromFile = readPrivateKeyFromEnvFile(envPath);
     if (fromFile) {
       process.env.FIREBASE_PRIVATE_KEY = fromFile;

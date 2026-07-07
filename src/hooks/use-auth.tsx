@@ -9,8 +9,7 @@ import {
 } from "react";
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, type User as FirebaseUser } from "firebase/auth";
 import { type UserProfile, userMe, userRegister, userVerifyEmail, adminMe } from "@/lib/auth-api";
-import { mailSendLoginOtp, mailSendPasswordReset, mailSendWelcome, mailVerifyLoginOtp } from "@/lib/mail-api";
-import { sendUserVerificationEmail } from "@/lib/email-verification";
+import { mailSendLoginOtp, mailSendPasswordReset, mailSendRegistrationOtp, mailSendWelcome, mailVerifyLoginOtp, mailVerifyRegistrationOtp } from "@/lib/mail-api";
 import { mapFirebaseAuthError } from "@/lib/firebase-errors";
 import { auth } from "@/lib/firebase";
 import { clearReferralCode, markReferralVerified, recordReferralSignup } from "@/lib/referral-db";
@@ -34,6 +33,8 @@ interface AuthCtx {
   register: (name: string, email: string, password: string, refCode?: string) => Promise<void>;
   logout: () => void;
   resendVerificationEmail: () => Promise<void>;
+  sendRegistrationOtp: () => Promise<number>;
+  verifyRegistrationOtp: (code: string) => Promise<void>;
   confirmEmailVerified: () => Promise<boolean>;
   requestPasswordReset: (email: string) => Promise<void>;
   sendLoginOtp: () => Promise<number>;
@@ -150,7 +151,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setOtpSessionReady(false);
 
       const cred = await signInWithEmailAndPassword(auth, email, password);
-      await sendUserVerificationEmail(cred.user);
+      await mailSendRegistrationOtp(await cred.user.getIdToken());
 
       if (refCode) {
         recordReferralSignup(refCode, { name, email });
@@ -167,10 +168,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const resendVerificationEmail = useCallback(async () => {
     const firebaseUser = auth.currentUser;
     if (!firebaseUser) {
-      throw new Error("Sign in again to resend the verification email.");
+      throw new Error("Sign in again to resend the verification code.");
     }
 
-    await sendUserVerificationEmail(firebaseUser);
+    const idToken = await firebaseUser.getIdToken();
+    await mailSendRegistrationOtp(idToken);
+  }, []);
+
+  const sendRegistrationOtp = useCallback(async () => {
+    const firebaseUser = auth.currentUser;
+    if (!firebaseUser) {
+      throw new Error("Sign in again to receive a verification code.");
+    }
+    const idToken = await firebaseUser.getIdToken();
+    const { resendInSeconds } = await mailSendRegistrationOtp(idToken);
+    return resendInSeconds;
+  }, []);
+
+  const verifyRegistrationOtp = useCallback(async (code: string) => {
+    const firebaseUser = auth.currentUser;
+    if (!firebaseUser?.email) {
+      throw new Error("Sign in again to verify your code.");
+    }
+
+    const idToken = await firebaseUser.getIdToken();
+    await mailVerifyRegistrationOtp(idToken, code);
+    await firebaseUser.reload();
+    setEmailVerified(firebaseUser.emailVerified);
   }, []);
 
   const confirmEmailVerified = useCallback(async (): Promise<boolean> => {
@@ -263,6 +287,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       register,
       logout,
       resendVerificationEmail,
+      sendRegistrationOtp,
+      verifyRegistrationOtp,
       confirmEmailVerified,
       requestPasswordReset,
       sendLoginOtp,
@@ -281,6 +307,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       register,
       logout,
       resendVerificationEmail,
+      sendRegistrationOtp,
+      verifyRegistrationOtp,
       confirmEmailVerified,
       requestPasswordReset,
       sendLoginOtp,

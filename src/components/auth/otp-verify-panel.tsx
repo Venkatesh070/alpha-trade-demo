@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { cn } from "@/lib/utils";
 
@@ -14,6 +14,7 @@ interface OtpVerifyPanelProps {
   trustDevice?: boolean;
   onTrustDeviceChange?: (value: boolean) => void;
   showTrustDevice?: boolean;
+  description?: ReactNode;
   onVerify: (code: string) => void;
   onResend: () => void;
 }
@@ -28,6 +29,7 @@ export function OtpVerifyPanel({
   trustDevice = false,
   onTrustDeviceChange,
   showTrustDevice = true,
+  description,
   onVerify,
   onResend,
 }: OtpVerifyPanelProps) {
@@ -50,8 +52,12 @@ export function OtpVerifyPanel({
         </h1>
         <p className="mt-3 text-sm font-medium text-[#141d22]/80">{subtitle}</p>
         <p className="mx-auto mt-3 max-w-[320px] text-sm leading-relaxed text-[#64748b]">
-          Enter the 6-digit code sent to your verified email{" "}
-          <span className="font-medium text-[#141d22]">{email}</span>.
+          {description ?? (
+            <>
+              Enter the 6-digit code sent to your verified email{" "}
+              <span className="font-medium text-[#141d22]">{email}</span>.
+            </>
+          )}
         </p>
       </div>
 

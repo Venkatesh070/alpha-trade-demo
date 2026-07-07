@@ -1,5 +1,5 @@
 -- Session storage for Exness India demo platform
--- Compatible with MySQL 8+ and SQLite 3
+-- Compatible with MySQL 5.7+ / MariaDB 10.x (cPanel shared hosting)
 
 CREATE TABLE IF NOT EXISTS app_sessions (
   id VARCHAR(36) PRIMARY KEY,
@@ -12,20 +12,18 @@ CREATE TABLE IF NOT EXISTS app_sessions (
   payload_json TEXT,
   created_at BIGINT NOT NULL,
   updated_at BIGINT NOT NULL,
-  expires_at BIGINT NOT NULL
+  expires_at BIGINT NOT NULL,
+  INDEX idx_app_sessions_user_email (user_email),
+  INDEX idx_app_sessions_admin_email (admin_email),
+  INDEX idx_app_sessions_expires_at (expires_at),
+  INDEX idx_app_sessions_device (user_email, device_id)
 );
-
-CREATE INDEX IF NOT EXISTS idx_app_sessions_user_email ON app_sessions (user_email);
-CREATE INDEX IF NOT EXISTS idx_app_sessions_admin_email ON app_sessions (admin_email);
-CREATE INDEX IF NOT EXISTS idx_app_sessions_expires_at ON app_sessions (expires_at);
-CREATE INDEX IF NOT EXISTS idx_app_sessions_device ON app_sessions (user_email, device_id);
 
 CREATE TABLE IF NOT EXISTS login_otp_codes (
   email VARCHAR(254) PRIMARY KEY,
   code_hash VARCHAR(64) NOT NULL,
   expires_at BIGINT NOT NULL,
   resend_available_at BIGINT NOT NULL,
-  attempts INT NOT NULL DEFAULT 0
+  attempts INT NOT NULL DEFAULT 0,
+  INDEX idx_login_otp_expires_at (expires_at)
 );
-
-CREATE INDEX IF NOT EXISTS idx_login_otp_expires_at ON login_otp_codes (expires_at);
