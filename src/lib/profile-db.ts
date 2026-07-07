@@ -129,3 +129,7 @@ export function formatPasswordAge(ts?: number): string {
   if (days === 1) return "Last changed yesterday";
   return `Last changed ${days} days ago`;
 }
+
+export function markPasswordChanged(email: string): ProfileExtras {
+  return updateProfileExtras(email, { passwordChangedAt: Date.now() });
+}

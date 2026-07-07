@@ -69,3 +69,32 @@ export async function mailSendWelcome(
     body: JSON.stringify({ userName }),
   });
 }
+
+export async function mailSendLoginOtp(
+  idToken: string,
+): Promise<{ message: string; resendInSeconds: number }> {
+  return requestMail("/api/email/send-login-otp", {
+    method: "POST",
+    idToken,
+  });
+}
+
+export async function mailGetLoginOtpResend(
+  idToken: string,
+): Promise<{ resendInSeconds: number }> {
+  return requestMail("/api/email/send-login-otp", {
+    method: "GET",
+    idToken,
+  });
+}
+
+export async function mailVerifyLoginOtp(
+  idToken: string,
+  code: string,
+): Promise<{ message: string; verified: boolean }> {
+  return requestMail("/api/email/verify-login-otp", {
+    method: "POST",
+    idToken,
+    body: JSON.stringify({ code }),
+  });
+}

@@ -20,6 +20,8 @@ const FIREBASE_AUTH_ERRORS: Record<string, string> = {
     "This site is not authorized in Firebase. Add localhost to Authentication → Settings → Authorized domains in Firebase Console.",
   "auth/invalid-continue-uri":
     "Verification link misconfigured. Ensure localhost is in Firebase Authorized domains.",
+  "auth/expired-action-code": "This link has expired. Request a new one.",
+  "auth/invalid-action-code": "This link is invalid or has already been used.",
 };
 
 const REST_ERROR_MESSAGES: Record<string, string> = {

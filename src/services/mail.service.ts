@@ -1,5 +1,6 @@
 import { loadServerEnv } from "@/server/load-env";
 import { Resend } from "resend";
+import { loginOtpEmailHtml } from "@/services/email-templates/login-otp";
 import { passwordResetEmailHtml } from "@/services/email-templates/password-reset";
 import { verificationEmailHtml } from "@/services/email-templates/verification";
 import { welcomeEmailHtml } from "@/services/email-templates/welcome";
@@ -44,6 +45,24 @@ export async function sendVerificationEmail(to: string, verificationLink: string
 
   if (error) {
     throw new Error(error.message ?? "Failed to send verification email.");
+  }
+}
+
+export async function sendLoginOtpEmail(to: string, code: string): Promise<void> {
+  const email = assertValidRecipient(to);
+  if (!/^\d{6}$/.test(code)) {
+    throw new Error("Invalid OTP code.");
+  }
+
+  const { error } = await getResend().emails.send({
+    from: SENDER,
+    to: email,
+    subject: `${code} is your Exness India sign-in code`,
+    html: loginOtpEmailHtml(code),
+  });
+
+  if (error) {
+    throw new Error(error.message ?? "Failed to send sign-in code.");
   }
 }
 

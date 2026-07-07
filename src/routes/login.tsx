@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,12 +7,15 @@ import { toast } from "sonner";
 import { Eye, EyeOff } from "lucide-react";
 import { AuthGate } from "@/components/auth/auth-gate";
 import { AuthShell, GoogleAuthButton, authInputClass, authLabelClass } from "@/components/auth/auth-shell";
+import { AuthOtpShell } from "@/components/auth/auth-otp-shell";
+import { OtpVerifyPanel } from "@/components/auth/otp-verify-panel";
 import { RedirectIfAuthed } from "@/components/auth/redirect-if-authed";
 import { useAuth, getAuthIdToken } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 import { adminMe } from "@/lib/auth-api";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { mailGetLoginOtpResend } from "@/lib/mail-api";
 
 const schema = z.object({
   email: z.string().email("Enter a valid email"),
@@ -23,7 +26,13 @@ type FormVals = z.infer<typeof schema>;
 export const Route = createFileRoute("/login")({
   validateSearch: (s) => ({
     redirect: (s.redirect as string) ?? "/app",
-    step: (s.step as string) === "form" ? ("form" as const) : undefined,
+    step:
+      (s.step as string) === "form"
+        ? ("form" as const)
+        : (s.step as string) === "otp"
+          ? ("otp" as const)
+          : undefined,
+    email: typeof s.email === "string" ? s.email : undefined,
   }),
   head: () => ({ meta: [{ title: "Sign in — Exness India" }] }),
   component: LoginPage,
@@ -34,13 +43,13 @@ function LoginPage() {
 
   return (
     <RedirectIfAuthed>
-      {step === "form" ? <LoginForm /> : <AuthGate />}
+      {step === "otp" ? <LoginOtpStep /> : step === "form" ? <LoginForm /> : <AuthGate />}
     </RedirectIfAuthed>
   );
 }
 
 function LoginForm() {
-  const { login } = useAuth();
+  const { login, shouldRequireLoginOtp, sendLoginOtp } = useAuth();
   const nav = useNavigate();
   const { redirect } = useSearch({ from: "/login" });
   const [showPw, setShowPw] = useState(false);
@@ -74,6 +83,14 @@ function LoginForm() {
         nav({ to: "/verify", search: { email: vals.email } });
         return;
       }
+
+      if (shouldRequireLoginOtp(vals.email)) {
+        await sendLoginOtp();
+        toast.message("Enter the 6-digit code sent to your email");
+        nav({ to: "/login", search: { step: "otp", email: vals.email, redirect } });
+        return;
+      }
+
       toast.success("Welcome back");
       nav({ to: redirect });
     } catch (e) {
@@ -154,5 +171,99 @@ function LoginForm() {
         </p>
       </form>
     </AuthShell>
+  );
+}
+
+function LoginOtpStep() {
+  const { email, redirect } = useSearch({ from: "/login" });
+  const { verifyLoginOtp, sendLoginOtp, user } = useAuth();
+  const nav = useNavigate();
+  const [trustDevice, setTrustDevice] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [resendInSeconds, setResendInSeconds] = useState(0);
+  const [otpAttempt, setOtpAttempt] = useState(0);
+
+  const displayEmail = email ?? user?.email ?? "";
+
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      const idToken = await getAuthIdToken();
+      if (!idToken && !cancelled) {
+        nav({ to: "/login", search: { step: "form", redirect } });
+        return;
+      }
+
+      if (!idToken || cancelled) return;
+      try {
+        const { resendInSeconds: seconds } = await mailGetLoginOtpResend(idToken);
+        if (!cancelled) setResendInSeconds(seconds);
+      } catch {
+        // ignore
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [nav, redirect]);
+
+  useEffect(() => {
+    if (resendInSeconds <= 0) return;
+    const timer = window.setInterval(() => {
+      setResendInSeconds((s) => Math.max(0, s - 1));
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [resendInSeconds]);
+
+  const handleVerify = useCallback(
+    async (code: string) => {
+      if (!displayEmail || verifying) return;
+      setVerifying(true);
+      try {
+        await verifyLoginOtp(code, trustDevice);
+        toast.success("Welcome back");
+        nav({ to: redirect });
+      } catch (e) {
+        toast.error((e as Error).message);
+        setOtpAttempt((a) => a + 1);
+      } finally {
+        setVerifying(false);
+      }
+    },
+    [displayEmail, verifying, verifyLoginOtp, trustDevice, nav, redirect],
+  );
+
+  const handleResend = async () => {
+    setResending(true);
+    try {
+      const seconds = await sendLoginOtp();
+      setResendInSeconds(seconds);
+      toast.success("New code sent to your email");
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setResending(false);
+    }
+  };
+
+  if (!displayEmail) return null;
+
+  return (
+    <AuthOtpShell backTo={{ to: "/login", search: { step: "form", redirect } }}>
+      <OtpVerifyPanel
+        key={otpAttempt}
+        email={displayEmail}
+        verifying={verifying}
+        loading={resending}
+        resendInSeconds={resendInSeconds}
+        trustDevice={trustDevice}
+        onTrustDeviceChange={setTrustDevice}
+        onVerify={handleVerify}
+        onResend={handleResend}
+      />
+    </AuthOtpShell>
   );
 }

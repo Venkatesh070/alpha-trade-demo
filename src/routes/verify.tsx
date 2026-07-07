@@ -1,14 +1,14 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { MailCheck } from "lucide-react";
-import { SiteHeader } from "@/components/site/header";
+import { CheckCircle2, MailCheck } from "lucide-react";
+import { AuthShell } from "@/components/auth/auth-shell";
 import { AuthLoading } from "@/components/auth/auth-loading";
-import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { applyEmailVerificationFromUrl } from "@/lib/email-verification";
 import { mapFirebaseAuthError } from "@/lib/firebase-errors";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/verify")({
   validateSearch: (s) => ({ email: (s.email as string) ?? "" }),
@@ -37,7 +37,12 @@ function VerifyPage() {
 
   const displayEmail = email || user?.email || "your inbox";
 
-  return <VerifyContent email={displayEmail} needsVerification={needsEmailVerification || !!email} />;
+  return (
+    <VerifyContent
+      email={displayEmail}
+      needsVerification={needsEmailVerification || !!email}
+    />
+  );
 }
 
 function VerifyContent({ email, needsVerification }: { email: string; needsVerification: boolean }) {
@@ -46,6 +51,7 @@ function VerifyContent({ email, needsVerification }: { email: string; needsVerif
   const [resending, setResending] = useState(false);
   const [checking, setChecking] = useState(false);
   const [applyingLink, setApplyingLink] = useState(true);
+  const [linkApplied, setLinkApplied] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -54,6 +60,7 @@ function VerifyContent({ email, needsVerification }: { email: string; needsVerif
       try {
         const applied = await applyEmailVerificationFromUrl();
         if (applied && !cancelled) {
+          setLinkApplied(true);
           const verified = await confirmEmailVerified();
           if (verified) {
             toast.success("Email verified — welcome!");
@@ -74,7 +81,7 @@ function VerifyContent({ email, needsVerification }: { email: string; needsVerif
     return () => {
       cancelled = true;
     };
-  }, [nav]);
+  }, [nav, confirmEmailVerified]);
 
   const handleResend = async () => {
     setResending(true);
@@ -110,46 +117,73 @@ function VerifyContent({ email, needsVerification }: { email: string; needsVerif
   }
 
   return (
-    <div className="min-h-screen">
-      <SiteHeader />
-      <div className="mx-auto grid max-w-md gap-6 px-4 py-16 text-center">
-        <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[color:var(--gold)]/15">
-          <MailCheck className="h-8 w-8 text-[color:var(--gold)]" />
-        </div>
-        <h1 className="font-display text-3xl font-extrabold">
-          Verify your <span className="gold-text">email</span>
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          We sent a verification link to{" "}
-          <strong className="text-foreground">{email}</strong>. Open the email and click the link,
-          then return here and press continue.
-        </p>
-        <div className="glossy mx-auto w-full rounded-2xl p-6">
-          <Button
-            disabled={checking}
-            onClick={handleContinue}
-            className="gold-button hover:gold-button-hover w-full"
-          >
-            {checking ? "Checking…" : "I've verified — continue"}
-          </Button>
-          <button
-            type="button"
-            disabled={resending}
-            onClick={handleResend}
-            className="mt-4 text-xs text-[color:var(--gold)] hover:underline disabled:opacity-50"
-          >
-            {resending ? "Sending…" : "Resend verification email"}
-          </button>
-          {!needsVerification && (
-            <p className="mt-4 text-xs text-muted-foreground">
-              Wrong email?{" "}
-              <Link to="/register" className="text-[color:var(--gold)] hover:underline">
-                Register again
-              </Link>
-            </p>
+    <AuthShell active="signup">
+      <div className="space-y-6 text-center">
+        <div
+          className={cn(
+            "mx-auto grid h-16 w-16 place-items-center rounded-full",
+            linkApplied ? "bg-[#22c55e]/15" : "bg-[#ffde02]/20",
+          )}
+        >
+          {linkApplied ? (
+            <CheckCircle2 className="h-8 w-8 text-[#22c55e]" />
+          ) : (
+            <MailCheck className="h-8 w-8 text-[#141d22]" />
           )}
         </div>
+
+        <div>
+          <h2 className="font-display text-2xl font-bold">
+            {linkApplied ? "Email verified" : "Verify your email"}
+          </h2>
+          <p className="mt-3 text-sm leading-relaxed text-[#141d22]/60">
+            {linkApplied ? (
+              "Your email is confirmed. Redirecting you to the platform…"
+            ) : (
+              <>
+                We sent a verification link to{" "}
+                <strong className="text-[#141d22]">{email}</strong>. Open the email and click
+                &quot;Verify Email Address&quot; to activate your account.
+              </>
+            )}
+          </p>
+        </div>
+
+        {!linkApplied && (
+          <>
+            <button
+              type="button"
+              disabled={checking}
+              onClick={handleContinue}
+              className={cn(
+                "inline-flex h-11 w-full items-center justify-center rounded",
+                "bg-[#ffde02] text-sm font-semibold text-black",
+                "transition-colors hover:bg-[#ffe535] disabled:opacity-60",
+              )}
+            >
+              {checking ? "Checking…" : "I've verified — continue"}
+            </button>
+
+            <button
+              type="button"
+              disabled={resending}
+              onClick={handleResend}
+              className="text-sm text-[#158bf9] hover:underline disabled:opacity-50"
+            >
+              {resending ? "Sending…" : "Resend verification email"}
+            </button>
+          </>
+        )}
+
+        {!needsVerification && !linkApplied && (
+          <p className="text-xs text-[#141d22]/50">
+            Wrong email?{" "}
+            <Link to="/register" search={{ step: "form" }} className="text-[#158bf9] hover:underline">
+              Register again
+            </Link>
+          </p>
+        )}
       </div>
-    </div>
+    </AuthShell>
   );
 }
