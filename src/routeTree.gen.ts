@@ -693,6 +693,7 @@ export interface RootRouteChildren {
   ApiAdminSplatRoute: typeof ApiAdminSplatRoute
   ApiAdminDashboardRoute: typeof ApiAdminDashboardRoute
   ApiAdminUsersRoute: typeof ApiAdminUsersRoute
+  ApiAdminDepositsPaymentSettingsRoute: typeof ApiAdminDepositsPaymentSettingsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1189,6 +1190,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAdminSplatRoute: ApiAdminSplatRoute,
   ApiAdminDashboardRoute: ApiAdminDashboardRoute,
   ApiAdminUsersRoute: ApiAdminUsersRoute,
+  ApiAdminDepositsPaymentSettingsRoute: ApiAdminDepositsPaymentSettingsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
