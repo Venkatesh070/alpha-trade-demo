@@ -59,17 +59,6 @@ import { Route as AdminCmsRouteImport } from './routes/admin.cms'
 import { Route as AppWalletIndexRouteImport } from './routes/app.wallet.index'
 import { Route as AppWalletWithdrawRouteImport } from './routes/app.wallet.withdraw'
 import { Route as AppWalletDepositRouteImport } from './routes/app.wallet.deposit'
-import { Route as ApiSessionStatusRouteImport } from './routes/api/session/status'
-import { Route as ApiSessionLogoutRouteImport } from './routes/api/session/logout'
-import { Route as ApiSessionCompleteOtpRouteImport } from './routes/api/session/complete-otp'
-import { Route as ApiSessionAdminRouteImport } from './routes/api/session/admin'
-import { Route as ApiEmailVerifyRegistrationOtpRouteImport } from './routes/api/email/verify-registration-otp'
-import { Route as ApiEmailVerifyLoginOtpRouteImport } from './routes/api/email/verify-login-otp'
-import { Route as ApiEmailSendWelcomeRouteImport } from './routes/api/email/send-welcome'
-import { Route as ApiEmailSendVerificationRouteImport } from './routes/api/email/send-verification'
-import { Route as ApiEmailSendRegistrationOtpRouteImport } from './routes/api/email/send-registration-otp'
-import { Route as ApiEmailSendPasswordResetRouteImport } from './routes/api/email/send-password-reset'
-import { Route as ApiEmailSendLoginOtpRouteImport } from './routes/api/email/send-login-otp'
 import { Route as ApiAdminUsersRouteImport } from './routes/api/admin/users'
 import { Route as ApiAdminDashboardRouteImport } from './routes/api/admin/dashboard'
 import { Route as ApiAdminSplatRouteImport } from './routes/api/admin/$'
@@ -325,65 +314,6 @@ const AppWalletDepositRoute = AppWalletDepositRouteImport.update({
   path: '/deposit',
   getParentRoute: () => AppWalletRoute,
 } as any)
-const ApiSessionStatusRoute = ApiSessionStatusRouteImport.update({
-  id: '/api/session/status',
-  path: '/api/session/status',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiSessionLogoutRoute = ApiSessionLogoutRouteImport.update({
-  id: '/api/session/logout',
-  path: '/api/session/logout',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiSessionCompleteOtpRoute = ApiSessionCompleteOtpRouteImport.update({
-  id: '/api/session/complete-otp',
-  path: '/api/session/complete-otp',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiSessionAdminRoute = ApiSessionAdminRouteImport.update({
-  id: '/api/session/admin',
-  path: '/api/session/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiEmailVerifyRegistrationOtpRoute =
-  ApiEmailVerifyRegistrationOtpRouteImport.update({
-    id: '/api/email/verify-registration-otp',
-    path: '/api/email/verify-registration-otp',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiEmailVerifyLoginOtpRoute = ApiEmailVerifyLoginOtpRouteImport.update({
-  id: '/api/email/verify-login-otp',
-  path: '/api/email/verify-login-otp',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiEmailSendWelcomeRoute = ApiEmailSendWelcomeRouteImport.update({
-  id: '/api/email/send-welcome',
-  path: '/api/email/send-welcome',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiEmailSendVerificationRoute =
-  ApiEmailSendVerificationRouteImport.update({
-    id: '/api/email/send-verification',
-    path: '/api/email/send-verification',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiEmailSendRegistrationOtpRoute =
-  ApiEmailSendRegistrationOtpRouteImport.update({
-    id: '/api/email/send-registration-otp',
-    path: '/api/email/send-registration-otp',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiEmailSendPasswordResetRoute =
-  ApiEmailSendPasswordResetRouteImport.update({
-    id: '/api/email/send-password-reset',
-    path: '/api/email/send-password-reset',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiEmailSendLoginOtpRoute = ApiEmailSendLoginOtpRouteImport.update({
-  id: '/api/email/send-login-otp',
-  path: '/api/email/send-login-otp',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiAdminUsersRoute = ApiAdminUsersRouteImport.update({
   id: '/api/admin/users',
   path: '/api/admin/users',
@@ -457,17 +387,6 @@ export interface FileRoutesByFullPath {
   '/api/admin/$': typeof ApiAdminSplatRoute
   '/api/admin/dashboard': typeof ApiAdminDashboardRoute
   '/api/admin/users': typeof ApiAdminUsersRoute
-  '/api/email/send-login-otp': typeof ApiEmailSendLoginOtpRoute
-  '/api/email/send-password-reset': typeof ApiEmailSendPasswordResetRoute
-  '/api/email/send-registration-otp': typeof ApiEmailSendRegistrationOtpRoute
-  '/api/email/send-verification': typeof ApiEmailSendVerificationRoute
-  '/api/email/send-welcome': typeof ApiEmailSendWelcomeRoute
-  '/api/email/verify-login-otp': typeof ApiEmailVerifyLoginOtpRoute
-  '/api/email/verify-registration-otp': typeof ApiEmailVerifyRegistrationOtpRoute
-  '/api/session/admin': typeof ApiSessionAdminRoute
-  '/api/session/complete-otp': typeof ApiSessionCompleteOtpRoute
-  '/api/session/logout': typeof ApiSessionLogoutRoute
-  '/api/session/status': typeof ApiSessionStatusRoute
   '/app/wallet/deposit': typeof AppWalletDepositRoute
   '/app/wallet/withdraw': typeof AppWalletWithdrawRoute
   '/app/wallet/': typeof AppWalletIndexRoute
@@ -521,17 +440,6 @@ export interface FileRoutesByTo {
   '/api/admin/$': typeof ApiAdminSplatRoute
   '/api/admin/dashboard': typeof ApiAdminDashboardRoute
   '/api/admin/users': typeof ApiAdminUsersRoute
-  '/api/email/send-login-otp': typeof ApiEmailSendLoginOtpRoute
-  '/api/email/send-password-reset': typeof ApiEmailSendPasswordResetRoute
-  '/api/email/send-registration-otp': typeof ApiEmailSendRegistrationOtpRoute
-  '/api/email/send-verification': typeof ApiEmailSendVerificationRoute
-  '/api/email/send-welcome': typeof ApiEmailSendWelcomeRoute
-  '/api/email/verify-login-otp': typeof ApiEmailVerifyLoginOtpRoute
-  '/api/email/verify-registration-otp': typeof ApiEmailVerifyRegistrationOtpRoute
-  '/api/session/admin': typeof ApiSessionAdminRoute
-  '/api/session/complete-otp': typeof ApiSessionCompleteOtpRoute
-  '/api/session/logout': typeof ApiSessionLogoutRoute
-  '/api/session/status': typeof ApiSessionStatusRoute
   '/app/wallet/deposit': typeof AppWalletDepositRoute
   '/app/wallet/withdraw': typeof AppWalletWithdrawRoute
   '/app/wallet': typeof AppWalletIndexRoute
@@ -589,17 +497,6 @@ export interface FileRoutesById {
   '/api/admin/$': typeof ApiAdminSplatRoute
   '/api/admin/dashboard': typeof ApiAdminDashboardRoute
   '/api/admin/users': typeof ApiAdminUsersRoute
-  '/api/email/send-login-otp': typeof ApiEmailSendLoginOtpRoute
-  '/api/email/send-password-reset': typeof ApiEmailSendPasswordResetRoute
-  '/api/email/send-registration-otp': typeof ApiEmailSendRegistrationOtpRoute
-  '/api/email/send-verification': typeof ApiEmailSendVerificationRoute
-  '/api/email/send-welcome': typeof ApiEmailSendWelcomeRoute
-  '/api/email/verify-login-otp': typeof ApiEmailVerifyLoginOtpRoute
-  '/api/email/verify-registration-otp': typeof ApiEmailVerifyRegistrationOtpRoute
-  '/api/session/admin': typeof ApiSessionAdminRoute
-  '/api/session/complete-otp': typeof ApiSessionCompleteOtpRoute
-  '/api/session/logout': typeof ApiSessionLogoutRoute
-  '/api/session/status': typeof ApiSessionStatusRoute
   '/app/wallet/deposit': typeof AppWalletDepositRoute
   '/app/wallet/withdraw': typeof AppWalletWithdrawRoute
   '/app/wallet/': typeof AppWalletIndexRoute
@@ -658,17 +555,6 @@ export interface FileRouteTypes {
     | '/api/admin/$'
     | '/api/admin/dashboard'
     | '/api/admin/users'
-    | '/api/email/send-login-otp'
-    | '/api/email/send-password-reset'
-    | '/api/email/send-registration-otp'
-    | '/api/email/send-verification'
-    | '/api/email/send-welcome'
-    | '/api/email/verify-login-otp'
-    | '/api/email/verify-registration-otp'
-    | '/api/session/admin'
-    | '/api/session/complete-otp'
-    | '/api/session/logout'
-    | '/api/session/status'
     | '/app/wallet/deposit'
     | '/app/wallet/withdraw'
     | '/app/wallet/'
@@ -722,17 +608,6 @@ export interface FileRouteTypes {
     | '/api/admin/$'
     | '/api/admin/dashboard'
     | '/api/admin/users'
-    | '/api/email/send-login-otp'
-    | '/api/email/send-password-reset'
-    | '/api/email/send-registration-otp'
-    | '/api/email/send-verification'
-    | '/api/email/send-welcome'
-    | '/api/email/verify-login-otp'
-    | '/api/email/verify-registration-otp'
-    | '/api/session/admin'
-    | '/api/session/complete-otp'
-    | '/api/session/logout'
-    | '/api/session/status'
     | '/app/wallet/deposit'
     | '/app/wallet/withdraw'
     | '/app/wallet'
@@ -789,17 +664,6 @@ export interface FileRouteTypes {
     | '/api/admin/$'
     | '/api/admin/dashboard'
     | '/api/admin/users'
-    | '/api/email/send-login-otp'
-    | '/api/email/send-password-reset'
-    | '/api/email/send-registration-otp'
-    | '/api/email/send-verification'
-    | '/api/email/send-welcome'
-    | '/api/email/verify-login-otp'
-    | '/api/email/verify-registration-otp'
-    | '/api/session/admin'
-    | '/api/session/complete-otp'
-    | '/api/session/logout'
-    | '/api/session/status'
     | '/app/wallet/deposit'
     | '/app/wallet/withdraw'
     | '/app/wallet/'
@@ -829,18 +693,6 @@ export interface RootRouteChildren {
   ApiAdminSplatRoute: typeof ApiAdminSplatRoute
   ApiAdminDashboardRoute: typeof ApiAdminDashboardRoute
   ApiAdminUsersRoute: typeof ApiAdminUsersRoute
-  ApiEmailSendLoginOtpRoute: typeof ApiEmailSendLoginOtpRoute
-  ApiEmailSendPasswordResetRoute: typeof ApiEmailSendPasswordResetRoute
-  ApiEmailSendRegistrationOtpRoute: typeof ApiEmailSendRegistrationOtpRoute
-  ApiEmailSendVerificationRoute: typeof ApiEmailSendVerificationRoute
-  ApiEmailSendWelcomeRoute: typeof ApiEmailSendWelcomeRoute
-  ApiEmailVerifyLoginOtpRoute: typeof ApiEmailVerifyLoginOtpRoute
-  ApiEmailVerifyRegistrationOtpRoute: typeof ApiEmailVerifyRegistrationOtpRoute
-  ApiSessionAdminRoute: typeof ApiSessionAdminRoute
-  ApiSessionCompleteOtpRoute: typeof ApiSessionCompleteOtpRoute
-  ApiSessionLogoutRoute: typeof ApiSessionLogoutRoute
-  ApiSessionStatusRoute: typeof ApiSessionStatusRoute
-  ApiAdminDepositsPaymentSettingsRoute: typeof ApiAdminDepositsPaymentSettingsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1195,83 +1047,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppWalletDepositRouteImport
       parentRoute: typeof AppWalletRoute
     }
-    '/api/session/status': {
-      id: '/api/session/status'
-      path: '/api/session/status'
-      fullPath: '/api/session/status'
-      preLoaderRoute: typeof ApiSessionStatusRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/session/logout': {
-      id: '/api/session/logout'
-      path: '/api/session/logout'
-      fullPath: '/api/session/logout'
-      preLoaderRoute: typeof ApiSessionLogoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/session/complete-otp': {
-      id: '/api/session/complete-otp'
-      path: '/api/session/complete-otp'
-      fullPath: '/api/session/complete-otp'
-      preLoaderRoute: typeof ApiSessionCompleteOtpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/session/admin': {
-      id: '/api/session/admin'
-      path: '/api/session/admin'
-      fullPath: '/api/session/admin'
-      preLoaderRoute: typeof ApiSessionAdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/email/verify-registration-otp': {
-      id: '/api/email/verify-registration-otp'
-      path: '/api/email/verify-registration-otp'
-      fullPath: '/api/email/verify-registration-otp'
-      preLoaderRoute: typeof ApiEmailVerifyRegistrationOtpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/email/verify-login-otp': {
-      id: '/api/email/verify-login-otp'
-      path: '/api/email/verify-login-otp'
-      fullPath: '/api/email/verify-login-otp'
-      preLoaderRoute: typeof ApiEmailVerifyLoginOtpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/email/send-welcome': {
-      id: '/api/email/send-welcome'
-      path: '/api/email/send-welcome'
-      fullPath: '/api/email/send-welcome'
-      preLoaderRoute: typeof ApiEmailSendWelcomeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/email/send-verification': {
-      id: '/api/email/send-verification'
-      path: '/api/email/send-verification'
-      fullPath: '/api/email/send-verification'
-      preLoaderRoute: typeof ApiEmailSendVerificationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/email/send-registration-otp': {
-      id: '/api/email/send-registration-otp'
-      path: '/api/email/send-registration-otp'
-      fullPath: '/api/email/send-registration-otp'
-      preLoaderRoute: typeof ApiEmailSendRegistrationOtpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/email/send-password-reset': {
-      id: '/api/email/send-password-reset'
-      path: '/api/email/send-password-reset'
-      fullPath: '/api/email/send-password-reset'
-      preLoaderRoute: typeof ApiEmailSendPasswordResetRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/email/send-login-otp': {
-      id: '/api/email/send-login-otp'
-      path: '/api/email/send-login-otp'
-      fullPath: '/api/email/send-login-otp'
-      preLoaderRoute: typeof ApiEmailSendLoginOtpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/admin/users': {
       id: '/api/admin/users'
       path: '/api/admin/users'
@@ -1414,18 +1189,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAdminSplatRoute: ApiAdminSplatRoute,
   ApiAdminDashboardRoute: ApiAdminDashboardRoute,
   ApiAdminUsersRoute: ApiAdminUsersRoute,
-  ApiEmailSendLoginOtpRoute: ApiEmailSendLoginOtpRoute,
-  ApiEmailSendPasswordResetRoute: ApiEmailSendPasswordResetRoute,
-  ApiEmailSendRegistrationOtpRoute: ApiEmailSendRegistrationOtpRoute,
-  ApiEmailSendVerificationRoute: ApiEmailSendVerificationRoute,
-  ApiEmailSendWelcomeRoute: ApiEmailSendWelcomeRoute,
-  ApiEmailVerifyLoginOtpRoute: ApiEmailVerifyLoginOtpRoute,
-  ApiEmailVerifyRegistrationOtpRoute: ApiEmailVerifyRegistrationOtpRoute,
-  ApiSessionAdminRoute: ApiSessionAdminRoute,
-  ApiSessionCompleteOtpRoute: ApiSessionCompleteOtpRoute,
-  ApiSessionLogoutRoute: ApiSessionLogoutRoute,
-  ApiSessionStatusRoute: ApiSessionStatusRoute,
-  ApiAdminDepositsPaymentSettingsRoute: ApiAdminDepositsPaymentSettingsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -3,8 +3,8 @@ import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { AuthOtpShell } from "@/components/auth/auth-otp-shell";
 import { OtpVerifyPanel } from "@/components/auth/otp-verify-panel";
-import { useAuth, getAuthIdToken } from "@/hooks/use-auth";
-import { mailGetRegistrationOtpResend } from "@/lib/mail-api";
+import { useAuth } from "@/hooks/use-auth";
+import { userRegisterOtpResendStatus } from "@/lib/auth-api";
 
 interface EmailVerifyOtpStepProps {
   email: string;
@@ -13,38 +13,34 @@ interface EmailVerifyOtpStepProps {
 }
 
 export function EmailVerifyOtpStep({ email, backTo, onVerified }: EmailVerifyOtpStepProps) {
-  const { sendRegistrationOtp, verifyRegistrationOtp, confirmEmailVerified, user } = useAuth();
+  const { sendRegistrationOtp, verifyRegistrationOtp } = useAuth();
   const nav = useNavigate();
   const [verifying, setVerifying] = useState(false);
   const [resending, setResending] = useState(false);
   const [resendInSeconds, setResendInSeconds] = useState(0);
   const [otpAttempt, setOtpAttempt] = useState(0);
 
-  const displayEmail = email || user?.email || "";
+  const displayEmail = email.trim();
 
   useEffect(() => {
+    if (!displayEmail) {
+      nav({ to: backTo.to, search: backTo.search });
+      return;
+    }
+
     let cancelled = false;
-
-    (async () => {
-      const idToken = await getAuthIdToken();
-      if (!idToken && !cancelled) {
-        nav({ to: backTo.to, search: backTo.search });
-        return;
-      }
-
-      if (!idToken || cancelled) return;
-      try {
-        const { resendInSeconds: seconds } = await mailGetRegistrationOtpResend(idToken);
+    void userRegisterOtpResendStatus(displayEmail)
+      .then(({ resendInSeconds: seconds }) => {
         if (!cancelled) setResendInSeconds(seconds);
-      } catch {
+      })
+      .catch(() => {
         // ignore
-      }
-    })();
+      });
 
     return () => {
       cancelled = true;
     };
-  }, [nav, backTo]);
+  }, [displayEmail, nav, backTo]);
 
   useEffect(() => {
     if (resendInSeconds <= 0) return;
@@ -59,11 +55,7 @@ export function EmailVerifyOtpStep({ email, backTo, onVerified }: EmailVerifyOtp
       if (!displayEmail || verifying) return;
       setVerifying(true);
       try {
-        await verifyRegistrationOtp(code);
-        const verified = await confirmEmailVerified();
-        if (!verified) {
-          throw new Error("Email verification did not complete. Try again.");
-        }
+        await verifyRegistrationOtp(displayEmail, code);
         toast.success("Email verified — welcome!");
         onVerified();
       } catch (e) {
@@ -73,13 +65,13 @@ export function EmailVerifyOtpStep({ email, backTo, onVerified }: EmailVerifyOtp
         setVerifying(false);
       }
     },
-    [displayEmail, verifying, verifyRegistrationOtp, confirmEmailVerified, onVerified],
+    [displayEmail, verifying, verifyRegistrationOtp, onVerified],
   );
 
   const handleResend = async () => {
     setResending(true);
     try {
-      const seconds = await sendRegistrationOtp();
+      const seconds = await sendRegistrationOtp(displayEmail);
       setResendInSeconds(seconds);
       toast.success("New code sent to your email");
     } catch (e) {

@@ -1,5 +1,13 @@
-// Admin routes are always served (or proxied) by the TanStack server.
-const API_URL = "";
+import { loadAdminSession } from "@/lib/admin-session-storage";
+
+function getApiBase(): string {
+  const configured = import.meta.env.VITE_API_URL as string | undefined;
+  if (configured?.trim()) return configured.replace(/\/$/, "");
+  if (import.meta.env.DEV) return "";
+  return "http://localhost:4000";
+}
+
+const API_URL = getApiBase();
 
 export interface AdminDashboardStats {
   totalUsers: number;
@@ -59,6 +67,13 @@ export interface DepositRequest {
   reviewedAt?: number;
 }
 
+async function getAdminToken(): Promise<string> {
+  const stored = loadAdminSession();
+  const token = stored?.tokens?.idToken;
+  if (!token) throw new Error("Admin session expired. Please sign in again.");
+  return token;
+}
+
 async function adminFetch<T>(
   path: string,
   options: RequestInit = {},
@@ -67,7 +82,6 @@ async function adminFetch<T>(
   // oversized request headers on shared hosting (413).
   const res = await fetch(path, {
     ...options,
-    credentials: "include",
     headers: {
       "Content-Type": "application/json",
       ...options.headers,

@@ -7,27 +7,33 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut, updateProfile, type User as FirebaseUser } from "firebase/auth";
-import { adminMe, type UserProfile, userMeWithIdToken, userRegister, userVerifyEmail } from "@/lib/auth-api";
+import { onAuthStateChanged, signInWithCustomToken, signOut, type User as FirebaseUser } from "firebase/auth";
+import {
+  AuthApiError,
+  adminMe,
+  type UserProfile,
+  userMe,
+  userMeJwt,
+  userRegister,
+  userResendLoginOtp,
+  userResendRegisterOtp,
+  userStartLogin,
+  userVerifyLoginOtp,
+  userVerifyRegisterOtp,
+} from "@/lib/auth-api";
+import { logoutApiSession } from "@/lib/api-client";
 import { ensureUserProfile } from "@/lib/ensure-user-profile";
 import { signInWithGooglePopup } from "@/lib/google-auth";
-import { mailSendLoginOtp, mailSendPasswordReset, mailSendRegistrationOtp, mailSendWelcome, mailVerifyLoginOtp, mailVerifyRegistrationOtp } from "@/lib/mail-api";
+import { sendUserPasswordResetEmail } from "@/lib/email-verification";
 import { mapFirebaseAuthError } from "@/lib/firebase-errors";
 import { auth, getClientAuth } from "@/lib/firebase";
 import { clearReferralCode, markReferralVerified, recordReferralSignup } from "@/lib/referral-db";
 import { getProfileExtras } from "@/lib/profile-db";
-import {
-  clearLegacyBrowserSessionKeys,
-  completeOtpSession,
-  fetchUserSessionStatus,
-  logoutUserSession,
-  type UserSessionStatus,
-} from "@/lib/session-api";
+import { clearTokens, getStoredTokens } from "@/lib/token-store";
+import { clearLegacyBrowserSessionKeys } from "@/lib/admin-session-storage";
 
 export type GoogleSignInOutcome =
   | { type: "admin" }
-  | { type: "login_otp"; email: string }
-  | { type: "verify_email"; email: string }
   | { type: "done" };
 
 interface AuthCtx {
@@ -37,31 +43,50 @@ interface AuthCtx {
   needsEmailVerification: boolean;
   needsLoginOtp: boolean;
   loading: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<{ resendInSeconds: number }>;
   signInWithGoogle: (refCode?: string) => Promise<GoogleSignInOutcome>;
   register: (name: string, email: string, password: string, refCode?: string) => Promise<void>;
   logout: () => void;
-  resendVerificationEmail: () => Promise<void>;
-  sendRegistrationOtp: () => Promise<number>;
-  verifyRegistrationOtp: (code: string) => Promise<void>;
-  confirmEmailVerified: () => Promise<boolean>;
+  resendVerificationEmail: (email: string) => Promise<void>;
+  sendRegistrationOtp: (email: string) => Promise<number>;
+  verifyRegistrationOtp: (email: string, code: string) => Promise<void>;
   requestPasswordReset: (email: string) => Promise<void>;
-  sendLoginOtp: () => Promise<number>;
-  verifyLoginOtp: (code: string, trustThisDevice?: boolean) => Promise<void>;
-  refreshSessionStatus: () => Promise<UserSessionStatus | null>;
+  sendLoginOtp: (email: string) => Promise<number>;
+  verifyLoginOtp: (email: string, code: string, trustThisDevice?: boolean) => Promise<void>;
   updateUser: (patch: Partial<UserProfile>) => void;
 }
 
 const AuthContext = createContext<AuthCtx | null>(null);
 
-async function loadProfile(firebaseUser: FirebaseUser): Promise<UserProfile> {
-  const idToken = await firebaseUser.getIdToken();
-  const { user } = await userMeWithIdToken(idToken);
-  return user;
+const PENDING_REF_KEY = "pendingRegisterRef";
+
+function applyProfileExtras(profile: UserProfile): UserProfile {
+  const extras = getProfileExtras(profile.email);
+  return {
+    ...profile,
+    country: extras.country ?? profile.country,
+    twoFA: extras.twoFA ?? profile.twoFA,
+  };
+}
+
+async function establishFirebaseSession(customToken: string): Promise<FirebaseUser> {
+  const cred = await signInWithCustomToken(auth, customToken);
+  await cred.user.reload();
+  return cred.user;
 }
 
 function isGoogleAccount(firebaseUser: FirebaseUser): boolean {
   return firebaseUser.providerData.some((provider) => provider.providerId === "google.com");
+}
+
+async function loadProfile(firebaseUser: FirebaseUser): Promise<UserProfile> {
+  if (getStoredTokens()) {
+    const { user } = await userMeJwt();
+    return user;
+  }
+  const idToken = await firebaseUser.getIdToken();
+  const { user } = await userMe(idToken);
+  return user;
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -70,35 +95,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [otpSessionReady, setOtpSessionReady] = useState(false);
 
-  const refreshSessionStatus = useCallback(async (): Promise<UserSessionStatus | null> => {
-    const firebaseUser = auth.currentUser;
-    if (!firebaseUser?.email || !firebaseUser.emailVerified) {
-      setOtpSessionReady(false);
-      return null;
-    }
-
-    try {
-      const idToken = await firebaseUser.getIdToken();
-      const status = await fetchUserSessionStatus(idToken);
-      setOtpSessionReady(!status.otpRequired);
-      return status;
-    } catch (err) {
-      console.error("Failed to load SQL session status:", err);
-      setOtpSessionReady(false);
-      return null;
-    }
-  }, []);
+  const completeBackendAuth = useCallback(
+    async (data: { user: UserProfile; customToken: string }) => {
+      await establishFirebaseSession(data.customToken);
+      const profile = applyProfileExtras(data.user);
+      setUser(profile);
+      setEmailVerified(true);
+      setOtpSessionReady(true);
+      return profile;
+    },
+    [],
+  );
 
   useEffect(() => {
     clearLegacyBrowserSessionKeys();
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+
+    async function restoreJwtSession(): Promise<boolean> {
+      if (!getStoredTokens()) return false;
+      try {
+        const { user: profile } = await userMeJwt();
+        if (cancelled) return true;
+        setUser(applyProfileExtras(profile));
+        setEmailVerified(true);
+        setOtpSessionReady(true);
+        return true;
+      } catch {
+        clearTokens();
+        return false;
+      }
+    }
+
     const unsubscribe = onAuthStateChanged(getClientAuth(), async (firebaseUser) => {
+      if (cancelled) return;
+
       if (!firebaseUser) {
-        setUser(null);
-        setEmailVerified(false);
-        setOtpSessionReady(false);
+        const restored = await restoreJwtSession();
+        if (!restored) {
+          setUser(null);
+          setEmailVerified(false);
+          setOtpSessionReady(false);
+        }
         setLoading(false);
         return;
       }
@@ -128,42 +168,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
           profile = (await ensureUserProfile(firebaseUser)).user;
         }
-        const extras = getProfileExtras(profile.email);
-        setUser({
-          ...profile,
-          country: extras.country ?? profile.country,
-          twoFA: extras.twoFA ?? profile.twoFA,
-        });
-        if (firebaseUser.emailVerified && !profile.verified) {
-          const freshToken = await firebaseUser.getIdToken(true);
-          const { user: verifiedProfile } = await userVerifyEmail(freshToken);
-          setUser(verifiedProfile);
-        }
 
-        if (firebaseUser.emailVerified) {
-          await refreshSessionStatus();
-        } else {
-          setOtpSessionReady(false);
-        }
+        setUser(applyProfileExtras(profile));
+        setOtpSessionReady(firebaseUser.emailVerified && (profile.verified || getStoredTokens() !== null));
       } catch (err) {
         console.error("Failed to load user profile:", err);
         setUser(null);
+        setOtpSessionReady(false);
       } finally {
         setLoading(false);
       }
     });
 
-    return unsubscribe;
-  }, [refreshSessionStatus]);
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
+  }, []);
 
-  const login = useCallback(async (email: string, password: string): Promise<boolean> => {
+  const login = useCallback(async (email: string, password: string) => {
     try {
-      const cred = await signInWithEmailAndPassword(auth, email, password);
-      await cred.user.reload();
-      setEmailVerified(cred.user.emailVerified);
-      return cred.user.emailVerified;
+      const result = await userStartLogin(email, password);
+      return { resendInSeconds: result.resendInSeconds };
     } catch (err) {
-      throw new Error(mapFirebaseAuthError(err));
+      const message =
+        err instanceof AuthApiError ? err.message : err instanceof Error ? err.message : "Sign in failed.";
+      throw new Error(message);
     }
   }, []);
 
@@ -180,13 +210,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       const { user: profile, isNewUser } = await ensureUserProfile(cred.user);
-      const extras = getProfileExtras(profile.email);
-      setUser({
-        ...profile,
-        country: extras.country ?? profile.country,
-        twoFA: extras.twoFA ?? profile.twoFA,
-      });
+      setUser(applyProfileExtras(profile));
       setEmailVerified(cred.user.emailVerified);
+      setOtpSessionReady(true);
 
       if (isNewUser) {
         if (refCode && cred.user.email) {
@@ -196,122 +222,62 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (cred.user.emailVerified && cred.user.email) {
           markReferralVerified(cred.user.email);
         }
-        await mailSendWelcome(idToken, profile.name).catch((err) => {
-          console.error("Failed to send welcome email:", err);
-        });
       }
 
-      if (!cred.user.emailVerified) {
-        await mailSendRegistrationOtp(idToken);
-        return { type: "verify_email", email: cred.user.email ?? "" };
-      }
-
-      const session = await refreshSessionStatus();
-      if (session?.otpRequired) {
-        await mailSendLoginOtp(idToken);
-        return { type: "login_otp", email: cred.user.email ?? "" };
-      }
-
-      setOtpSessionReady(true);
       return { type: "done" };
     } catch (err) {
       throw new Error(mapFirebaseAuthError(err));
     }
-  }, [refreshSessionStatus]);
+  }, []);
 
   const register = useCallback(async (name: string, email: string, password: string, refCode?: string) => {
     try {
-      const cred = await createUserWithEmailAndPassword(auth, email, password);
-      if (name.trim()) {
-        await updateProfile(cred.user, { displayName: name.trim() });
-      }
-
-      const { user: profile } = await ensureUserProfile(cred.user);
-      setUser(profile);
-      setEmailVerified(false);
-      setOtpSessionReady(false);
-
-      await mailSendRegistrationOtp(await cred.user.getIdToken());
-
+      await userRegister({ name, email, password });
       if (refCode) {
-        recordReferralSignup(refCode, { name, email });
-        clearReferralCode();
+        sessionStorage.setItem(PENDING_REF_KEY, refCode);
+      } else {
+        sessionStorage.removeItem(PENDING_REF_KEY);
       }
     } catch (err) {
-      throw new Error(mapFirebaseAuthError(err));
+      const message =
+        err instanceof AuthApiError ? err.message : err instanceof Error ? err.message : "Registration failed.";
+      throw new Error(message);
     }
   }, []);
 
-  const resendVerificationEmail = useCallback(async () => {
-    const firebaseUser = auth.currentUser;
-    if (!firebaseUser) {
-      throw new Error("Sign in again to resend the verification code.");
-    }
-
-    const idToken = await firebaseUser.getIdToken();
-    await mailSendRegistrationOtp(idToken);
+  const resendVerificationEmail = useCallback(async (email: string) => {
+    await userResendRegisterOtp(email);
   }, []);
 
-  const sendRegistrationOtp = useCallback(async () => {
-    const firebaseUser = auth.currentUser;
-    if (!firebaseUser) {
-      throw new Error("Sign in again to receive a verification code.");
-    }
-    const idToken = await firebaseUser.getIdToken();
-    const { resendInSeconds } = await mailSendRegistrationOtp(idToken);
+  const sendRegistrationOtp = useCallback(async (email: string) => {
+    const { resendInSeconds } = await userResendRegisterOtp(email);
     return resendInSeconds;
   }, []);
 
-  const verifyRegistrationOtp = useCallback(async (code: string) => {
-    const firebaseUser = auth.currentUser;
-    if (!firebaseUser?.email) {
-      throw new Error("Sign in again to verify your code.");
-    }
+  const verifyRegistrationOtp = useCallback(
+    async (email: string, code: string) => {
+      const data = await userVerifyRegisterOtp(email, code);
+      const profile = await completeBackendAuth(data);
 
-    const idToken = await firebaseUser.getIdToken();
-    // The server verifies the code, marks the email verified, and opens a
-    // completed session — so no separate sign-in OTP is needed afterwards.
-    const status = await mailVerifyRegistrationOtp(idToken, code);
-    await firebaseUser.reload();
-    setEmailVerified(firebaseUser.emailVerified);
-    setOtpSessionReady(!status.otpRequired);
-  }, []);
-
-  const confirmEmailVerified = useCallback(async (): Promise<boolean> => {
-    const firebaseUser = auth.currentUser;
-    if (!firebaseUser) {
-      throw new Error("Sign in again to verify your email.");
-    }
-
-    await firebaseUser.reload();
-    if (!firebaseUser.emailVerified) {
-      setEmailVerified(false);
-      return false;
-    }
-
-    setEmailVerified(true);
-    const idToken = await firebaseUser.getIdToken(true);
-    const { user: profile } = await userVerifyEmail(idToken);
-    setUser(profile);
-    if (firebaseUser.email) {
-      markReferralVerified(firebaseUser.email);
-    }
-    await mailSendWelcome(idToken, profile.name).catch((err) => {
-      console.error("Failed to send welcome email:", err);
-    });
-    await refreshSessionStatus();
-    return true;
-  }, [refreshSessionStatus]);
+      const refCode = sessionStorage.getItem(PENDING_REF_KEY);
+      if (refCode) {
+        recordReferralSignup(refCode, { name: profile.name, email });
+        clearReferralCode();
+        sessionStorage.removeItem(PENDING_REF_KEY);
+      }
+      markReferralVerified(email);
+    },
+    [completeBackendAuth],
+  );
 
   const logout = useCallback(() => {
     void (async () => {
-      const idToken = await getAuthIdToken();
       try {
-        await logoutUserSession(idToken ?? undefined);
+        await logoutApiSession();
       } catch {
-        // still sign out locally
+        clearTokens();
       }
-      signOut(auth);
+      await signOut(auth);
       setUser(null);
       setEmailVerified(false);
       setOtpSessionReady(false);
@@ -319,41 +285,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const requestPasswordReset = useCallback(async (email: string) => {
-    await mailSendPasswordReset(email);
+    await sendUserPasswordResetEmail(email);
   }, []);
 
-  const sendLoginOtp = useCallback(async () => {
-    const firebaseUser = auth.currentUser;
-    if (!firebaseUser) {
-      throw new Error("Sign in again to receive a verification code.");
-    }
-    const idToken = await firebaseUser.getIdToken();
-    const { resendInSeconds } = await mailSendLoginOtp(idToken);
+  const sendLoginOtp = useCallback(async (email: string) => {
+    const { resendInSeconds } = await userResendLoginOtp(email);
     return resendInSeconds;
   }, []);
 
   const verifyLoginOtp = useCallback(
-    async (code: string, trustThisDevice = false) => {
-      const firebaseUser = auth.currentUser;
-      if (!firebaseUser?.email) {
-        throw new Error("Sign in again to verify your code.");
-      }
-
-      const idToken = await firebaseUser.getIdToken();
-      await mailVerifyLoginOtp(idToken, code);
-      const status = await completeOtpSession(idToken, trustThisDevice);
-      setOtpSessionReady(!status.otpRequired);
+    async (email: string, code: string, _trustThisDevice = false) => {
+      const data = await userVerifyLoginOtp(email, code);
+      await completeBackendAuth(data);
     },
-    [],
+    [completeBackendAuth],
   );
 
   const updateUser = useCallback((patch: Partial<UserProfile>) => {
     setUser((prev) => (prev ? { ...prev, ...patch } : null));
   }, []);
 
-  const needsLoginOtp = !!user && emailVerified && !otpSessionReady;
+  const needsLoginOtp = false;
   const isAuthenticated = !!user && emailVerified && otpSessionReady;
-  const needsEmailVerification = !!user && !emailVerified;
+  const needsEmailVerification = false;
 
   const value = useMemo<AuthCtx>(
     () => ({
@@ -370,11 +324,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       resendVerificationEmail,
       sendRegistrationOtp,
       verifyRegistrationOtp,
-      confirmEmailVerified,
       requestPasswordReset,
       sendLoginOtp,
       verifyLoginOtp,
-      refreshSessionStatus,
       updateUser,
     }),
     [
@@ -391,11 +343,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       resendVerificationEmail,
       sendRegistrationOtp,
       verifyRegistrationOtp,
-      confirmEmailVerified,
       requestPasswordReset,
       sendLoginOtp,
       verifyLoginOtp,
-      refreshSessionStatus,
       updateUser,
     ],
   );
@@ -417,4 +367,5 @@ export async function getAuthIdToken(): Promise<string | null> {
 
 export function clearLoginSessions() {
   clearLegacyBrowserSessionKeys();
+  clearTokens();
 }

@@ -23,25 +23,6 @@ export function useGoogleSignIn(options: {
         return;
       }
 
-      if (outcome.type === "verify_email") {
-        toast.message("Enter the 6-digit code sent to your email");
-        nav({ to: "/verify", search: { step: "otp", email: outcome.email } });
-        return;
-      }
-
-      if (outcome.type === "login_otp") {
-        toast.message("Enter the 6-digit code sent to your email");
-        nav({
-          to: "/login",
-          search: {
-            step: "otp",
-            email: outcome.email,
-            redirect: options.redirect ?? "/app",
-          },
-        });
-        return;
-      }
-
       toast.success(options.refCode ? "Welcome to Exness!" : "Welcome back");
       if (options.onSuccess) {
         options.onSuccess();

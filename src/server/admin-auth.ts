@@ -1,6 +1,4 @@
-import { getSessionById } from "@/server/db/session-store";
 import { loadServerEnv } from "@/server/load-env";
-import { getAdminSessionIdFromRequest } from "@/server/session-cookies";
 
 export interface AdminRequestContext {
   email: string;
@@ -43,20 +41,6 @@ async function verifyAdminBearer(authorization: string | null): Promise<AdminReq
 }
 
 export async function requireAdminSession(request: Request): Promise<AdminRequestContext> {
-  const sessionId = getAdminSessionIdFromRequest(request);
-  if (sessionId) {
-    const session = await getSessionById(sessionId);
-    if (session?.session_type === "admin" && session.admin_email && session.payload_json) {
-      const payload = JSON.parse(session.payload_json) as {
-        tokens?: { idToken?: string };
-      };
-      return {
-        email: session.admin_email,
-        idToken: payload.tokens?.idToken ?? null,
-      };
-    }
-  }
-
   const fromBearer = await verifyAdminBearer(request.headers.get("Authorization"));
   if (fromBearer) return fromBearer;
 

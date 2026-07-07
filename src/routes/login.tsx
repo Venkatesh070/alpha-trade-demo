@@ -10,13 +10,10 @@ import { AuthShell, GoogleAuthButton, authInputClass, authLabelClass } from "@/c
 import { AuthOtpShell } from "@/components/auth/auth-otp-shell";
 import { OtpVerifyPanel } from "@/components/auth/otp-verify-panel";
 import { RedirectIfAuthed } from "@/components/auth/redirect-if-authed";
-import { useAuth, getAuthIdToken } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/use-auth";
 import { useGoogleSignIn } from "@/hooks/use-google-sign-in";
 import { cn } from "@/lib/utils";
-import { adminMe } from "@/lib/auth-api";
-import { signOut } from "firebase/auth";
-import { auth } from "@/lib/firebase";
-import { mailGetLoginOtpResend } from "@/lib/mail-api";
+import { userLoginOtpResendStatus } from "@/lib/auth-api";
 import { sanitizeAuthRedirect } from "@/lib/auth-redirect";
 
 const schema = z.object({
@@ -51,7 +48,7 @@ function LoginPage() {
 }
 
 function LoginForm() {
-  const { login, refreshSessionStatus, sendLoginOtp } = useAuth();
+  const { login } = useAuth();
   const nav = useNavigate();
   const { redirect } = useSearch({ from: "/login" });
   const { handleGoogleSignIn, googleLoading } = useGoogleSignIn({ redirect });
@@ -66,52 +63,9 @@ function LoginForm() {
   const onSubmit = async (vals: FormVals) => {
     setLoading(true);
     try {
-      const verified = await login(vals.email, vals.password);
-      if (!verified) {
-        const idToken = await getAuthIdToken();
-        if (idToken) {
-          try {
-            const { admin } = await adminMe(idToken);
-            if (admin) {
-              await signOut(auth);
-              toast.message("This is an admin account — use the admin sign-in page");
-              nav({ to: "/admin/login" });
-              return;
-            }
-          } catch {
-            // not an admin — continue to email verification
-          }
-        }
-        toast.message("Verify your email to continue");
-        nav({ to: "/verify", search: { step: "otp", email: vals.email } });
-        return;
-      }
-
-      const idToken = await getAuthIdToken();
-      if (idToken) {
-        try {
-          const { admin } = await adminMe(idToken);
-          if (admin) {
-            await signOut(auth);
-            toast.message("This is an admin account — use the admin sign-in page");
-            nav({ to: "/admin/login" });
-            return;
-          }
-        } catch {
-          // not an admin
-        }
-
-        const session = await refreshSessionStatus();
-        if (session?.otpRequired) {
-          await sendLoginOtp();
-          toast.message("Enter the 6-digit code sent to your email");
-          nav({ to: "/login", search: { step: "otp", email: vals.email, redirect } });
-          return;
-        }
-      }
-
-      toast.success("Welcome back");
-      nav({ to: redirect });
+      await login(vals.email, vals.password);
+      toast.message("Enter the 6-digit code sent to your email");
+      nav({ to: "/login", search: { step: "otp", email: vals.email, redirect } });
     } catch (e) {
       toast.error((e as Error).message);
     } finally {
@@ -200,7 +154,7 @@ function LoginForm() {
 
 function LoginOtpStep() {
   const { email, redirect } = useSearch({ from: "/login" });
-  const { verifyLoginOtp, sendLoginOtp, user } = useAuth();
+  const { verifyLoginOtp, sendLoginOtp } = useAuth();
   const nav = useNavigate();
   const [trustDevice, setTrustDevice] = useState(false);
   const [verifying, setVerifying] = useState(false);
@@ -208,31 +162,27 @@ function LoginOtpStep() {
   const [resendInSeconds, setResendInSeconds] = useState(0);
   const [otpAttempt, setOtpAttempt] = useState(0);
 
-  const displayEmail = email ?? user?.email ?? "";
+  const displayEmail = email?.trim() ?? "";
 
   useEffect(() => {
+    if (!displayEmail) {
+      nav({ to: "/login", search: { step: "form", email: undefined, redirect } });
+      return;
+    }
+
     let cancelled = false;
-
-    (async () => {
-      const idToken = await getAuthIdToken();
-      if (!idToken && !cancelled) {
-        nav({ to: "/login", search: { step: "form", redirect } });
-        return;
-      }
-
-      if (!idToken || cancelled) return;
-      try {
-        const { resendInSeconds: seconds } = await mailGetLoginOtpResend(idToken);
+    void userLoginOtpResendStatus(displayEmail)
+      .then(({ resendInSeconds: seconds }) => {
         if (!cancelled) setResendInSeconds(seconds);
-      } catch {
+      })
+      .catch(() => {
         // ignore
-      }
-    })();
+      });
 
     return () => {
       cancelled = true;
     };
-  }, [nav, redirect]);
+  }, [displayEmail, nav, redirect]);
 
   useEffect(() => {
     if (resendInSeconds <= 0) return;
@@ -247,7 +197,7 @@ function LoginOtpStep() {
       if (!displayEmail || verifying) return;
       setVerifying(true);
       try {
-        await verifyLoginOtp(code, trustDevice);
+        await verifyLoginOtp(displayEmail, code, trustDevice);
         toast.success("Welcome back");
         nav({ to: redirect });
       } catch (e) {
@@ -263,7 +213,7 @@ function LoginOtpStep() {
   const handleResend = async () => {
     setResending(true);
     try {
-      const seconds = await sendLoginOtp();
+      const seconds = await sendLoginOtp(displayEmail);
       setResendInSeconds(seconds);
       toast.success("New code sent to your email");
     } catch (e) {
@@ -276,7 +226,7 @@ function LoginOtpStep() {
   if (!displayEmail) return null;
 
   return (
-    <AuthOtpShell backTo={{ to: "/login", search: { step: "form", redirect } }}>
+    <AuthOtpShell backTo={{ to: "/login", search: { step: "form", email: undefined, redirect } }}>
       <OtpVerifyPanel
         key={otpAttempt}
         email={displayEmail}

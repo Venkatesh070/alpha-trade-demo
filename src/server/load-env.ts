@@ -40,7 +40,7 @@ export function loadServerEnv(): void {
     console.warn(`[load-env] No .env file at ${envPath} (cwd=${process.cwd()})`);
   }
 
-  // Fall back to backend/.env for shared MySQL credentials (GoDaddy cPanel).
+  // Optional shared backend env (Firebase credentials, etc.)
   const backendEnvPath = resolve(root, "backend/.env");
   if (existsSync(backendEnvPath)) {
     config({ path: backendEnvPath });

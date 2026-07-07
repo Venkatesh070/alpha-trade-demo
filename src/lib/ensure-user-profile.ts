@@ -1,5 +1,5 @@
 import type { User as FirebaseUser } from "firebase/auth";
-import { AuthApiError, type UserProfile, userMeWithIdToken, userSyncWithIdToken, userVerifyEmail } from "@/lib/auth-api";
+import { AuthApiError, type UserProfile, userMe, userSync, userVerifyEmail } from "@/lib/auth-api";
 
 export async function ensureUserProfile(
   firebaseUser: FirebaseUser,
@@ -7,7 +7,7 @@ export async function ensureUserProfile(
   const idToken = await firebaseUser.getIdToken();
 
   try {
-    const { user } = await userMeWithIdToken(idToken);
+    const { user } = await userMe(idToken);
     return { user, isNewUser: false };
   } catch (err) {
     const missingProfile =
@@ -20,7 +20,7 @@ export async function ensureUserProfile(
     firebaseUser.email?.split("@")[0] ||
     "User";
 
-  const { user } = await userSyncWithIdToken(idToken, { name });
+  const { user } = await userSync(idToken, { name });
 
   if (firebaseUser.emailVerified) {
     try {

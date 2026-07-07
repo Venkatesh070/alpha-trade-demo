@@ -18,7 +18,7 @@ function buildReturnTo(pathname: string, search: Record<string, unknown> | undef
 }
 
 export function RequireAuth({ children }: { children: ReactNode }) {
-  const { isAuthenticated, needsEmailVerification, needsLoginOtp, loading, user } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
   const nav = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const search = useRouterState({ select: (s) => s.location.search as Record<string, unknown> | undefined });
@@ -27,25 +27,11 @@ export function RequireAuth({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (loading) return;
 
-    if (needsEmailVerification) {
-      nav({ to: "/verify", search: { step: "otp", email: user?.email ?? "" } });
-      return;
-    }
-
-    if (needsLoginOtp) {
-      if (pathname.startsWith("/login")) return;
-      nav({
-        to: "/login",
-        search: { step: "otp", email: user?.email ?? "", redirect: returnTo },
-      });
-      return;
-    }
-
     if (!isAuthenticated) {
       if (pathname.startsWith("/login")) return;
-      nav({ to: "/login", search: { redirect: returnTo } });
+      nav({ to: "/login", search: { redirect: returnTo, step: undefined, email: undefined } });
     }
-  }, [loading, isAuthenticated, needsEmailVerification, needsLoginOtp, nav, returnTo, pathname, user?.email]);
+  }, [loading, isAuthenticated, nav, returnTo, pathname]);
 
   if (loading) return <AuthLoading />;
   if (!isAuthenticated) return null;

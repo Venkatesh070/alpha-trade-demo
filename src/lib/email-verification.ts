@@ -1,15 +1,20 @@
-import { applyActionCode, type ActionCodeSettings, type User } from "firebase/auth";
-import { mailSendVerification } from "@/lib/mail-api";
+import {
+  applyActionCode,
+  sendEmailVerification,
+  sendPasswordResetEmail,
+  type ActionCodeSettings,
+  type User,
+} from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { mapFirebaseAuthError } from "@/lib/firebase-errors";
 
-/** Base URL for email verification redirects — must match a Firebase Authorized domain. */
+/** Base URL for email action redirects — must match a Firebase Authorized domain. */
 function getVerificationBaseUrl(): string {
   const configured = import.meta.env.VITE_APP_URL as string | undefined;
   if (configured?.trim()) {
     return configured.replace(/\/$/, "");
   }
 
-  // Network IPs (172.x, 192.x) are not Firebase-authorized; always use localhost in dev.
   if (import.meta.env.DEV) {
     return "http://localhost:8080";
   }
@@ -29,13 +34,38 @@ export function verificationActionCodeSettings(email: string): ActionCodeSetting
   };
 }
 
+export function passwordResetActionCodeSettings(email: string): ActionCodeSettings {
+  const base = getVerificationBaseUrl();
+  return {
+    url: `${base}/reset-password?email=${encodeURIComponent(email)}`,
+    handleCodeInApp: true,
+  };
+}
+
 export async function sendUserVerificationEmail(user: User): Promise<void> {
   const email = user.email;
   if (!email) {
     throw new Error("No email address on this account.");
   }
 
-  await mailSendVerification();
+  try {
+    await sendEmailVerification(user, verificationActionCodeSettings(email));
+  } catch (err) {
+    throw new Error(mapFirebaseAuthError(err));
+  }
+}
+
+export async function sendUserPasswordResetEmail(email: string): Promise<void> {
+  const normalized = email.trim().toLowerCase();
+  if (!normalized) {
+    throw new Error("Email is required.");
+  }
+
+  try {
+    await sendPasswordResetEmail(auth, normalized, passwordResetActionCodeSettings(normalized));
+  } catch (err) {
+    throw new Error(mapFirebaseAuthError(err));
+  }
 }
 
 export async function applyEmailVerificationFromUrl(): Promise<boolean> {
