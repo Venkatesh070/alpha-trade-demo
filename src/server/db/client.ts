@@ -3,6 +3,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Pool } from "mysql2/promise";
 import { loadServerEnv } from "@/server/load-env";
+import { SESSION_MIGRATION_SQL } from "@/server/db/session-migration-sql";
 
 export type DbDialect = "mysql";
 
@@ -20,18 +21,22 @@ export interface SqlDatabase {
 let dbInstance: SqlDatabase | null = null;
 let migratePromise: Promise<void> | null = null;
 
-function projectRoot(): string {
+function migrationSql(): string {
+  const candidates = [resolve(process.cwd(), "migrations/001_sessions.sql")];
+
   let dir = dirname(fileURLToPath(import.meta.url));
-  for (let i = 0; i < 6; i++) {
-    if (existsSync(resolve(dir, "package.json"))) return dir;
+  for (let i = 0; i < 10; i++) {
+    candidates.push(resolve(dir, "migrations/001_sessions.sql"));
     dir = dirname(dir);
   }
-  return process.cwd();
-}
 
-function migrationSql(): string {
-  const path = resolve(projectRoot(), "migrations/001_sessions.sql");
-  return readFileSync(path, "utf8");
+  for (const path of candidates) {
+    if (existsSync(path)) {
+      return readFileSync(path, "utf8");
+    }
+  }
+
+  return SESSION_MIGRATION_SQL;
 }
 
 function splitStatements(sql: string): string[] {
