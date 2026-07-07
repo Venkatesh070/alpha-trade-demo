@@ -2,12 +2,25 @@ import { useId, useMemo } from "react";
 import { cn } from "@/lib/utils";
 
 function buildPath(points: number[], w: number, h: number) {
-  const min = Math.min(...points);
-  const max = Math.max(...points);
-  const span = Math.max(1, max - min);
-  const step = w / (points.length - 1);
+  const safe = points.filter((n) => Number.isFinite(n));
+  if (safe.length === 0) return { d: "", coords: [] as { x: number; y: number }[] };
+  if (safe.length === 1) {
+    const y = h / 2;
+    return {
+      d: `M 0 ${y.toFixed(2)} L ${w.toFixed(2)} ${y.toFixed(2)}`,
+      coords: [
+        { x: 0, y },
+        { x: w, y },
+      ],
+    };
+  }
 
-  const coords = points.map((v, i) => ({
+  const min = Math.min(...safe);
+  const max = Math.max(...safe);
+  const span = Math.max(1, max - min);
+  const step = w / (safe.length - 1);
+
+  const coords = safe.map((v, i) => ({
     x: i * step,
     y: h - ((v - min) / span) * h,
   }));
@@ -38,13 +51,17 @@ export function Sparkline({
   const w = 100;
   const h = 32;
 
-  const { d, coords } = useMemo(() => buildPath(points, w, h), [points]);
+  const { d, coords } = useMemo(() => {
+    const finitePoints = points.filter((n) => Number.isFinite(n));
+    return buildPath(finitePoints, w, h);
+  }, [points, w, h]);
+
   const color = up ? "var(--success)" : "var(--destructive)";
   const gradId = `sg-${uid}`;
   const last = coords[coords.length - 1];
   const endDot = animated || showEndDot;
 
-  if (!points.length) return null;
+  if (!points.length || !d) return null;
 
   return (
     <svg

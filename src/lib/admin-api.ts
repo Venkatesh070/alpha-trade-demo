@@ -1,11 +1,5 @@
-import { loadAdminSessionFromServer } from "@/lib/session-api";
-
 // Admin routes are always served (or proxied) by the TanStack server.
-function getApiBase(): string {
-  return "";
-}
-
-const API_URL = getApiBase();
+const API_URL = "";
 
 export interface AdminDashboardStats {
   totalUsers: number;
@@ -65,24 +59,17 @@ export interface DepositRequest {
   reviewedAt?: number;
 }
 
-async function getAdminToken(): Promise<string> {
-  const stored = await loadAdminSessionFromServer();
-  const token = stored?.tokens?.idToken;
-  if (!token) throw new Error("Admin session expired. Please sign in again.");
-  return token;
-}
-
 async function adminFetch<T>(
   path: string,
   options: RequestInit = {},
 ): Promise<T> {
-  const token = await getAdminToken();
-  const res = await fetch(`${API_URL}${path}`, {
+  // Cookie session is enough for same-origin admin routes; skip Bearer to avoid
+  // oversized request headers on shared hosting (413).
+  const res = await fetch(path, {
     ...options,
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
       ...options.headers,
     },
   });
@@ -95,22 +82,22 @@ async function adminFetch<T>(
 }
 
 async function adminGet<T>(path: string): Promise<T> {
-  return adminFetch<T>(path);
+  return adminFetch<T>(`${API_URL}${path}`);
 }
 
 async function adminPut<T>(path: string, body: unknown): Promise<T> {
-  return adminFetch<T>(path, { method: "PUT", body: JSON.stringify(body) });
+  return adminFetch<T>(`${API_URL}${path}`, { method: "PUT", body: JSON.stringify(body) });
 }
 
 async function adminPost<T>(path: string, body?: unknown): Promise<T> {
-  return adminFetch<T>(path, {
+  return adminFetch<T>(`${API_URL}${path}`, {
     method: "POST",
     ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
   });
 }
 
 async function adminDelete<T>(path: string): Promise<T> {
-  return adminFetch<T>(path, { method: "DELETE" });
+  return adminFetch<T>(`${API_URL}${path}`, { method: "DELETE" });
 }
 
 export async function fetchAdminDashboard(days = 60): Promise<AdminDashboardData> {

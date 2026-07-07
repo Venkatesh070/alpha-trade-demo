@@ -73,6 +73,7 @@ import { Route as ApiEmailSendLoginOtpRouteImport } from './routes/api/email/sen
 import { Route as ApiAdminUsersRouteImport } from './routes/api/admin/users'
 import { Route as ApiAdminDashboardRouteImport } from './routes/api/admin/dashboard'
 import { Route as ApiAdminSplatRouteImport } from './routes/api/admin/$'
+import { Route as ApiAdminDepositsPaymentSettingsRouteImport } from './routes/api/admin/deposits/payment-settings'
 
 const VerifyRoute = VerifyRouteImport.update({
   id: '/verify',
@@ -398,6 +399,12 @@ const ApiAdminSplatRoute = ApiAdminSplatRouteImport.update({
   path: '/api/admin/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminDepositsPaymentSettingsRoute =
+  ApiAdminDepositsPaymentSettingsRouteImport.update({
+    id: '/api/admin/deposits/payment-settings',
+    path: '/api/admin/deposits/payment-settings',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -464,6 +471,7 @@ export interface FileRoutesByFullPath {
   '/app/wallet/deposit': typeof AppWalletDepositRoute
   '/app/wallet/withdraw': typeof AppWalletWithdrawRoute
   '/app/wallet/': typeof AppWalletIndexRoute
+  '/api/admin/deposits/payment-settings': typeof ApiAdminDepositsPaymentSettingsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -527,6 +535,7 @@ export interface FileRoutesByTo {
   '/app/wallet/deposit': typeof AppWalletDepositRoute
   '/app/wallet/withdraw': typeof AppWalletWithdrawRoute
   '/app/wallet': typeof AppWalletIndexRoute
+  '/api/admin/deposits/payment-settings': typeof ApiAdminDepositsPaymentSettingsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -594,6 +603,7 @@ export interface FileRoutesById {
   '/app/wallet/deposit': typeof AppWalletDepositRoute
   '/app/wallet/withdraw': typeof AppWalletWithdrawRoute
   '/app/wallet/': typeof AppWalletIndexRoute
+  '/api/admin/deposits/payment-settings': typeof ApiAdminDepositsPaymentSettingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -662,6 +672,7 @@ export interface FileRouteTypes {
     | '/app/wallet/deposit'
     | '/app/wallet/withdraw'
     | '/app/wallet/'
+    | '/api/admin/deposits/payment-settings'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -725,6 +736,7 @@ export interface FileRouteTypes {
     | '/app/wallet/deposit'
     | '/app/wallet/withdraw'
     | '/app/wallet'
+    | '/api/admin/deposits/payment-settings'
   id:
     | '__root__'
     | '/'
@@ -791,6 +803,7 @@ export interface FileRouteTypes {
     | '/app/wallet/deposit'
     | '/app/wallet/withdraw'
     | '/app/wallet/'
+    | '/api/admin/deposits/payment-settings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -827,6 +840,7 @@ export interface RootRouteChildren {
   ApiSessionCompleteOtpRoute: typeof ApiSessionCompleteOtpRoute
   ApiSessionLogoutRoute: typeof ApiSessionLogoutRoute
   ApiSessionStatusRoute: typeof ApiSessionStatusRoute
+  ApiAdminDepositsPaymentSettingsRoute: typeof ApiAdminDepositsPaymentSettingsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1279,6 +1293,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/deposits/payment-settings': {
+      id: '/api/admin/deposits/payment-settings'
+      path: '/api/admin/deposits/payment-settings'
+      fullPath: '/api/admin/deposits/payment-settings'
+      preLoaderRoute: typeof ApiAdminDepositsPaymentSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1404,6 +1425,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiSessionCompleteOtpRoute: ApiSessionCompleteOtpRoute,
   ApiSessionLogoutRoute: ApiSessionLogoutRoute,
   ApiSessionStatusRoute: ApiSessionStatusRoute,
+  ApiAdminDepositsPaymentSettingsRoute: ApiAdminDepositsPaymentSettingsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

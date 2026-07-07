@@ -71,7 +71,7 @@ export async function proxyAdminRequest(request: Request, path: string): Promise
   if (!base) return null;
 
   const admin = await requireAdminSession(request);
-  const token = admin.idToken ?? request.headers.get("Authorization")?.slice("Bearer ".length);
+  const token = admin.idToken;
   if (!token) return null;
 
   const incoming = new URL(request.url);
