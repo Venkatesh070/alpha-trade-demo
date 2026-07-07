@@ -1,19 +1,22 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo } from "react";
-import { Briefcase, Plus } from "lucide-react";
+import { Briefcase } from "lucide-react";
 import { Sparkline } from "@/components/site/sparkline";
 import { AnimatedNumber } from "@/components/site/animated-number";
 import { PageShell } from "@/components/dashboard/page-shell";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { DataPanel } from "@/components/dashboard/data-panel";
 import { DataTable, DataTableHead, DataTableRow, Th, Td } from "@/components/dashboard/data-table";
-import { Button } from "@/components/ui/button";
 import { ALL_ASSETS, sparklineFor } from "@/data/markets";
 import { GatedNumber, PriceLockBanner, GatedChart } from "@/components/pricing/price-gate";
-import { useTrading } from "@/hooks/use-trading";
 import { useWallet } from "@/hooks/use-wallet";
-import { useLivePrices } from "@/hooks/use-live-prices";
-import { calcAccountMetrics } from "@/lib/account-metrics";
+import { useTrading } from "@/hooks/use-trading";
+import { useLivePrices, formatPrice } from "@/hooks/use-live-prices";
+import {
+  calcAccountMetrics,
+  calcPositionPnl,
+  formatSignedInr,
+} from "@/lib/account-metrics";
 
 const COLORS = ["#FFD10C", "#22c55e", "#60a5fa", "#f472b6", "#a78bfa", "#fb923c"];
 
@@ -26,6 +29,14 @@ function PortfolioPage() {
   const { openPositions, closedTrades, syncLivePnl } = useTrading();
   const live = useLivePrices(4000);
 
+  useEffect(() => {
+    const prices: Record<string, number> = {};
+    for (const [symbol, quote] of Object.entries(live)) {
+      if (quote?.price !== undefined) prices[symbol] = quote.price;
+    }
+    syncLivePnl(prices);
+  }, [live, syncLivePnl]);
+
   const prices = useMemo(
     () =>
       Object.fromEntries(
@@ -34,45 +45,57 @@ function PortfolioPage() {
     [live],
   );
 
-  useEffect(() => {
-    syncLivePnl(prices);
-  }, [prices, syncLivePnl]);
-
   const metrics = useMemo(
-    () => calcAccountMetrics({ balance, openPositions, closedTrades, prices }),
+    () =>
+      calcAccountMetrics({
+        balance,
+        openPositions,
+        closedTrades,
+        prices,
+      }),
     [balance, openPositions, closedTrades, prices],
   );
 
   const pnl30d = useMemo(() => {
     const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
-    const realized = closedTrades
+    const realized30d = closedTrades
       .filter((trade) => trade.closedAt >= thirtyDaysAgo)
       .reduce((sum, trade) => sum + trade.pnl, 0);
-    return realized + metrics.unrealizedPnl;
-  }, [closedTrades, metrics.unrealizedPnl]);
+    const equity30dAgo = Math.max(0, metrics.equity - realized30d);
+    return metrics.equity - equity30dAgo;
+  }, [closedTrades, metrics.equity]);
 
-  const allocation = useMemo(() => {
-    const bySymbol = new Map<string, number>();
-    for (const position of openPositions) {
-      const price = prices[position.symbol] ?? position.price;
-      const notional = Math.abs(position.qty * price * 100);
-      bySymbol.set(position.symbol, (bySymbol.get(position.symbol) ?? 0) + notional);
-    }
-    const total = [...bySymbol.values()].reduce((sum, value) => sum + value, 0);
-    return [...bySymbol.entries()]
-      .map(([sym, notional]) => ({
-        sym,
-        alloc: total > 0 ? Math.round((notional / total) * 100) : 0,
-      }))
-      .sort((a, b) => b.alloc - a.alloc);
+  const holdings = useMemo(() => {
+    const rows = openPositions.map((position) => {
+      const asset = ALL_ASSETS.find((a) => a.symbol === position.symbol);
+      const lastPrice = prices[position.symbol] ?? position.price;
+      const notional = position.qty * lastPrice * 100;
+      const pnl = calcPositionPnl(position, lastPrice);
+      return {
+        id: position.id,
+        sym: position.symbol,
+        qty: position.qty,
+        avg: position.price,
+        lastPrice,
+        pnl,
+        notional,
+        asset,
+      };
+    });
+
+    const totalNotional = rows.reduce((sum, row) => sum + row.notional, 0);
+    return rows.map((row) => ({
+      ...row,
+      alloc: totalNotional > 0 ? Math.round((row.notional / totalNotional) * 100) : 0,
+    }));
   }, [openPositions, prices]);
 
   const instrumentCount = useMemo(
-    () => new Set(openPositions.map((position) => position.symbol)).size,
+    () => new Set(openPositions.map((p) => p.symbol)).size,
     [openPositions],
   );
 
-  const pnlUp = pnl30d >= 0;
+  const pnl30dUp = pnl30d >= 0;
 
   return (
     <PageShell
@@ -80,13 +103,6 @@ function PortfolioPage() {
       title="Portfolio"
       description="Asset allocation, open positions, and unrealised P&L across your account."
       width="2xl"
-      actions={
-        <Button asChild className="gold-button hover:gold-button-hover">
-          <Link to="/app/trading">
-            <Plus className="mr-2 h-4 w-4" /> New trade
-          </Link>
-        </Button>
-      }
     >
       <PriceLockBanner />
 
@@ -94,17 +110,17 @@ function PortfolioPage() {
         <StatCard
           label="Equity"
           value={
-            <AnimatedNumber value={metrics.equity} format={(n) => `₹${Math.round(n).toLocaleString()}`} />
+            <AnimatedNumber value={metrics.equity} format={(n) => `₹${n.toLocaleString()}`} />
           }
           icon={Briefcase}
         />
         <StatCard
           label="P&L (30d)"
-          accent={pnlUp ? "var(--success)" : "var(--destructive)"}
+          accent={pnl30dUp ? "var(--success)" : "var(--destructive)"}
           value={
             <AnimatedNumber
               value={Math.abs(pnl30d)}
-              format={(n) => `${pnlUp ? "+" : "-"}₹${Math.round(n).toLocaleString()}`}
+              format={(n) => formatSignedInr(pnl30dUp ? n : -n)}
             />
           }
         />
@@ -112,112 +128,118 @@ function PortfolioPage() {
           label="Open positions"
           value={openPositions.length}
           sub={
-            instrumentCount > 0
-              ? `Across ${instrumentCount} instrument${instrumentCount === 1 ? "" : "s"}`
-              : "No active holdings"
+            instrumentCount === 0
+              ? "No active instruments"
+              : `Across ${instrumentCount} instrument${instrumentCount === 1 ? "" : "s"}`
           }
         />
       </div>
 
-      {openPositions.length === 0 ? (
-        <DataPanel title="No holdings yet" description="Open a position from the trading terminal">
-          <div className="py-8 text-center text-sm text-muted-foreground">
-            Your portfolio will update automatically as you trade.
-          </div>
-        </DataPanel>
-      ) : (
-        <>
-          <DataPanel title="Asset allocation" description="Portfolio weight by instrument">
+      <DataPanel title="Asset allocation" description="Portfolio weight by instrument">
+        {holdings.length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            No open positions yet. Open a trade to see allocation.
+          </p>
+        ) : (
+          <>
             <div className="flex h-2.5 overflow-hidden rounded-full bg-surface">
-              {allocation.map((item, i) => (
+              {holdings.map((h, i) => (
                 <div
-                  key={item.sym}
-                  style={{ width: `${item.alloc}%`, background: COLORS[i % COLORS.length] }}
-                  title={`${item.sym} ${item.alloc}%`}
+                  key={h.id}
+                  style={{ width: `${h.alloc}%`, background: COLORS[i % COLORS.length] }}
+                  title={`${h.sym} ${h.alloc}%`}
                 />
               ))}
             </div>
             <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-muted-foreground">
-              {allocation.map((item, i) => (
-                <span key={item.sym} className="inline-flex items-center gap-1.5">
+              {holdings.map((h, i) => (
+                <span key={h.id} className="inline-flex items-center gap-1.5">
                   <span
                     className="h-2 w-2 rounded-full"
                     style={{ background: COLORS[i % COLORS.length] }}
                   />
-                  {item.sym} · {item.alloc}%
+                  {h.sym} · {h.alloc}%
                 </span>
               ))}
             </div>
-          </DataPanel>
+          </>
+        )}
+      </DataPanel>
 
-          <DataPanel title="Positions" description="Live marks and performance" padding={false}>
-            <DataTable>
-              <DataTableHead>
-                <tr>
-                  <Th>Symbol</Th>
-                  <Th className="text-right">Qty</Th>
-                  <Th className="text-right">Avg price</Th>
-                  <Th className="text-right">Last</Th>
-                  <Th className="text-right">P&L</Th>
-                  <Th>Trend</Th>
-                </tr>
-              </DataTableHead>
-              <tbody>
-                {openPositions.map((position) => {
-                  const last = prices[position.symbol] ?? position.price;
-                  const up = position.pnl >= 0;
-                  return (
-                    <DataTableRow key={position.id}>
-                      <Td className="font-sans font-semibold">
-                        <Link
-                          to="/app/trading"
-                          search={{ symbol: position.symbol }}
-                          className="hover:text-[color:var(--gold)]"
-                        >
-                          {position.symbol}
-                        </Link>
-                      </Td>
-                      <Td mono className="text-right">
-                        {position.qty}
-                      </Td>
-                      <Td mono className="text-right">
-                        <GatedNumber value={position.price} />
-                      </Td>
-                      <Td mono className="text-right">
-                        <GatedNumber value={last} />
-                      </Td>
-                      <Td
-                        mono
-                        className={
-                          "text-right font-medium " +
-                          (up ? "text-[color:var(--success)]" : "text-[color:var(--destructive)]")
-                        }
+      <DataPanel title="Positions" description="Live marks and performance" padding={false}>
+        {holdings.length === 0 ? (
+          <div className="px-6 py-12 text-center text-sm text-muted-foreground">
+            No open positions. Place a trade from the{" "}
+            <Link to="/app/trading" className="font-medium text-[color:var(--gold)] hover:underline">
+              trading terminal
+            </Link>
+            .
+          </div>
+        ) : (
+          <DataTable>
+            <DataTableHead>
+              <tr>
+                <Th>Symbol</Th>
+                <Th className="text-right">Qty</Th>
+                <Th className="text-right">Avg price</Th>
+                <Th className="text-right">Last</Th>
+                <Th className="text-right">P&L</Th>
+                <Th>Trend</Th>
+              </tr>
+            </DataTableHead>
+            <tbody>
+              {holdings.map((h) => {
+                const up = h.pnl >= 0;
+                const lastDisplay = h.asset
+                  ? formatPrice(h.asset, h.lastPrice)
+                  : h.lastPrice.toFixed(2);
+                return (
+                  <DataTableRow key={h.id}>
+                    <Td className="font-sans font-semibold">
+                      <Link
+                        to="/app/trading"
+                        search={{ symbol: h.sym }}
+                        className="hover:text-[color:var(--gold)]"
                       >
-                        <GatedNumber
-                          value={position.pnl.toFixed(2)}
-                          prefix={up ? "+" : ""}
-                          className={
-                            up ? "text-[color:var(--success)]" : "text-[color:var(--destructive)]"
-                          }
-                        />
-                      </Td>
-                      <Td>
-                        <GatedChart className="w-24" showMessage>
-                          <Sparkline
-                            points={sparklineFor(position.symbol)}
-                            up={up}
-                            className="h-8 w-24"
-                          />
-                        </GatedChart>
-                      </Td>
-                    </DataTableRow>
-                  );
-                })}
-              </tbody>
-            </DataTable>
-          </DataPanel>
-        </>
-      )}
+                        {h.sym}
+                      </Link>
+                    </Td>
+                    <Td mono className="text-right">
+                      {h.qty}
+                    </Td>
+                    <Td mono className="text-right">
+                      <GatedNumber value={h.avg} />
+                    </Td>
+                    <Td mono className="text-right">
+                      <GatedNumber value={lastDisplay} />
+                    </Td>
+                    <Td
+                      mono
+                      className={
+                        "text-right font-medium " +
+                        (up ? "text-[color:var(--success)]" : "text-[color:var(--destructive)]")
+                      }
+                    >
+                      <GatedNumber
+                        value={h.pnl.toFixed(2)}
+                        prefix={up ? "+" : ""}
+                        className={
+                          up ? "text-[color:var(--success)]" : "text-[color:var(--destructive)]"
+                        }
+                      />
+                    </Td>
+                    <Td>
+                      <GatedChart className="w-24" showMessage>
+                        <Sparkline points={sparklineFor(h.sym)} up={up} className="h-8 w-24" />
+                      </GatedChart>
+                    </Td>
+                  </DataTableRow>
+                );
+              })}
+            </tbody>
+          </DataTable>
+        )}
+      </DataPanel>
     </PageShell>
   );
 }
