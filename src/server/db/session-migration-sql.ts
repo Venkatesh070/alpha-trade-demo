@@ -29,3 +29,34 @@ CREATE TABLE IF NOT EXISTS login_otp_codes (
   INDEX idx_login_otp_expires_at (expires_at)
 );
 `;
+
+/** SQLite-compatible schema for local dev (inline INDEX is MySQL-only). */
+export const SQLITE_SESSION_MIGRATION_SQL = `CREATE TABLE IF NOT EXISTS app_sessions (
+  id TEXT PRIMARY KEY,
+  session_type TEXT NOT NULL,
+  user_email TEXT,
+  admin_email TEXT,
+  device_id TEXT,
+  otp_verified INTEGER NOT NULL DEFAULT 0,
+  trusted_until INTEGER,
+  payload_json TEXT,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL,
+  expires_at INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_app_sessions_user_email ON app_sessions(user_email);
+CREATE INDEX IF NOT EXISTS idx_app_sessions_admin_email ON app_sessions(admin_email);
+CREATE INDEX IF NOT EXISTS idx_app_sessions_expires_at ON app_sessions(expires_at);
+CREATE INDEX IF NOT EXISTS idx_app_sessions_device ON app_sessions(user_email, device_id);
+
+CREATE TABLE IF NOT EXISTS login_otp_codes (
+  email TEXT PRIMARY KEY,
+  code_hash TEXT NOT NULL,
+  expires_at INTEGER NOT NULL,
+  resend_available_at INTEGER NOT NULL,
+  attempts INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE INDEX IF NOT EXISTS idx_login_otp_expires_at ON login_otp_codes(expires_at);
+`;

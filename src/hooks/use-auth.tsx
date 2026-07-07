@@ -7,13 +7,13 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { onAuthStateChanged, signInWithEmailAndPassword, signOut, type User as FirebaseUser } from "firebase/auth";
+import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut, updateProfile, type User as FirebaseUser } from "firebase/auth";
 import { adminMe, type UserProfile, userMeWithIdToken, userRegister, userVerifyEmail } from "@/lib/auth-api";
 import { ensureUserProfile } from "@/lib/ensure-user-profile";
 import { signInWithGooglePopup } from "@/lib/google-auth";
 import { mailSendLoginOtp, mailSendPasswordReset, mailSendRegistrationOtp, mailSendWelcome, mailVerifyLoginOtp, mailVerifyRegistrationOtp } from "@/lib/mail-api";
 import { mapFirebaseAuthError } from "@/lib/firebase-errors";
-import { auth } from "@/lib/firebase";
+import { auth, getClientAuth } from "@/lib/firebase";
 import { clearReferralCode, markReferralVerified, recordReferralSignup } from "@/lib/referral-db";
 import { getProfileExtras } from "@/lib/profile-db";
 import {
@@ -94,7 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(getClientAuth(), async (firebaseUser) => {
       if (!firebaseUser) {
         setUser(null);
         setEmailVerified(false);
@@ -107,7 +107,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       try {
         const idToken = await firebaseUser.getIdToken();
-        const adminCheck = await adminMe(idToken).catch(() => null);
+        const adminCheck = await Promise.race([
+          adminMe(idToken).catch(() => null),
+          new Promise<null>((resolve) => window.setTimeout(() => resolve(null), 5000)),
+        ]);
         if (adminCheck?.admin) {
           setUser(null);
           setEmailVerified(false);
@@ -190,7 +193,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           recordReferralSignup(refCode, { name: profile.name, email: cred.user.email });
           clearReferralCode();
         }
-        if (cred.user.emailVerified) {
+        if (cred.user.emailVerified && cred.user.email) {
           markReferralVerified(cred.user.email);
         }
         await mailSendWelcome(idToken, profile.name).catch((err) => {
@@ -218,13 +221,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = useCallback(async (name: string, email: string, password: string, refCode?: string) => {
     try {
-      await userRegister({ name, email, password }).catch(() => {
-        // Backend may already have this user from a prior attempt.
-      });
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      if (name.trim()) {
+        await updateProfile(cred.user, { displayName: name.trim() });
+      }
+
+      const { user: profile } = await ensureUserProfile(cred.user);
+      setUser(profile);
       setEmailVerified(false);
       setOtpSessionReady(false);
 
-      const cred = await signInWithEmailAndPassword(auth, email, password);
       await mailSendRegistrationOtp(await cred.user.getIdToken());
 
       if (refCode) {
@@ -232,10 +238,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         clearReferralCode();
       }
     } catch (err) {
-      if (err instanceof Error && err.message.includes("already exists")) {
-        throw err;
-      }
-      throw new Error(err instanceof Error ? err.message : mapFirebaseAuthError(err));
+      throw new Error(mapFirebaseAuthError(err));
     }
   }, []);
 

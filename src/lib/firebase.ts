@@ -36,6 +36,10 @@ export const auth: Auth = new Proxy({} as Auth, {
   },
 });
 
+export function getClientAuth(): Auth {
+  return ensureFirebaseAuth();
+}
+
 export default function getFirebaseApp(): FirebaseApp {
   ensureFirebaseAuth();
   return app!;

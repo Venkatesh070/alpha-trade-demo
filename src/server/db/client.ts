@@ -3,7 +3,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Pool } from "mysql2/promise";
 import { loadServerEnv } from "@/server/load-env";
-import { SESSION_MIGRATION_SQL } from "@/server/db/session-migration-sql";
+import { SESSION_MIGRATION_SQL, SQLITE_SESSION_MIGRATION_SQL } from "@/server/db/session-migration-sql";
 
 export type DbDialect = "mysql";
 
@@ -21,7 +21,11 @@ export interface SqlDatabase {
 let dbInstance: SqlDatabase | null = null;
 let migratePromise: Promise<void> | null = null;
 
-function migrationSql(): string {
+function migrationSql(dialect: DbDialect): string {
+  if (dialect === "sqlite") {
+    return SQLITE_SESSION_MIGRATION_SQL;
+  }
+
   const candidates = [resolve(process.cwd(), "migrations/001_sessions.sql")];
 
   let dir = dirname(fileURLToPath(import.meta.url));
@@ -144,7 +148,7 @@ export async function getDatabase(): Promise<SqlDatabase> {
 export async function runMigrations(db: SqlDatabase): Promise<void> {
   if (!migratePromise) {
     migratePromise = (async () => {
-      const statements = splitStatements(migrationSql());
+      const statements = splitStatements(migrationSql(db.dialect));
       for (const statement of statements) {
         try {
           await db.execute(statement);

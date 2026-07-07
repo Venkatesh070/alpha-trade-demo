@@ -18,6 +18,39 @@ const API_URL = getApiBase();
 
 let refreshPromise: Promise<string> | null = null;
 
+async function getFirebaseIdToken(): Promise<string | null> {
+  if (typeof window === "undefined") return null;
+  const { auth } = await import("@/lib/firebase");
+  const user = auth.currentUser;
+  if (!user) return null;
+  return user.getIdToken();
+}
+
+async function resolveBearerToken(): Promise<string> {
+  const jwt = getAccessToken();
+  if (jwt) return jwt;
+
+  const firebaseToken = await getFirebaseIdToken();
+  if (firebaseToken) return firebaseToken;
+
+  throw new Error("Not authenticated.");
+}
+
+async function fetchWithBearer(
+  path: string,
+  token: string,
+  options: RequestInit = {},
+): Promise<Response> {
+  return fetch(`${API_URL}${path}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      ...options.headers,
+    },
+  });
+}
+
 async function refreshAccessToken(): Promise<string> {
   if (refreshPromise) return refreshPromise;
 
@@ -59,23 +92,27 @@ export async function authFetch(
   options: RequestInit = {},
   retry = true,
 ): Promise<Response> {
-  const accessToken = getAccessToken();
-  if (!accessToken) {
-    throw new Error("Not authenticated.");
+  const token = await resolveBearerToken();
+  let res = await fetchWithBearer(path, token, options);
+
+  if (res.status !== 401 || !retry) {
+    return res;
   }
 
-  const res = await fetch(`${API_URL}${path}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-      ...options.headers,
-    },
-  });
+  if (getAccessToken() && getRefreshToken()) {
+    try {
+      await refreshAccessToken();
+      return authFetch(path, options, false);
+    } catch {
+      clearTokens();
+    }
+  } else if (getAccessToken()) {
+    clearTokens();
+  }
 
-  if (res.status === 401 && retry && getRefreshToken()) {
-    await refreshAccessToken();
-    return authFetch(path, options, false);
+  const firebaseToken = await getFirebaseIdToken();
+  if (firebaseToken) {
+    res = await fetchWithBearer(path, firebaseToken, options);
   }
 
   return res;

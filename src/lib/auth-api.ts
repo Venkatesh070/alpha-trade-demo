@@ -2,9 +2,8 @@ import {
   authFetch,
   publicFetch,
   persistUserTokens,
-  type UserApiTokens,
 } from "@/lib/api-client";
-import { getAccessToken } from "@/lib/token-store";
+import { getAccessToken, type UserApiTokens } from "@/lib/token-store";
 
 export interface UserProfile {
   id: string;
@@ -43,6 +42,15 @@ export class AuthApiError extends Error {
   }
 }
 
+function getApiBase(): string {
+  const configured = import.meta.env.VITE_API_URL as string | undefined;
+  if (configured?.trim()) return configured.replace(/\/$/, "");
+  if (import.meta.env.DEV) return "";
+  return "http://localhost:4000";
+}
+
+const API_URL = getApiBase();
+
 async function parseResponse<T>(res: Response): Promise<T & { error?: string }> {
   try {
     return (await res.json()) as T & { error?: string };
@@ -56,6 +64,35 @@ async function requestPublic<T>(path: string, options: RequestInit = {}): Promis
 
   try {
     res = await publicFetch(path, options);
+  } catch {
+    throw new AuthApiError(0, "Unable to reach the server. Is the API running on port 4000?");
+  }
+
+  const data = await parseResponse<T>(res);
+
+  if (!res.ok) {
+    throw new AuthApiError(res.status, data.error ?? "Request failed.");
+  }
+
+  return data;
+}
+
+async function requestWithToken<T>(
+  path: string,
+  token: string,
+  options: RequestInit = {},
+): Promise<T> {
+  let res: Response;
+
+  try {
+    res = await fetch(`${API_URL}${path}`, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        ...options.headers,
+      },
+    });
   } catch {
     throw new AuthApiError(0, "Unable to reach the server. Is the API running on port 4000?");
   }
@@ -103,6 +140,30 @@ function storeApiTokensFromResponse(data: VerifyAuthResponse): UserApiTokens {
   const apiTokens = { accessToken: data.accessToken, refreshToken: data.refreshToken };
   persistUserTokens(apiTokens);
   return apiTokens;
+}
+
+/** Firebase-authenticated profile APIs (pass Firebase ID token). */
+export async function userSync(
+  idToken: string,
+  input: { name: string; country?: string },
+): Promise<{ user: UserProfile }> {
+  return requestWithToken("/api/auth/user/sync", idToken, {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}
+
+export async function userVerifyEmail(idToken: string): Promise<{ user: UserProfile }> {
+  return requestWithToken("/api/auth/user/verify-email", idToken, { method: "POST" });
+}
+
+export async function userMe(idToken: string): Promise<{ user: UserProfile }> {
+  return requestWithToken("/api/auth/user/me", idToken);
+}
+
+/** JWT-authenticated profile fetch (wallet/dashboard after OTP login). */
+export async function userMeJwt(): Promise<{ user: UserProfile }> {
+  return requestAuth("/api/auth/user/me");
 }
 
 export async function userRegister(input: {
@@ -195,19 +256,6 @@ export async function userLogout(refreshToken: string): Promise<{ message: strin
   });
 }
 
-export async function userSync(
-  input: { name: string; country?: string },
-): Promise<{ user: UserProfile }> {
-  return requestAuth("/api/auth/user/sync", {
-    method: "POST",
-    body: JSON.stringify(input),
-  });
-}
-
-export async function userMe(): Promise<{ user: UserProfile }> {
-  return requestAuth("/api/auth/user/me");
-}
-
 export async function adminLogin(
   email: string,
   password: string,
@@ -219,26 +267,7 @@ export async function adminLogin(
 }
 
 export async function adminMe(idToken: string): Promise<{ admin: AdminProfile }> {
-  let res: Response;
-  const configured = import.meta.env.VITE_API_URL as string | undefined;
-  const base = configured?.trim() ? configured.replace(/\/$/, "") : import.meta.env.DEV ? "" : "http://localhost:4000";
-
-  try {
-    res = await fetch(`${base}/api/auth/admin/me`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${idToken}`,
-      },
-    });
-  } catch {
-    throw new AuthApiError(0, "Unable to reach the server.");
-  }
-
-  const data = await parseResponse<{ admin: AdminProfile }>(res);
-  if (!res.ok) {
-    throw new AuthApiError(res.status, data.error ?? "Request failed.");
-  }
-  return data;
+  return requestWithToken("/api/auth/admin/me", idToken);
 }
 
 /** Prefer JWT access token; falls back to Firebase ID token for admin/mail routes. */
