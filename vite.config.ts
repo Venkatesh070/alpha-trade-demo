@@ -16,6 +16,14 @@ export default defineConfig({
     preset: "node-server",
   },
   vite: {
+    ssr: {
+      external: ["mysql2", "mysql2/promise"],
+    },
+    build: {
+      rolldownOptions: {
+        external: ["mysql2", "mysql2/promise"],
+      },
+    },
     server: {
       proxy: {
         // Auth API lives on the external server; mail routes are served by this app.

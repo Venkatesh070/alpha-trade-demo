@@ -1,11 +1,10 @@
-import { existsSync, mkdirSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Pool } from "mysql2/promise";
-import type Database from "better-sqlite3";
 import { loadServerEnv } from "@/server/load-env";
 
-export type DbDialect = "mysql" | "sqlite";
+export type DbDialect = "mysql";
 
 export interface DbExecResult {
   changes?: number;
@@ -63,82 +62,60 @@ class MysqlDatabase implements SqlDatabase {
   }
 }
 
-class SqliteDatabase implements SqlDatabase {
-  dialect: DbDialect = "sqlite";
+function resolveMysqlConfig():
+  | { mode: "url"; url: string }
+  | { mode: "env"; host: string; port: number; user: string; password: string; database: string }
+  | null {
+  loadServerEnv();
 
-  constructor(private db: Database.Database) {}
-
-  async query<T extends Record<string, unknown>>(sql: string, params: unknown[] = []): Promise<T[]> {
-    return this.db.prepare(sql).all(...params) as T[];
+  const url = process.env.DATABASE_URL?.trim();
+  if (url?.startsWith("mysql://") || url?.startsWith("mysql2://")) {
+    return { mode: "url", url: url.replace(/^mysql2:\/\//, "mysql://") };
   }
 
-  async execute(sql: string, params: unknown[] = []): Promise<DbExecResult> {
-    const result = this.db.prepare(sql).run(...params);
-    return { changes: result.changes };
-  }
-
-  async close(): Promise<void> {
-    this.db.close();
-  }
-}
-
-async function createMysqlDatabase(url: string): Promise<SqlDatabase> {
-  const mysql = await import("mysql2/promise");
-  const pool = mysql.createPool(url);
-  return new MysqlDatabase(pool);
-}
-
-async function createMysqlDatabaseFromEnv(): Promise<SqlDatabase | null> {
   const host = process.env.MYSQL_HOST?.trim();
   const user = process.env.MYSQL_USER?.trim();
   const database = process.env.MYSQL_DATABASE?.trim();
   if (!host || !user || !database) return null;
 
-  const mysql = await import("mysql2/promise");
-  const pool = mysql.createPool({
+  return {
+    mode: "env",
     host,
     port: Number(process.env.MYSQL_PORT ?? 3306),
     user,
     password: process.env.MYSQL_PASSWORD ?? "",
     database,
-    waitForConnections: true,
-    connectionLimit: 10,
-  });
-  return new MysqlDatabase(pool);
+  };
 }
 
-async function createSqliteDatabase(filePath: string): Promise<SqlDatabase> {
-  const dir = dirname(filePath);
-  if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
-  const BetterSqlite3 = (await import("better-sqlite3")).default;
-  const db = new BetterSqlite3(filePath);
-  db.pragma("journal_mode = WAL");
-  return new SqliteDatabase(db);
+async function createMysqlDatabase(): Promise<SqlDatabase> {
+  const config = resolveMysqlConfig();
+  if (!config) {
+    throw new Error(
+      "MySQL is not configured. Set DATABASE_URL or MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, and MYSQL_DATABASE in .env.",
+    );
+  }
+
+  const mysql = await import("mysql2/promise");
+  const pool =
+    config.mode === "url"
+      ? mysql.createPool(config.url)
+      : mysql.createPool({
+          host: config.host,
+          port: config.port,
+          user: config.user,
+          password: config.password,
+          database: config.database,
+          waitForConnections: true,
+          connectionLimit: 10,
+        });
+
+  return new MysqlDatabase(pool);
 }
 
 export async function getDatabase(): Promise<SqlDatabase> {
   if (dbInstance) return dbInstance;
-
-  loadServerEnv();
-  const url = process.env.DATABASE_URL?.trim();
-
-  if (url?.startsWith("mysql://") || url?.startsWith("mysql2://")) {
-    dbInstance = await createMysqlDatabase(url.replace(/^mysql2:\/\//, "mysql://"));
-  } else if (url?.startsWith("sqlite:")) {
-    const file = url.replace(/^sqlite:/, "");
-    dbInstance = await createSqliteDatabase(resolve(file));
-  } else {
-    const fromEnv = await createMysqlDatabaseFromEnv();
-    if (fromEnv) {
-      console.info("[db] Using MySQL from MYSQL_* environment variables.");
-      dbInstance = fromEnv;
-    } else {
-      const fallback = resolve(projectRoot(), "data/exness-sessions.db");
-      console.warn(`[db] No DATABASE_URL or MYSQL_* vars — using SQLite at ${fallback}`);
-      dbInstance = await createSqliteDatabase(fallback);
-    }
-  }
-
+  dbInstance = await createMysqlDatabase();
   await runMigrations(dbInstance);
   return dbInstance;
 }
