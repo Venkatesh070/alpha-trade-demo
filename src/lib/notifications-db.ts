@@ -1,7 +1,7 @@
-import { NOTIFICATIONS, type AppNotification } from "@/data/content";
+import type { AppNotification } from "@/data/content";
 import { randomId } from "@/lib/id";
 
-export const NOTIFICATIONS_STORAGE_KEY = "exness-notifications";
+export const NOTIFICATIONS_STORAGE_KEY = "exness-notifications-v2";
 
 export type NotificationInput = Pick<AppNotification, "type" | "title" | "body">;
 
@@ -10,26 +10,6 @@ export interface StoredNotification extends AppNotification {
 }
 
 type NotificationsDb = Record<string, StoredNotification[]>;
-
-function parseTimeToMs(time: string): number {
-  const now = Date.now();
-  if (time === "Just now") return now;
-  const min = time.match(/^(\d+)m ago$/);
-  if (min) return now - Number(min[1]) * 60_000;
-  const hr = time.match(/^(\d+)h ago$/);
-  if (hr) return now - Number(hr[1]) * 3_600_000;
-  if (time === "Yesterday") return now - 86_400_000;
-  const days = time.match(/^(\d+)d ago$/);
-  if (days) return now - Number(days[1]) * 86_400_000;
-  return now;
-}
-
-function seedNotifications(): StoredNotification[] {
-  return NOTIFICATIONS.map((n) => ({
-    ...n,
-    createdAt: parseTimeToMs(n.time),
-  }));
-}
 
 export function loadNotificationsDb(): NotificationsDb {
   if (typeof window === "undefined") return {};
@@ -47,13 +27,7 @@ function saveNotificationsDb(db: NotificationsDb) {
 
 export function getNotifications(email: string): StoredNotification[] {
   const db = loadNotificationsDb();
-  if (!db[email]?.length) {
-    const seeded = seedNotifications();
-    db[email] = seeded;
-    saveNotificationsDb(db);
-    return seeded;
-  }
-  return db[email];
+  return db[email] ?? [];
 }
 
 export function pushNotification(email: string, input: NotificationInput): StoredNotification {

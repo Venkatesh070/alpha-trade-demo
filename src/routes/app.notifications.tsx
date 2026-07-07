@@ -51,7 +51,7 @@ function NotificationsPage() {
       }
       width="md"
       actions={
-        unreadCount > 0 ? (
+        items.length > 0 && unreadCount > 0 ? (
           <button
             type="button"
             onClick={markAllRead}
@@ -62,10 +62,18 @@ function NotificationsPage() {
         ) : null
       }
     >
-      <FilterTabs tabs={TABS} value={tab} onChange={setTab} />
+      {items.length > 0 && <FilterTabs tabs={TABS} value={tab} onChange={setTab} />}
 
       <ul className="space-y-2">
-        {filtered.length === 0 && (
+        {items.length === 0 ? (
+          <li className="glossy-soft rounded-2xl">
+            <EmptyState
+              icon={Bell}
+              title="No notifications yet"
+              description="Trades, deposits, withdrawals, and account updates will show up here."
+            />
+          </li>
+        ) : filtered.length === 0 ? (
           <li className="glossy-soft rounded-2xl">
             <EmptyState
               icon={Inbox}
@@ -73,7 +81,7 @@ function NotificationsPage() {
               description="No notifications in this filter."
             />
           </li>
-        )}
+        ) : null}
         {filtered.map((n) => {
           const Icon = ICONS[n.type] ?? Bell;
           return (
