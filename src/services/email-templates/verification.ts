@@ -1,22 +1,23 @@
-import { primaryButton, wrapEmailTemplate } from "@/services/email-templates/base";
+import { primaryButton, signOffBlock, wrapEmailTemplate } from "@/services/email-templates/base";
 
 export function verificationEmailHtml(verificationLink: string): string {
   const body = `
-    <h1 style="margin:0 0 12px;font-size:24px;font-weight:700;color:#f5f5f5;">Verify your email</h1>
-    <p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#b0b0b0;">
-      Thanks for signing up with Exness India. Please confirm your email address to activate your account and start trading.
+    <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#111111;"><strong>Dear Valued Client,</strong></p>
+    <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#111111;">
+      Thank you for registering with <strong>Exness India</strong>. Please verify your email address to activate your account.
     </p>
-    <p style="margin:0;font-size:15px;line-height:1.6;color:#b0b0b0;">
-      Click the button below to verify your email. This link expires in 24 hours.
+    <p style="margin:0;font-size:14px;line-height:1.6;color:#111111;">
+      Click the button below to confirm your email. This link expires in 24 hours.
     </p>
     ${primaryButton(verificationLink, "Verify Email Address")}
-    <p style="margin:28px 0 0;font-size:12px;line-height:1.6;color:#666666;word-break:break-all;">
+    <p style="margin:24px 0 0;font-size:12px;line-height:1.6;color:#555555;word-break:break-all;">
       If the button doesn't work, copy and paste this link into your browser:<br />
-      <a href="${verificationLink}" style="color:#d4af37;text-decoration:underline;">${verificationLink}</a>
+      <a href="${verificationLink}" style="color:#111111;text-decoration:underline;">${verificationLink}</a>
     </p>
-    <p style="margin:20px 0 0;font-size:12px;line-height:1.6;color:#666666;">
-      If you didn't create an account, you can safely ignore this email.
-    </p>`;
+    <p style="margin:16px 0 0;font-size:14px;line-height:1.6;color:#111111;">
+      If you did not create an account, please contact our Customer Experience team immediately.
+    </p>
+    ${signOffBlock()}`;
 
   return wrapEmailTemplate("Verify your email — Exness India", body);
 }

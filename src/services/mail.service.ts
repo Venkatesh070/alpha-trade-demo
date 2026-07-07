@@ -76,7 +76,7 @@ export async function sendLoginOtpEmail(to: string, code: string): Promise<void>
   const { error } = await getResend().emails.send({
     from: SENDER,
     to: email,
-    subject: `${code} is your Exness India sign-in code`,
+    subject: "Your one-time verification code — Exness India",
     html: loginOtpEmailHtml(code),
   });
 

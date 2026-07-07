@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useNotifications } from "@/hooks/use-notifications";
 import { useTheme } from "@/hooks/use-theme";
 import { DepositButton, WithdrawButton } from "@/components/pricing/price-gate";
-import { accountIdFromEmail } from "@/lib/account-id";
+import { getAccountId } from "@/lib/account-id";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,7 +19,7 @@ export function AppTopbar({ onMenu }: { onMenu: () => void }) {
   const { unreadCount } = useNotifications();
   const { theme, toggle } = useTheme();
   const nav = useNavigate();
-  const accountId = accountIdFromEmail(user?.email);
+  const accountId = getAccountId(user);
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border/60 bg-background/95 px-4 backdrop-blur-xl light:shadow-sm light:shadow-black/[0.03]">

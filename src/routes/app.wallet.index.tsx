@@ -19,7 +19,7 @@ function WalletPage() {
   const { balance, transactions, refresh } = useWallet();
   const { stats } = useReferral();
   useEffect(() => {
-    refresh();
+    void refresh();
   }, [refresh]);
 
   return (

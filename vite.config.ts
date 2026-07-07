@@ -26,8 +26,20 @@ export default defineConfig({
     },
     server: {
       proxy: {
-        // Auth API lives on the external server; mail routes are served by this app.
+        // Backend API on port 4000
         "/api/auth": {
+          target: "http://localhost:4000",
+          changeOrigin: true,
+        },
+        "/api/dashboard": {
+          target: "http://localhost:4000",
+          changeOrigin: true,
+        },
+        "/api/admin": {
+          target: "http://localhost:4000",
+          changeOrigin: true,
+        },
+        "/api/wallet": {
           target: "http://localhost:4000",
           changeOrigin: true,
         },

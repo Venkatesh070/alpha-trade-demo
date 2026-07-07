@@ -18,15 +18,24 @@ function WithdrawPage() {
   const [account, setAccount] = useState("");
   const [ifsc, setIfsc] = useState("");
   const { balance, withdraw } = useWallet();
+  const [loading, setLoading] = useState(false);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!account || !ifsc) return toast.error("Enter account and IFSC");
     const amt = Number(amount);
     if (!amt || amt <= 0) return toast.error("Enter a valid amount");
     if (amt > balance) return toast.error("Insufficient balance");
-    withdraw(amt, `IMPS · ${ifsc}`);
-    toast.success(`Withdrawal of ₹${amt.toLocaleString()} initiated`);
+
+    setLoading(true);
+    try {
+      await withdraw(amt, account.trim(), ifsc.trim());
+      toast.success(`Withdrawal of ₹${amt.toLocaleString("en-IN")} initiated`);
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -82,8 +91,11 @@ function WithdrawPage() {
             </p>
           </div>
           <div className="border-t border-border/50 px-4 py-4 sm:px-5">
-            <Button className="gold-button hover:gold-button-hover w-full sm:w-auto">
-              Confirm withdrawal
+            <Button
+              disabled={loading}
+              className="gold-button hover:gold-button-hover w-full sm:w-auto"
+            >
+              {loading ? "Processing…" : "Confirm withdrawal"}
             </Button>
           </div>
         </DataPanel>

@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAuth } from "@/hooks/use-auth";
 import { useWallet } from "@/hooks/use-wallet";
-import { accountIdFromEmail } from "@/lib/account-id";
+import { getAccountId } from "@/lib/account-id";
 import { cn } from "@/lib/utils";
 import { XM_BORDER, XM_CHART_BG, XM_REAL_DOT, XM_TEXT } from "@/lib/xm-trading-tokens";
 
@@ -45,7 +45,7 @@ export function AccountDropdown({
   const [open, setOpen] = useState(false);
   const { balance } = useWallet();
   const { user } = useAuth();
-  const accountId = accountIdFromEmail(user?.email);
+  const accountId = getAccountId(user);
   const sym = currency === "usd" ? "$" : "₹";
   const formatted = `${sym}${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 

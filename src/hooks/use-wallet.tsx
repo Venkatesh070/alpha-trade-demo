@@ -8,138 +8,101 @@ import {
   type ReactNode,
 } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { addDepositRequest } from "@/lib/payments";
-import { applyReferralDepositReward } from "@/lib/referral-db";
-import { emptyWallet, getWallet, updateWallet, type WalletState } from "@/lib/wallet-db";
 import { pushNotification } from "@/lib/notifications-db";
+import {
+  fetchWallet,
+  submitDepositRequestApi,
+  submitWithdrawalApi,
+  type WalletData,
+  type WalletTxn,
+} from "@/lib/wallet-api";
 
 export const MIN_TRADING_BALANCE = 5000;
 
 interface WalletCtx {
   balance: number;
-  transactions: WalletState["transactions"];
+  transactions: WalletTxn[];
   loading: boolean;
   canTrade: boolean;
-  deposit: (amount: number, method: string) => void;
-  withdraw: (amount: number, method: string) => void;
-  submitDepositRequest: (amount: number, referenceId: string, screenshot: string) => void;
-  refresh: () => void;
+  isFunded: boolean;
+  submitDepositRequest: (amount: number, referenceId: string, screenshot: string) => Promise<void>;
+  withdraw: (amount: number, accountNumber: string, ifsc: string) => Promise<void>;
+  refresh: () => Promise<void>;
 }
 
 const WalletContext = createContext<WalletCtx | null>(null);
 
+const emptyWallet: WalletData = {
+  balance: 0,
+  transactions: [],
+  isFunded: false,
+  minTradingBalance: MIN_TRADING_BALANCE,
+};
+
 export function WalletProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth();
-  const [wallet, setWallet] = useState<WalletState>(emptyWallet);
+  const { user, isAuthenticated } = useAuth();
+  const [wallet, setWallet] = useState<WalletData>(emptyWallet);
   const [loading, setLoading] = useState(true);
 
-  const refresh = useCallback(() => {
-    if (!user?.email) {
-      setWallet(emptyWallet());
+  const refresh = useCallback(async () => {
+    if (!isAuthenticated || !user) {
+      setWallet(emptyWallet);
+      setLoading(false);
       return;
     }
-    setWallet(getWallet(user.email));
-  }, [user?.email]);
+
+    try {
+      const data = await fetchWallet();
+      setWallet(data);
+    } catch {
+      setWallet(emptyWallet);
+    } finally {
+      setLoading(false);
+    }
+  }, [isAuthenticated, user]);
 
   useEffect(() => {
-    refresh();
-    setLoading(false);
+    void refresh();
   }, [refresh]);
 
-  const persist = useCallback(
-    (updater: (prev: WalletState) => WalletState) => {
-      if (!user?.email) return;
-      const next = updateWallet(user.email, updater);
-      setWallet(next);
-    },
-    [user?.email],
-  );
-
-  const deposit = useCallback(
-    (amount: number, method: string) => {
-      if (!user?.email || amount <= 0) return;
-      persist((prev) => ({
-        balance: prev.balance + amount,
-        transactions: [
-          {
-            id: `txn-${Date.now()}`,
-            type: "Deposit",
-            method,
-            amount,
-            status: "Completed",
-            date: new Date().toLocaleDateString("en-IN", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            }),
-          },
-          ...prev.transactions,
-        ],
-      }));
-      if (user.email) {
-        applyReferralDepositReward(user.email, amount);
-      }
-      pushNotification(user.email, {
-        type: "deposit",
-        title: "Deposit received",
-        body: `₹${amount.toLocaleString("en-IN")} credited via ${method}.`,
-      });
-    },
-    [persist, user?.email],
-  );
-
-  const withdraw = useCallback(
-    (amount: number, method: string) => {
-      if (!user?.email || amount <= 0) return;
-      persist((prev) => {
-        if (amount > prev.balance) return prev;
-        return {
-          balance: prev.balance - amount,
-          transactions: [
-            {
-              id: `txn-${Date.now()}`,
-              type: "Withdrawal",
-              method,
-              amount: -amount,
-              status: "Completed",
-              date: new Date().toLocaleDateString("en-IN", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              }),
-            },
-            ...prev.transactions,
-          ],
-        };
-      });
-      pushNotification(user.email, {
-        type: "deposit",
-        title: "Withdrawal initiated",
-        body: `₹${amount.toLocaleString("en-IN")} withdrawn via ${method}.`,
-      });
-    },
-    [persist, user?.email],
-  );
-
   const submitDepositRequest = useCallback(
-    (amount: number, referenceId: string, screenshot: string) => {
-      if (!user?.email) return;
-      addDepositRequest({
-        userId: user.id,
-        userEmail: user.email,
-        userName: user.name,
+    async (amount: number, referenceId: string, screenshot: string) => {
+      if (!user?.email) {
+        throw new Error("You must be signed in to submit a deposit.");
+      }
+
+      const { wallet: updated } = await submitDepositRequestApi({
         amount,
         referenceId,
         screenshot,
       });
-      refresh();
+      setWallet(updated);
+
       pushNotification(user.email, {
         type: "deposit",
         title: "Deposit request submitted",
         body: `₹${amount.toLocaleString("en-IN")} is pending admin approval.`,
       });
     },
-    [refresh, user],
+    [user?.email],
+  );
+
+  const withdraw = useCallback(
+    async (amount: number, accountNumber: string, ifsc: string) => {
+      if (!user?.email) {
+        throw new Error("You must be signed in to withdraw.");
+      }
+
+      const updated = await submitWithdrawalApi({ amount, accountNumber, ifsc });
+      setWallet(updated);
+
+      pushNotification(user.email, {
+        type: "deposit",
+        title: "Withdrawal initiated",
+        body: `₹${amount.toLocaleString("en-IN")} bank transfer is being processed.`,
+      });
+    },
+    [user?.email],
   );
 
   const value = useMemo<WalletCtx>(
@@ -147,21 +110,13 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       balance: wallet.balance,
       transactions: wallet.transactions,
       loading,
-      canTrade: wallet.balance >= MIN_TRADING_BALANCE,
-      deposit,
-      withdraw,
+      canTrade: wallet.isFunded,
+      isFunded: wallet.isFunded,
       submitDepositRequest,
+      withdraw,
       refresh,
     }),
-    [
-      wallet.balance,
-      wallet.transactions,
-      loading,
-      deposit,
-      withdraw,
-      submitDepositRequest,
-      refresh,
-    ],
+    [wallet, loading, submitDepositRequest, withdraw, refresh],
   );
 
   return <WalletContext.Provider value={value}>{children}</WalletContext.Provider>;
@@ -173,5 +128,4 @@ export function useWallet() {
   return ctx;
 }
 
-// Re-export for consumers that imported from here before
-export type { WalletTxn } from "@/lib/wallet-db";
+export type { WalletTxn };

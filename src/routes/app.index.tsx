@@ -18,14 +18,12 @@ import { DataPanel } from "@/components/dashboard/data-panel";
 import { StatusBadge } from "@/components/dashboard/status-badge";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import { useLivePrices } from "@/hooks/use-live-prices";
-import { useTrading } from "@/hooks/use-trading";
-import { useWallet } from "@/hooks/use-wallet";
-import { GatedPrice, GatedNumber, PriceLockBanner, GatedChart } from "@/components/pricing/price-gate";
-import { ALL_ASSETS } from "@/data/markets";
-import { NEWS } from "@/data/content";
-import { buildEquityCurve, calcAccountMetrics, formatInr, formatSignedInr } from "@/lib/account-metrics";
+import { useDashboard } from "@/hooks/use-dashboard";
+import { GatedNumber, PriceLockBanner, GatedChart } from "@/components/pricing/price-gate";
+import { usePriceAccess } from "@/components/pricing/price-gate";
+import { formatInr, formatSignedInr } from "@/lib/account-metrics";
 import { cn } from "@/lib/utils";
+import type { DashboardMarketMover, DashboardTrade } from "@/lib/dashboard-api";
 
 export const Route = createFileRoute("/app/")({
   component: DashboardPage,
@@ -73,51 +71,61 @@ const listStagger = {
   },
 };
 
-const MarketMovers = memo(function MarketMovers() {
-  const live = useLivePrices(4000);
-  const movers = useMemo(
-    () => [...ALL_ASSETS].sort((a, b) => Math.abs(b.changePct) - Math.abs(a.changePct)).slice(0, 6),
-    [],
-  );
+function GatedPriceFromApi({ asset }: { asset: DashboardMarketMover }) {
+  const { canViewPrices } = usePriceAccess();
+  const up = asset.changePct >= 0;
 
+  if (!canViewPrices) {
+    return (
+      <div className="flex shrink-0 flex-col items-end gap-0.5 text-muted-foreground">
+        <span className="text-xs">--.--</span>
+        <span className="text-xs">--.-%</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex shrink-0 flex-col items-end gap-0.5 font-mono text-xs">
+      <span className="tabular-nums text-foreground">{asset.price.toLocaleString()}</span>
+      <span className={cn("tabular-nums", up ? "text-[color:var(--success)]" : "text-[color:var(--destructive)]")}>
+        {up ? "+" : ""}
+        {asset.changePct.toFixed(2)}%
+      </span>
+    </div>
+  );
+}
+
+const MarketMovers = memo(function MarketMovers({
+  movers,
+}: {
+  movers: DashboardMarketMover[];
+}) {
   return (
     <motion.div variants={fadeUp}>
       <DataPanel title="Market movers" description="Largest % moves today">
         <PriceLockBanner className="mb-4" />
-        <motion.ul
-          className="space-y-1"
-          variants={listStagger}
-          initial="hidden"
-          animate="show"
-        >
-          {movers.map((a) => {
-            const p = live[a.symbol];
-            return (
-              <motion.li
-                key={a.symbol}
-                variants={fadeUp}
-                whileHover={{ x: 4, transition: { duration: 0.2 } }}
+        <motion.ul className="space-y-1" variants={listStagger} initial="hidden" animate="show">
+          {movers.map((a) => (
+            <motion.li
+              key={a.symbol}
+              variants={fadeUp}
+              whileHover={{ x: 4, transition: { duration: 0.2 } }}
+            >
+              <Link
+                to="/app/trading"
+                search={{ symbol: a.symbol }}
+                className={cn(
+                  "flex items-center justify-between gap-4 rounded-xl px-3 py-3.5 transition-colors",
+                  "hover:bg-accent/50",
+                )}
               >
-                <Link
-                  to="/app/trading"
-                  search={{ symbol: a.symbol }}
-                  className={cn(
-                    "flex items-center justify-between gap-4 rounded-xl px-3 py-3.5 transition-colors",
-                    "hover:bg-accent/50",
-                  )}
-                >
-                  <div className="min-w-0 space-y-0.5">
-                    <div className="font-medium">{a.symbol}</div>
-                  </div>
-                  <GatedPrice
-                    asset={a}
-                    price={p?.price ?? a.price}
-                    changePct={p?.changePct ?? a.changePct}
-                  />
-                </Link>
-              </motion.li>
-            );
-          })}
+                <div className="min-w-0 space-y-0.5">
+                  <div className="font-medium">{a.symbol}</div>
+                </div>
+                <GatedPriceFromApi asset={a} />
+              </Link>
+            </motion.li>
+          ))}
         </motion.ul>
       </DataPanel>
     </motion.div>
@@ -125,36 +133,24 @@ const MarketMovers = memo(function MarketMovers() {
 });
 
 function DashboardPage() {
-  const { user, loading } = useAuth();
-  const { balance } = useWallet();
-  const { openPositions, closedTrades } = useTrading();
-  const live = useLivePrices(4000);
+  const { user, loading: authLoading } = useAuth();
+  const { data, isLoading, isError } = useDashboard();
 
-  const prices = useMemo(() => {
-    const map: Record<string, number> = {};
-    for (const asset of ALL_ASSETS) {
-      map[asset.symbol] = live[asset.symbol]?.price ?? asset.price;
-    }
-    return map;
-  }, [live]);
+  const metrics = data?.summary ?? {
+    balance: 0,
+    equity: 0,
+    profitToday: 0,
+    margin: 0,
+    freeMargin: 0,
+    leverageLabel: "1:500",
+    change30dPct: 0,
+    isFunded: false,
+  };
 
-  const metrics = useMemo(
-    () =>
-      calcAccountMetrics({
-        balance,
-        openPositions,
-        closedTrades,
-        prices,
-      }),
-    [balance, openPositions, closedTrades, prices],
-  );
-
-  const portfolioPoints = useMemo(
-    () => buildEquityCurve(balance, closedTrades, metrics.unrealizedPnl, 60),
-    [balance, closedTrades, metrics.unrealizedPnl],
-  );
-
-  const recentTrades = useMemo(() => closedTrades.slice(0, 4), [closedTrades]);
+  const portfolioPoints = data?.equityCurve.points ?? Array.from({ length: 60 }, () => 0);
+  const recentTrades: DashboardTrade[] = data?.recentTrades ?? [];
+  const news = data?.news ?? [];
+  const marketMovers = data?.marketMovers ?? [];
 
   const cards = useMemo(
     () => [
@@ -174,7 +170,7 @@ function DashboardPage() {
     [metrics],
   );
 
-  const displayName = loading ? "…" : (user?.name?.split(" ")[0] ?? "Trader");
+  const displayName = authLoading || isLoading ? "…" : (user?.name?.split(" ")[0] ?? "Trader");
   const equityUp = metrics.change30dPct >= 0;
 
   return (
@@ -197,6 +193,12 @@ function DashboardPage() {
         </motion.div>
       }
     >
+      {isError && (
+        <div className="mb-4 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
+          Could not load dashboard data. Please sign in again.
+        </div>
+      )}
+
       <motion.div
         initial="hidden"
         animate="show"
@@ -277,7 +279,7 @@ function DashboardPage() {
             </DataPanel>
           </motion.div>
 
-          <MarketMovers />
+          <MarketMovers movers={marketMovers} />
         </motion.div>
 
         <motion.div variants={stagger} className="grid gap-5 lg:grid-cols-2 lg:gap-6">
@@ -288,12 +290,7 @@ function DashboardPage() {
                   No closed trades yet. Open the terminal and place your first trade.
                 </div>
               ) : (
-                <motion.ul
-                  className="space-y-1"
-                  variants={listStagger}
-                  initial="hidden"
-                  animate="show"
-                >
+                <motion.ul className="space-y-1" variants={listStagger} initial="hidden" animate="show">
                   {recentTrades.map((t) => (
                     <motion.li
                       key={t.id}
@@ -331,13 +328,8 @@ function DashboardPage() {
 
           <motion.div variants={fadeUp}>
             <DataPanel title="Latest news" description="Market headlines">
-              <motion.ul
-                className="space-y-3 sm:space-y-4"
-                variants={listStagger}
-                initial="hidden"
-                animate="show"
-              >
-                {NEWS.slice(0, 4).map((n) => (
+              <motion.ul className="space-y-3 sm:space-y-4" variants={listStagger} initial="hidden" animate="show">
+                {news.map((n) => (
                   <motion.li
                     key={n.id}
                     variants={scaleIn}

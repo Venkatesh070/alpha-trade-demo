@@ -1,20 +1,20 @@
-import { wrapEmailTemplate } from "@/services/email-templates/base";
+import { otpCodeBlock, signOffBlock, wrapEmailTemplate } from "@/services/email-templates/base";
 
 export function loginOtpEmailHtml(code: string): string {
   const body = `
-    <h1 style="margin:0 0 12px;font-size:24px;font-weight:700;color:#f5f5f5;">Your sign-in code</h1>
-    <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#b0b0b0;">
-      Enter this 6-digit code to complete sign-in to your Exness India account. It expires in 10 minutes.
+    <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#111111;"><strong>Dear Valued Client,</strong></p>
+    <p style="margin:0 0 4px;font-size:14px;line-height:1.6;color:#111111;">Your one-time verification code (OTP) is:</p>
+    ${otpCodeBlock(code)}
+    <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#111111;">
+      This code is valid for a single verification and has been sent to the email address associated with your <strong>Exness India</strong> account to ensure your account's security.
     </p>
-    <p style="margin:0 0 8px;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:#888888;">
-      Verification code
+    <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#111111;">
+      Never share your verification code with anyone.
     </p>
-    <p style="margin:0 0 24px;font-size:36px;font-weight:700;letter-spacing:0.35em;color:#d4af37;font-family:monospace;">
-      ${code}
+    <p style="margin:0;font-size:14px;line-height:1.6;color:#111111;">
+      If you did not request this code, please contact our Customer Experience team immediately.
     </p>
-    <p style="margin:0;font-size:12px;line-height:1.6;color:#666666;">
-      If you didn't try to sign in, secure your account by changing your password immediately.
-    </p>`;
+    ${signOffBlock()}`;
 
-  return wrapEmailTemplate("Your sign-in code — Exness India", body);
+  return wrapEmailTemplate("Your one-time verification code — Exness India", body);
 }

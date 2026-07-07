@@ -9,7 +9,7 @@ import {
 } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useWallet } from "@/hooks/use-wallet";
-import { accountIdFromEmail } from "@/lib/account-id";
+import { getAccountId } from "@/lib/account-id";
 import {
   formatMemberSince,
   formatPasswordAge,
@@ -104,7 +104,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<ProfileCtx>(
     () => ({
-      accountId: accountIdFromEmail(user?.email),
+      accountId: getAccountId(user),
       memberSince: user?.createdAt ? formatMemberSince(user.createdAt) : "—",
       emailVerified,
       kycStatus: kycState ? getKycOverallStatus(kycState) : "not_started",
@@ -119,6 +119,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       refresh,
     }),
     [
+      user?.accountId,
       user?.email,
       user?.createdAt,
       emailVerified,

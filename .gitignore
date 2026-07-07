@@ -17,6 +17,7 @@ dist-ssr
 .nitro
 *.local
 data/
+.data/
 .env
 .env.*
 !.env.example

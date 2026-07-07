@@ -5,72 +5,109 @@ import { Check, ImageIcon, QrCode, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  approveDepositRequest,
-  fileToDataUrl,
-  getDepositRequests,
-  getPaymentSettings,
-  rejectDepositRequest,
-  savePaymentSettings,
-  type DepositRequest,
-  type PaymentSettings,
-} from "@/lib/payments";
+import { useAdminDeposits } from "@/hooks/use-admin-deposits";
+import { fileToDataUrl, type DepositRequest } from "@/lib/payments";
+import type { WithdrawalRequest } from "@/lib/admin-api";
 
 export const Route = createFileRoute("/admin/deposits")({
   component: AdminDeposits,
 });
 
 function AdminDeposits() {
-  const [settings, setSettings] = useState<PaymentSettings>(() => getPaymentSettings());
-  const [requests, setRequests] = useState<DepositRequest[]>(() => getDepositRequests());
+  const {
+    settings,
+    requests,
+    withdrawalRequests,
+    isLoading,
+    isError,
+    refetchRequests,
+    updateSettings,
+    approve,
+    reject,
+    approveWithdrawal,
+    rejectWithdrawal,
+  } = useAdminDeposits();
+
   const [preview, setPreview] = useState<DepositRequest | null>(null);
   const qrRef = useRef<HTMLInputElement>(null);
-
-  const reload = () => setRequests(getDepositRequests());
 
   const onQrUpload = async (file: File | undefined) => {
     if (!file) return;
     try {
       const qrImage = await fileToDataUrl(file);
-      const next = savePaymentSettings({ qrImage });
-      setSettings(next);
+      await updateSettings.mutateAsync({ qrImage });
       toast.success("Payment QR updated");
     } catch (e) {
       toast.error((e as Error).message);
     }
   };
 
-  const saveDetails = (e: React.FormEvent<HTMLFormElement>) => {
+  const saveDetails = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
-    const next = savePaymentSettings({
-      upiId: String(fd.get("upiId") ?? ""),
-      accountName: String(fd.get("accountName") ?? ""),
-    });
-    setSettings(next);
-    toast.success("Payment details saved");
+    try {
+      await updateSettings.mutateAsync({
+        upiId: String(fd.get("upiId") ?? ""),
+        accountName: String(fd.get("accountName") ?? ""),
+      });
+      toast.success("Payment details saved");
+    } catch (err) {
+      toast.error((err as Error).message);
+    }
   };
 
-  const approve = (id: string) => {
-    approveDepositRequest(id);
-    reload();
-    toast.success("Deposit approved — wallet credited");
-    if (preview?.id === id) setPreview(null);
+  const handleApprove = async (id: string) => {
+    try {
+      await approve.mutateAsync(id);
+      toast.success("Deposit approved — wallet credited");
+      if (preview?.id === id) setPreview(null);
+    } catch (err) {
+      toast.error((err as Error).message);
+    }
   };
 
-  const reject = (id: string) => {
-    rejectDepositRequest(id);
-    reload();
-    toast.error("Deposit rejected");
-    if (preview?.id === id) setPreview(null);
+  const handleReject = async (id: string) => {
+    try {
+      await reject.mutateAsync(id);
+      toast.error("Deposit rejected");
+      if (preview?.id === id) setPreview(null);
+    } catch (err) {
+      toast.error((err as Error).message);
+    }
+  };
+
+  const handleRejectWithdrawal = async (id: string) => {
+    try {
+      await rejectWithdrawal.mutateAsync(id);
+      toast.success("Withdrawal rejected — balance refunded");
+    } catch (err) {
+      toast.error((err as Error).message);
+    }
+  };
+
+  const handleApproveWithdrawal = async (id: string) => {
+    try {
+      await approveWithdrawal.mutateAsync(id);
+      toast.success("Withdrawal approved — transfer processed");
+    } catch (err) {
+      toast.error((err as Error).message);
+    }
   };
 
   const pending = requests.filter((r) => r.status === "pending");
   const reviewed = requests.filter((r) => r.status !== "pending");
+  const pendingWithdrawals = withdrawalRequests.filter((r) => r.status === "pending");
+  const reviewedWithdrawals = withdrawalRequests.filter((r) => r.status !== "pending");
 
   return (
     <div className="space-y-8 p-6">
-      <h1 className="font-display text-2xl font-bold">Deposits &amp; payment QR</h1>
+      <h1 className="font-display text-2xl font-bold">Deposits &amp; Withdrawals</h1>
+
+      {isError && (
+        <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
+          Could not load deposit data. Check that you are signed in as admin.
+        </div>
+      )}
 
       <section className="glossy rounded-2xl p-6">
         <h2 className="font-display text-lg font-bold">Payment QR code</h2>
@@ -80,7 +117,11 @@ function AdminDeposits() {
 
         <div className="mt-5 grid gap-6 lg:grid-cols-2">
           <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-surface/50 p-6">
-            {settings.qrImage ? (
+            {isLoading ? (
+              <div className="grid h-48 w-48 place-items-center text-sm text-muted-foreground">
+                Loading…
+              </div>
+            ) : settings?.qrImage ? (
               <img
                 src={settings.qrImage}
                 alt="Payment QR"
@@ -102,26 +143,34 @@ function AdminDeposits() {
               type="button"
               className="mt-4 gold-button hover:gold-button-hover"
               onClick={() => qrRef.current?.click()}
+              disabled={updateSettings.isPending}
             >
-              <Upload className="mr-2 h-4 w-4" /> {settings.qrImage ? "Replace QR" : "Upload QR"}
+              <Upload className="mr-2 h-4 w-4" />{" "}
+              {settings?.qrImage ? "Replace QR" : "Upload QR"}
             </Button>
           </div>
 
           <form onSubmit={saveDetails} className="space-y-4">
             <div>
               <Label htmlFor="accountName">Account name</Label>
-              <Input id="accountName" name="accountName" defaultValue={settings.accountName} />
+              <Input
+                id="accountName"
+                name="accountName"
+                key={settings?.accountName}
+                defaultValue={settings?.accountName ?? ""}
+              />
             </div>
             <div>
               <Label htmlFor="upiId">UPI ID</Label>
               <Input
                 id="upiId"
                 name="upiId"
-                defaultValue={settings.upiId}
+                key={settings?.upiId}
+                defaultValue={settings?.upiId ?? ""}
                 placeholder="merchant@upi"
               />
             </div>
-            <Button type="submit" variant="outline">
+            <Button type="submit" variant="outline" disabled={updateSettings.isPending}>
               Save details
             </Button>
           </form>
@@ -130,13 +179,105 @@ function AdminDeposits() {
 
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-lg font-bold">Pending deposits ({pending.length})</h2>
-          <Button variant="outline" size="sm" onClick={reload}>
+          <h2 className="font-display text-lg font-bold">
+            Pending withdrawals ({pendingWithdrawals.length})
+          </h2>
+          <Button variant="outline" size="sm" onClick={() => refetchRequests()}>
             Refresh
           </Button>
         </div>
 
-        {pending.length === 0 ? (
+        {isLoading ? (
+          <div className="glossy-soft rounded-2xl p-8 text-center text-sm text-muted-foreground">
+            Loading withdrawal requests…
+          </div>
+        ) : pendingWithdrawals.length === 0 ? (
+          <div className="glossy-soft rounded-2xl p-8 text-center text-sm text-muted-foreground">
+            No pending withdrawal requests.
+          </div>
+        ) : (
+          <div className="glossy overflow-hidden rounded-2xl">
+            <table className="w-full text-sm">
+              <thead className="bg-surface/60 text-left text-xs uppercase text-muted-foreground">
+                <tr>
+                  <th className="px-4 py-3">User</th>
+                  <th className="px-4 py-3 text-right">Amount</th>
+                  <th className="px-4 py-3">Account</th>
+                  <th className="px-4 py-3">IFSC</th>
+                  <th className="px-4 py-3">Submitted</th>
+                  <th className="px-4 py-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pendingWithdrawals.map((r) => (
+                  <WithdrawalRow
+                    key={r.id}
+                    request={r}
+                    onApprove={() => handleApproveWithdrawal(r.id)}
+                    onReject={() => handleRejectWithdrawal(r.id)}
+                    approvePending={approveWithdrawal.isPending}
+                    rejectPending={rejectWithdrawal.isPending}
+                  />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+      {reviewedWithdrawals.length > 0 && (
+        <section className="space-y-4">
+          <h2 className="font-display text-lg font-bold">Reviewed withdrawals</h2>
+          <div className="glossy overflow-hidden rounded-2xl">
+            <table className="w-full text-sm">
+              <thead className="bg-surface/60 text-left text-xs uppercase text-muted-foreground">
+                <tr>
+                  <th className="px-4 py-3">User</th>
+                  <th className="px-4 py-3 text-right">Amount</th>
+                  <th className="px-4 py-3">Account</th>
+                  <th className="px-4 py-3">IFSC</th>
+                  <th className="px-4 py-3">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {reviewedWithdrawals.slice(0, 20).map((r) => (
+                  <tr key={r.id} className="border-t border-border/60">
+                    <td className="px-4 py-3">{r.userName}</td>
+                    <td className="px-4 py-3 text-right font-mono">
+                      ₹{r.amount.toLocaleString("en-IN")}
+                    </td>
+                    <td className="px-4 py-3 font-mono text-xs">
+                      ••••{r.accountNumber.slice(-4)}
+                    </td>
+                    <td className="px-4 py-3 font-mono text-xs">{r.ifsc}</td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`rounded px-2 py-0.5 text-xs capitalize ${r.status === "approved" ? "bg-[color:var(--success)]/15 text-[color:var(--success)]" : "bg-[color:var(--destructive)]/15 text-[color:var(--destructive)]"}`}
+                      >
+                        {r.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="font-display text-lg font-bold">Pending deposits ({pending.length})</h2>
+          <Button variant="outline" size="sm" onClick={() => refetchRequests()}>
+            Refresh
+          </Button>
+        </div>
+
+        {isLoading ? (
+          <div className="glossy-soft rounded-2xl p-8 text-center text-sm text-muted-foreground">
+            Loading deposit requests…
+          </div>
+        ) : pending.length === 0 ? (
           <div className="glossy-soft rounded-2xl p-8 text-center text-sm text-muted-foreground">
             No pending deposit requests.
           </div>
@@ -160,7 +301,9 @@ function AdminDeposits() {
                       <div className="font-medium">{r.userName}</div>
                       <div className="text-xs text-muted-foreground">{r.userEmail}</div>
                     </td>
-                    <td className="px-4 py-3 text-right font-mono">₹{r.amount.toLocaleString()}</td>
+                    <td className="px-4 py-3 text-right font-mono">
+                      ₹{r.amount.toLocaleString("en-IN")}
+                    </td>
                     <td className="px-4 py-3 font-mono text-xs">{r.referenceId}</td>
                     <td className="px-4 py-3">
                       <button
@@ -183,7 +326,8 @@ function AdminDeposits() {
                         <Button
                           size="sm"
                           className="bg-[color:var(--success)] text-[color:var(--success-foreground)] hover:brightness-110"
-                          onClick={() => approve(r.id)}
+                          onClick={() => handleApprove(r.id)}
+                          disabled={approve.isPending}
                         >
                           <Check className="mr-1 h-3.5 w-3.5" /> Approve
                         </Button>
@@ -191,7 +335,8 @@ function AdminDeposits() {
                           size="sm"
                           variant="outline"
                           className="text-[color:var(--destructive)]"
-                          onClick={() => reject(r.id)}
+                          onClick={() => handleReject(r.id)}
+                          disabled={reject.isPending}
                         >
                           <X className="mr-1 h-3.5 w-3.5" /> Reject
                         </Button>
@@ -223,7 +368,9 @@ function AdminDeposits() {
                 {reviewed.slice(0, 20).map((r) => (
                   <tr key={r.id} className="border-t border-border/60">
                     <td className="px-4 py-3">{r.userName}</td>
-                    <td className="px-4 py-3 text-right font-mono">₹{r.amount.toLocaleString()}</td>
+                    <td className="px-4 py-3 text-right font-mono">
+                      ₹{r.amount.toLocaleString("en-IN")}
+                    </td>
                     <td className="px-4 py-3 font-mono text-xs">{r.referenceId}</td>
                     <td className="px-4 py-3">
                       <span
@@ -258,7 +405,7 @@ function AdminDeposits() {
               <div>
                 <h3 className="font-display font-bold">{preview.userName}</h3>
                 <p className="text-sm text-muted-foreground">
-                  ₹{preview.amount.toLocaleString()} · Ref: {preview.referenceId}
+                  ₹{preview.amount.toLocaleString("en-IN")} · Ref: {preview.referenceId}
                 </p>
               </div>
               <button type="button" onClick={() => setPreview(null)}>
@@ -274,14 +421,16 @@ function AdminDeposits() {
               <div className="mt-4 flex gap-2">
                 <Button
                   className="flex-1 bg-[color:var(--success)] text-[color:var(--success-foreground)]"
-                  onClick={() => approve(preview.id)}
+                  onClick={() => handleApprove(preview.id)}
+                  disabled={approve.isPending}
                 >
                   Approve
                 </Button>
                 <Button
                   variant="outline"
                   className="flex-1 text-[color:var(--destructive)]"
-                  onClick={() => reject(preview.id)}
+                  onClick={() => handleReject(preview.id)}
+                  disabled={reject.isPending}
                 >
                   Reject
                 </Button>
@@ -291,5 +440,55 @@ function AdminDeposits() {
         </div>
       )}
     </div>
+  );
+}
+
+function WithdrawalRow({
+  request,
+  onApprove,
+  onReject,
+  approvePending,
+  rejectPending,
+}: {
+  request: WithdrawalRequest;
+  onApprove: () => void;
+  onReject: () => void;
+  approvePending: boolean;
+  rejectPending: boolean;
+}) {
+  return (
+    <tr className="border-t border-border/60">
+      <td className="px-4 py-3">
+        <div className="font-medium">{request.userName}</div>
+        <div className="text-xs text-muted-foreground">{request.userEmail}</div>
+      </td>
+      <td className="px-4 py-3 text-right font-mono">₹{request.amount.toLocaleString("en-IN")}</td>
+      <td className="px-4 py-3 font-mono text-xs">••••{request.accountNumber.slice(-4)}</td>
+      <td className="px-4 py-3 font-mono text-xs">{request.ifsc}</td>
+      <td className="px-4 py-3 text-xs text-muted-foreground">
+        {new Date(request.createdAt).toLocaleString("en-IN")}
+      </td>
+      <td className="px-4 py-3">
+        <div className="flex gap-2">
+          <Button
+            size="sm"
+            className="bg-[color:var(--success)] text-[color:var(--success-foreground)] hover:brightness-110"
+            onClick={onApprove}
+            disabled={approvePending}
+          >
+            <Check className="mr-1 h-3.5 w-3.5" /> Approve
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="text-[color:var(--destructive)]"
+            onClick={onReject}
+            disabled={rejectPending}
+          >
+            <X className="mr-1 h-3.5 w-3.5" /> Reject
+          </Button>
+        </div>
+      </td>
+    </tr>
   );
 }

@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useWallet, MIN_TRADING_BALANCE } from "@/hooks/use-wallet";
 import { fileToDataUrl, getPaymentSettings, type PaymentSettings } from "@/lib/payments";
+import { fetchPaymentSettings } from "@/lib/wallet-api";
 import { cn } from "@/lib/utils";
 import { PageShell } from "@/components/dashboard/page-shell";
 import { DataPanel } from "@/components/dashboard/data-panel";
@@ -60,10 +61,18 @@ function DepositPage() {
   const nav = useNavigate();
 
   useEffect(() => {
-    const reload = () => setSettings(getPaymentSettings());
-    reload();
-    window.addEventListener("focus", reload);
-    return () => window.removeEventListener("focus", reload);
+    async function load() {
+      try {
+        const remote = await fetchPaymentSettings();
+        setSettings(remote);
+      } catch {
+        setSettings(getPaymentSettings());
+      }
+    }
+    void load();
+    const onFocus = () => void load();
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
   }, []);
 
   const amt = Number(amount) || 0;
@@ -104,11 +113,13 @@ function DepositPage() {
 
     setLoading(true);
     try {
-      submitDepositRequest(amt, utr.trim(), screenshot);
+      await submitDepositRequest(amt, utr.trim(), screenshot);
       toast.success("Deposit submitted for review", {
         description: "Your balance will update once admin verifies your payment.",
       });
       nav({ to: "/app/wallet" });
+    } catch (err) {
+      toast.error((err as Error).message);
     } finally {
       setLoading(false);
     }
@@ -317,6 +328,7 @@ function DepositPage() {
         )}
 
         <Button
+          type="submit"
           disabled={loading || !hasPaymentConfig}
           className="gold-button hover:gold-button-hover w-full py-6 text-base font-semibold"
         >

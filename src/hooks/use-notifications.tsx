@@ -4,7 +4,6 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -12,7 +11,6 @@ import { toast } from "sonner";
 import type { AppNotification } from "@/data/content";
 import { useAuth } from "@/hooks/use-auth";
 import {
-  DRIP_NOTIFICATIONS,
   formatNotificationTime,
   getNotifications,
   markAllNotificationsRead,
@@ -60,32 +58,49 @@ function toastForNotification(n: Pick<AppNotification, "type" | "title" | "body"
   }
 }
 
-function NotificationToastBridge({ items }: { items: AppNotification[] }) {
-  const seenRef = useRef<Set<string>>(new Set());
-  const primedRef = useRef(false);
-
+function NotificationToastBridge({
+  stored,
+  userEmail,
+}: {
+  stored: StoredNotification[];
+  userEmail?: string;
+}) {
   useEffect(() => {
-    if (!primedRef.current) {
-      items.forEach((n) => seenRef.current.add(n.id));
-      primedRef.current = true;
-      return;
+    if (!userEmail) return;
+
+    const seenKey = `exness-toasted-notifications:${userEmail}`;
+    let seen: Set<string>;
+    try {
+      seen = new Set(JSON.parse(sessionStorage.getItem(seenKey) ?? "[]") as string[]);
+    } catch {
+      seen = new Set();
     }
 
-    for (const n of items) {
-      if (seenRef.current.has(n.id)) continue;
-      seenRef.current.add(n.id);
-      toastForNotification(n);
-    }
-  }, [items]);
+    const now = Date.now();
+    const TOAST_WINDOW_MS = 15_000;
+    let changed = false;
 
-  return null;
+    for (const n of stored) {
+      if (seen.has(n.id)) continue;
+      seen.add(n.id);
+      changed = true;
+
+      if (now - n.createdAt <= TOAST_WINDOW_MS) {
+        toastForNotification(n);
+      }
+    }
+
+    if (changed) {
+      const trimmed = [...seen].slice(-200);
+      sessionStorage.setItem(seenKey, JSON.stringify(trimmed));
+    }
+  }, [stored, userEmail]);
 }
 
 export function NotificationProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [stored, setStored] = useState<StoredNotification[]>([]);
   const [loading, setLoading] = useState(true);
-  const dripIndexRef = useRef(0);
 
   const refresh = useCallback(() => {
     if (!user?.email) {
@@ -114,19 +129,6 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     };
   }, [refresh]);
 
-  useEffect(() => {
-    if (!user?.email) return;
-
-    const id = window.setInterval(() => {
-      const next = DRIP_NOTIFICATIONS[dripIndexRef.current % DRIP_NOTIFICATIONS.length];
-      dripIndexRef.current += 1;
-      pushNotification(user.email, next);
-      refresh();
-    }, 45_000);
-
-    return () => window.clearInterval(id);
-  }, [refresh, user?.email]);
-
   const markAllRead = useCallback(() => {
     if (!user?.email) return;
     markAllNotificationsRead(user.email);
@@ -143,7 +145,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
   return (
     <NotificationContext.Provider value={value}>
-      <NotificationToastBridge items={items} />
+      <NotificationToastBridge stored={stored} userEmail={user?.email} />
       {children}
     </NotificationContext.Provider>
   );

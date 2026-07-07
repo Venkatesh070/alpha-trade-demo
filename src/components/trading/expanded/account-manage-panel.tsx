@@ -27,7 +27,7 @@ import {
   formatInr,
   formatSignedInr,
 } from "@/lib/account-metrics";
-import { accountIdFromEmail } from "@/lib/account-id";
+import { getAccountId } from "@/lib/account-id";
 import { cn } from "@/lib/utils";
 
 const ACCOUNT_TYPE = "Ultra Low Standard";
@@ -59,7 +59,7 @@ export function AccountManagePanel({ onClose }: { onClose: () => void }) {
   const { user } = useAuth();
   const { openPositions, closedTrades } = useTrading();
   const live = useLivePrices(4000);
-  const accountId = accountIdFromEmail(user?.email);
+  const accountId = getAccountId(user);
 
   const prices = Object.fromEntries(
     ALL_ASSETS.map((asset) => [asset.symbol, live[asset.symbol]?.price ?? asset.price]),

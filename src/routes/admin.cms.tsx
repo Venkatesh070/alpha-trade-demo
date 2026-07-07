@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AdminCrud } from "./admin.news";
+import { AdminCrud } from "@/components/admin/admin-crud-placeholder";
 export const Route = createFileRoute("/admin/cms")({
   component: () => (
     <AdminCrud

@@ -60,6 +60,23 @@ export async function verifyBearerToken(
 
   loadServerEnv();
 
+  const apiBase =
+    process.env.VITE_API_URL?.replace(/\/$/, "") ?? "http://localhost:4000";
+
+  try {
+    const res = await fetch(`${apiBase}/api/auth/user/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (res.ok) {
+      const data = (await res.json()) as { user?: { id: string; email: string } };
+      if (data.user?.id) {
+        return { uid: data.user.id, email: data.user.email };
+      }
+    }
+  } catch {
+    // fall through to Firebase ID token verification
+  }
+
   const { getAdminAuth } = await import("@/server/firebase-admin");
   const decoded = await getAdminAuth().verifyIdToken(token);
   return { uid: decoded.uid, email: decoded.email };

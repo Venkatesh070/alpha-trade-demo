@@ -35,8 +35,7 @@ export async function sendUserVerificationEmail(user: User): Promise<void> {
     throw new Error("No email address on this account.");
   }
 
-  const idToken = await user.getIdToken();
-  await mailSendVerification(idToken);
+  await mailSendVerification();
 }
 
 export async function applyEmailVerificationFromUrl(): Promise<boolean> {
