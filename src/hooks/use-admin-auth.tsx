@@ -9,10 +9,12 @@ import {
 } from "react";
 import { type AdminProfile, type AuthTokens, adminLogin, adminMe } from "@/lib/auth-api";
 import {
-  clearLegacyAdminLocalStorage,
-  loadAdminTokens,
-  saveAdminSession,
-} from "@/lib/admin-session";
+  clearAdminSessionOnServer,
+  clearLegacyBrowserSessionKeys,
+  loadAdminSessionFromServer,
+  saveAdminSessionToServer,
+  updateAdminSessionOnServer,
+} from "@/lib/session-api";
 
 interface AdminAuthCtx {
   admin: AdminProfile | null;
@@ -28,27 +30,31 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const [admin, setAdmin] = useState<AdminProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const persist = useCallback((profile: AdminProfile | null, tokens: AuthTokens | null) => {
+  const persist = useCallback(async (profile: AdminProfile | null, tokens: AuthTokens | null) => {
     setAdmin(profile);
-    saveAdminSession(profile, tokens);
+    if (profile && tokens) {
+      await saveAdminSessionToServer(profile.email, { admin: profile, tokens });
+      return;
+    }
+    await clearAdminSessionOnServer();
   }, []);
 
   useEffect(() => {
-    clearLegacyAdminLocalStorage();
+    clearLegacyBrowserSessionKeys();
 
     async function restore() {
-      const tokens = loadAdminTokens();
-      if (!tokens?.idToken) {
-        setLoading(false);
-        return;
-      }
-
       try {
-        const { admin: profile } = await adminMe(tokens.idToken);
+        const stored = await loadAdminSessionFromServer();
+        if (!stored?.tokens?.idToken) {
+          setLoading(false);
+          return;
+        }
+
+        const { admin: profile } = await adminMe(stored.tokens.idToken);
         setAdmin(profile);
-        saveAdminSession(profile, tokens);
+        await updateAdminSessionOnServer({ admin: profile, tokens: stored.tokens });
       } catch {
-        saveAdminSession(null, null);
+        await clearAdminSessionOnServer();
       } finally {
         setLoading(false);
       }
@@ -60,14 +66,17 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(
     async (email: string, password: string) => {
       const { admin: profile, tokens } = await adminLogin(email, password);
-      persist(profile, tokens);
+      await persist(profile, tokens);
     },
     [persist],
   );
 
   const logout = useCallback(() => {
-    persist(null, null);
-  }, [persist]);
+    void (async () => {
+      await clearAdminSessionOnServer();
+      setAdmin(null);
+    })();
+  }, []);
 
   const value = useMemo<AdminAuthCtx>(
     () => ({

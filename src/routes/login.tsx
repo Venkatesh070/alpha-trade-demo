@@ -49,7 +49,7 @@ function LoginPage() {
 }
 
 function LoginForm() {
-  const { login, shouldRequireLoginOtp, sendLoginOtp } = useAuth();
+  const { login, refreshSessionStatus, sendLoginOtp } = useAuth();
   const nav = useNavigate();
   const { redirect } = useSearch({ from: "/login" });
   const [showPw, setShowPw] = useState(false);
@@ -84,11 +84,27 @@ function LoginForm() {
         return;
       }
 
-      if (shouldRequireLoginOtp(vals.email)) {
-        await sendLoginOtp();
-        toast.message("Enter the 6-digit code sent to your email");
-        nav({ to: "/login", search: { step: "otp", email: vals.email, redirect } });
-        return;
+      const idToken = await getAuthIdToken();
+      if (idToken) {
+        try {
+          const { admin } = await adminMe(idToken);
+          if (admin) {
+            await signOut(auth);
+            toast.message("This is an admin account — use the admin sign-in page");
+            nav({ to: "/admin/login" });
+            return;
+          }
+        } catch {
+          // not an admin
+        }
+
+        const session = await refreshSessionStatus();
+        if (session?.otpRequired) {
+          await sendLoginOtp();
+          toast.message("Enter the 6-digit code sent to your email");
+          nav({ to: "/login", search: { step: "otp", email: vals.email, redirect } });
+          return;
+        }
       }
 
       toast.success("Welcome back");

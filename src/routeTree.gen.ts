@@ -59,6 +59,10 @@ import { Route as AdminCmsRouteImport } from './routes/admin.cms'
 import { Route as AppWalletIndexRouteImport } from './routes/app.wallet.index'
 import { Route as AppWalletWithdrawRouteImport } from './routes/app.wallet.withdraw'
 import { Route as AppWalletDepositRouteImport } from './routes/app.wallet.deposit'
+import { Route as ApiSessionStatusRouteImport } from './routes/api/session/status'
+import { Route as ApiSessionLogoutRouteImport } from './routes/api/session/logout'
+import { Route as ApiSessionCompleteOtpRouteImport } from './routes/api/session/complete-otp'
+import { Route as ApiSessionAdminRouteImport } from './routes/api/session/admin'
 import { Route as ApiEmailVerifyLoginOtpRouteImport } from './routes/api/email/verify-login-otp'
 import { Route as ApiEmailSendWelcomeRouteImport } from './routes/api/email/send-welcome'
 import { Route as ApiEmailSendVerificationRouteImport } from './routes/api/email/send-verification'
@@ -315,6 +319,26 @@ const AppWalletDepositRoute = AppWalletDepositRouteImport.update({
   path: '/deposit',
   getParentRoute: () => AppWalletRoute,
 } as any)
+const ApiSessionStatusRoute = ApiSessionStatusRouteImport.update({
+  id: '/api/session/status',
+  path: '/api/session/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSessionLogoutRoute = ApiSessionLogoutRouteImport.update({
+  id: '/api/session/logout',
+  path: '/api/session/logout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSessionCompleteOtpRoute = ApiSessionCompleteOtpRouteImport.update({
+  id: '/api/session/complete-otp',
+  path: '/api/session/complete-otp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSessionAdminRoute = ApiSessionAdminRouteImport.update({
+  id: '/api/session/admin',
+  path: '/api/session/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiEmailVerifyLoginOtpRoute = ApiEmailVerifyLoginOtpRouteImport.update({
   id: '/api/email/verify-login-otp',
   path: '/api/email/verify-login-otp',
@@ -396,6 +420,10 @@ export interface FileRoutesByFullPath {
   '/api/email/send-verification': typeof ApiEmailSendVerificationRoute
   '/api/email/send-welcome': typeof ApiEmailSendWelcomeRoute
   '/api/email/verify-login-otp': typeof ApiEmailVerifyLoginOtpRoute
+  '/api/session/admin': typeof ApiSessionAdminRoute
+  '/api/session/complete-otp': typeof ApiSessionCompleteOtpRoute
+  '/api/session/logout': typeof ApiSessionLogoutRoute
+  '/api/session/status': typeof ApiSessionStatusRoute
   '/app/wallet/deposit': typeof AppWalletDepositRoute
   '/app/wallet/withdraw': typeof AppWalletWithdrawRoute
   '/app/wallet/': typeof AppWalletIndexRoute
@@ -450,6 +478,10 @@ export interface FileRoutesByTo {
   '/api/email/send-verification': typeof ApiEmailSendVerificationRoute
   '/api/email/send-welcome': typeof ApiEmailSendWelcomeRoute
   '/api/email/verify-login-otp': typeof ApiEmailVerifyLoginOtpRoute
+  '/api/session/admin': typeof ApiSessionAdminRoute
+  '/api/session/complete-otp': typeof ApiSessionCompleteOtpRoute
+  '/api/session/logout': typeof ApiSessionLogoutRoute
+  '/api/session/status': typeof ApiSessionStatusRoute
   '/app/wallet/deposit': typeof AppWalletDepositRoute
   '/app/wallet/withdraw': typeof AppWalletWithdrawRoute
   '/app/wallet': typeof AppWalletIndexRoute
@@ -508,6 +540,10 @@ export interface FileRoutesById {
   '/api/email/send-verification': typeof ApiEmailSendVerificationRoute
   '/api/email/send-welcome': typeof ApiEmailSendWelcomeRoute
   '/api/email/verify-login-otp': typeof ApiEmailVerifyLoginOtpRoute
+  '/api/session/admin': typeof ApiSessionAdminRoute
+  '/api/session/complete-otp': typeof ApiSessionCompleteOtpRoute
+  '/api/session/logout': typeof ApiSessionLogoutRoute
+  '/api/session/status': typeof ApiSessionStatusRoute
   '/app/wallet/deposit': typeof AppWalletDepositRoute
   '/app/wallet/withdraw': typeof AppWalletWithdrawRoute
   '/app/wallet/': typeof AppWalletIndexRoute
@@ -567,6 +603,10 @@ export interface FileRouteTypes {
     | '/api/email/send-verification'
     | '/api/email/send-welcome'
     | '/api/email/verify-login-otp'
+    | '/api/session/admin'
+    | '/api/session/complete-otp'
+    | '/api/session/logout'
+    | '/api/session/status'
     | '/app/wallet/deposit'
     | '/app/wallet/withdraw'
     | '/app/wallet/'
@@ -621,6 +661,10 @@ export interface FileRouteTypes {
     | '/api/email/send-verification'
     | '/api/email/send-welcome'
     | '/api/email/verify-login-otp'
+    | '/api/session/admin'
+    | '/api/session/complete-otp'
+    | '/api/session/logout'
+    | '/api/session/status'
     | '/app/wallet/deposit'
     | '/app/wallet/withdraw'
     | '/app/wallet'
@@ -678,6 +722,10 @@ export interface FileRouteTypes {
     | '/api/email/send-verification'
     | '/api/email/send-welcome'
     | '/api/email/verify-login-otp'
+    | '/api/session/admin'
+    | '/api/session/complete-otp'
+    | '/api/session/logout'
+    | '/api/session/status'
     | '/app/wallet/deposit'
     | '/app/wallet/withdraw'
     | '/app/wallet/'
@@ -708,6 +756,10 @@ export interface RootRouteChildren {
   ApiEmailSendVerificationRoute: typeof ApiEmailSendVerificationRoute
   ApiEmailSendWelcomeRoute: typeof ApiEmailSendWelcomeRoute
   ApiEmailVerifyLoginOtpRoute: typeof ApiEmailVerifyLoginOtpRoute
+  ApiSessionAdminRoute: typeof ApiSessionAdminRoute
+  ApiSessionCompleteOtpRoute: typeof ApiSessionCompleteOtpRoute
+  ApiSessionLogoutRoute: typeof ApiSessionLogoutRoute
+  ApiSessionStatusRoute: typeof ApiSessionStatusRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1062,6 +1114,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppWalletDepositRouteImport
       parentRoute: typeof AppWalletRoute
     }
+    '/api/session/status': {
+      id: '/api/session/status'
+      path: '/api/session/status'
+      fullPath: '/api/session/status'
+      preLoaderRoute: typeof ApiSessionStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/session/logout': {
+      id: '/api/session/logout'
+      path: '/api/session/logout'
+      fullPath: '/api/session/logout'
+      preLoaderRoute: typeof ApiSessionLogoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/session/complete-otp': {
+      id: '/api/session/complete-otp'
+      path: '/api/session/complete-otp'
+      fullPath: '/api/session/complete-otp'
+      preLoaderRoute: typeof ApiSessionCompleteOtpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/session/admin': {
+      id: '/api/session/admin'
+      path: '/api/session/admin'
+      fullPath: '/api/session/admin'
+      preLoaderRoute: typeof ApiSessionAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/email/verify-login-otp': {
       id: '/api/email/verify-login-otp'
       path: '/api/email/verify-login-otp'
@@ -1213,6 +1293,10 @@ const rootRouteChildren: RootRouteChildren = {
   ApiEmailSendVerificationRoute: ApiEmailSendVerificationRoute,
   ApiEmailSendWelcomeRoute: ApiEmailSendWelcomeRoute,
   ApiEmailVerifyLoginOtpRoute: ApiEmailVerifyLoginOtpRoute,
+  ApiSessionAdminRoute: ApiSessionAdminRoute,
+  ApiSessionCompleteOtpRoute: ApiSessionCompleteOtpRoute,
+  ApiSessionLogoutRoute: ApiSessionLogoutRoute,
+  ApiSessionStatusRoute: ApiSessionStatusRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

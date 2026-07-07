@@ -19,7 +19,7 @@ export const Route = createFileRoute("/api/email/verify-login-otp")({
             return jsonResponse({ error: "Enter the 6-digit code from your email." }, 400);
           }
 
-          verifyLoginOtp(email, code);
+          await verifyLoginOtp(email, code);
           return jsonResponse({ message: "Code verified.", verified: true });
         } catch (err) {
           if (err instanceof Response) return err;

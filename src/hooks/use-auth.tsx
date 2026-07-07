@@ -16,13 +16,12 @@ import { auth } from "@/lib/firebase";
 import { clearReferralCode, markReferralVerified, recordReferralSignup } from "@/lib/referral-db";
 import { getProfileExtras } from "@/lib/profile-db";
 import {
-  clearAllOtpSessions,
-  clearOtpSession,
-  isDeviceTrusted,
-  isOtpSessionVerified,
-  markOtpSessionVerified,
-  trustDevice,
-} from "@/lib/login-otp";
+  clearLegacyBrowserSessionKeys,
+  completeOtpSession,
+  fetchUserSessionStatus,
+  logoutUserSession,
+  type UserSessionStatus,
+} from "@/lib/session-api";
 
 interface AuthCtx {
   user: UserProfile | null;
@@ -39,8 +38,7 @@ interface AuthCtx {
   requestPasswordReset: (email: string) => Promise<void>;
   sendLoginOtp: () => Promise<number>;
   verifyLoginOtp: (code: string, trustThisDevice?: boolean) => Promise<void>;
-  completeLoginAfterOtp: (email: string, trustThisDevice?: boolean) => void;
-  shouldRequireLoginOtp: (email: string) => boolean;
+  refreshSessionStatus: () => Promise<UserSessionStatus | null>;
   updateUser: (patch: Partial<UserProfile>) => void;
 }
 
@@ -58,9 +56,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [otpSessionReady, setOtpSessionReady] = useState(false);
 
-  const shouldRequireLoginOtp = useCallback((email: string) => {
-    if (isDeviceTrusted(email)) return false;
-    return !isOtpSessionVerified(email);
+  const refreshSessionStatus = useCallback(async (): Promise<UserSessionStatus | null> => {
+    const firebaseUser = auth.currentUser;
+    if (!firebaseUser?.email || !firebaseUser.emailVerified) {
+      setOtpSessionReady(false);
+      return null;
+    }
+
+    try {
+      const idToken = await firebaseUser.getIdToken();
+      const status = await fetchUserSessionStatus(idToken);
+      setOtpSessionReady(!status.otpRequired);
+      return status;
+    } catch (err) {
+      console.error("Failed to load SQL session status:", err);
+      setOtpSessionReady(false);
+      return null;
+    }
+  }, []);
+
+  useEffect(() => {
+    clearLegacyBrowserSessionKeys();
   }, []);
 
   useEffect(() => {
@@ -74,11 +90,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       setEmailVerified(firebaseUser.emailVerified);
-      setOtpSessionReady(
-        firebaseUser.email
-          ? !shouldRequireLoginOtp(firebaseUser.email)
-          : false,
-      );
 
       try {
         const idToken = await firebaseUser.getIdToken();
@@ -103,6 +114,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const { user: verifiedProfile } = await userVerifyEmail(freshToken);
           setUser(verifiedProfile);
         }
+
+        if (firebaseUser.emailVerified) {
+          await refreshSessionStatus();
+        } else {
+          setOtpSessionReady(false);
+        }
       } catch (err) {
         console.error("Failed to load user profile:", err);
         setUser(null);
@@ -112,7 +129,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return unsubscribe;
-  }, [shouldRequireLoginOtp]);
+  }, [refreshSessionStatus]);
 
   const login = useCallback(async (email: string, password: string): Promise<boolean> => {
     try {
@@ -130,7 +147,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { user: profile } = await userRegister({ name, email, password });
       setUser(profile);
       setEmailVerified(false);
-      clearOtpSession(email);
+      setOtpSessionReady(false);
 
       const cred = await signInWithEmailAndPassword(auth, email, password);
       await sendUserVerificationEmail(cred.user);
@@ -178,16 +195,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await mailSendWelcome(idToken, profile.name).catch((err) => {
       console.error("Failed to send welcome email:", err);
     });
+    await refreshSessionStatus();
     return true;
-  }, []);
+  }, [refreshSessionStatus]);
 
   const logout = useCallback(() => {
-    const email = auth.currentUser?.email;
-    signOut(auth);
-    if (email) clearOtpSession(email);
-    setUser(null);
-    setEmailVerified(false);
-    setOtpSessionReady(false);
+    void (async () => {
+      const idToken = await getAuthIdToken();
+      try {
+        await logoutUserSession(idToken ?? undefined);
+      } catch {
+        // still sign out locally
+      }
+      signOut(auth);
+      setUser(null);
+      setEmailVerified(false);
+      setOtpSessionReady(false);
+    })();
   }, []);
 
   const requestPasswordReset = useCallback(async (email: string) => {
@@ -204,24 +228,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return resendInSeconds;
   }, []);
 
-  const completeLoginAfterOtp = useCallback((email: string, trustThisDevice = false) => {
-    markOtpSessionVerified(email);
-    if (trustThisDevice) {
-      trustDevice(email);
-    }
-    setOtpSessionReady(true);
-  }, []);
+  const verifyLoginOtp = useCallback(
+    async (code: string, trustThisDevice = false) => {
+      const firebaseUser = auth.currentUser;
+      if (!firebaseUser?.email) {
+        throw new Error("Sign in again to verify your code.");
+      }
 
-  const verifyLoginOtp = useCallback(async (code: string, trustThisDevice = false) => {
-    const firebaseUser = auth.currentUser;
-    if (!firebaseUser?.email) {
-      throw new Error("Sign in again to verify your code.");
-    }
-
-    const idToken = await firebaseUser.getIdToken();
-    await mailVerifyLoginOtp(idToken, code);
-    completeLoginAfterOtp(firebaseUser.email, trustThisDevice);
-  }, [completeLoginAfterOtp]);
+      const idToken = await firebaseUser.getIdToken();
+      await mailVerifyLoginOtp(idToken, code);
+      const status = await completeOtpSession(idToken, trustThisDevice);
+      setOtpSessionReady(!status.otpRequired);
+    },
+    [],
+  );
 
   const updateUser = useCallback((patch: Partial<UserProfile>) => {
     setUser((prev) => (prev ? { ...prev, ...patch } : null));
@@ -247,8 +267,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       requestPasswordReset,
       sendLoginOtp,
       verifyLoginOtp,
-      completeLoginAfterOtp,
-      shouldRequireLoginOtp,
+      refreshSessionStatus,
       updateUser,
     }),
     [
@@ -266,8 +285,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       requestPasswordReset,
       sendLoginOtp,
       verifyLoginOtp,
-      completeLoginAfterOtp,
-      shouldRequireLoginOtp,
+      refreshSessionStatus,
       updateUser,
     ],
   );
@@ -288,5 +306,5 @@ export async function getAuthIdToken(): Promise<string | null> {
 }
 
 export function clearLoginSessions() {
-  clearAllOtpSessions();
+  clearLegacyBrowserSessionKeys();
 }

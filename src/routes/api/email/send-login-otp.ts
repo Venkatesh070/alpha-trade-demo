@@ -14,7 +14,7 @@ export const Route = createFileRoute("/api/email/send-login-otp")({
             return jsonResponse({ error: "No email on this account." }, 400);
           }
 
-          const { code, resendInSeconds } = createLoginOtp(email);
+          const { code, resendInSeconds } = await createLoginOtp(email);
           await sendLoginOtpEmail(email, code);
           return jsonResponse({ message: "Sign-in code sent.", resendInSeconds });
         } catch (err) {
@@ -31,7 +31,7 @@ export const Route = createFileRoute("/api/email/send-login-otp")({
           if (!email) {
             return jsonResponse({ error: "No email on this account." }, 400);
           }
-          return jsonResponse({ resendInSeconds: getOtpResendSeconds(email) });
+          return jsonResponse({ resendInSeconds: await getOtpResendSeconds(email) });
         } catch (err) {
           if (err instanceof Response) return err;
           return jsonResponse({ error: "Failed to read resend timer." }, 500);

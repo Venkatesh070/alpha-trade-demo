@@ -1,4 +1,4 @@
-/** Same-origin mail API — routes are served by this TanStack Start app, not the external auth API. */
+import { getDeviceId } from "@/lib/device-id";
 
 export class MailApiError extends Error {
   status: number;
@@ -27,8 +27,10 @@ async function requestMail<T>(
   try {
     res = await fetch(path, {
       ...fetchOptions,
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
+        "X-Device-Id": getDeviceId(),
         ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
         ...fetchOptions.headers,
       },
