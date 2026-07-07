@@ -93,7 +93,7 @@ export async function mailGetRegistrationOtpResend(
 export async function mailVerifyRegistrationOtp(
   idToken: string,
   code: string,
-): Promise<{ message: string; verified: boolean }> {
+): Promise<{ message: string; verified: boolean; otpRequired: boolean }> {
   return requestMail("/api/email/verify-registration-otp", {
     method: "POST",
     idToken,

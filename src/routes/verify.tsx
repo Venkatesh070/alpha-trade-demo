@@ -19,7 +19,7 @@ export const Route = createFileRoute("/verify")({
 
 function VerifyPage() {
   const { email, step } = useSearch({ from: "/verify" });
-  const { loading, isAuthenticated, user, sendLoginOtp } = useAuth();
+  const { loading, isAuthenticated, user } = useAuth();
   const { isAuthenticated: isAdmin } = useAdminAuth();
   const nav = useNavigate();
 
@@ -72,20 +72,7 @@ function VerifyPage() {
     <EmailVerifyOtpStep
       email={displayEmail}
       backTo={{ to: "/login", search: { step: "form" } }}
-      onVerified={() => {
-        void (async () => {
-          try {
-            await sendLoginOtp();
-            toast.message("Enter the sign-in code sent to your email");
-          } catch {
-            // user can resend from the login OTP screen
-          }
-          nav({
-            to: "/login",
-            search: { step: "otp", email: displayEmail, redirect: "/app" },
-          });
-        })();
-      }}
+      onVerified={() => nav({ to: "/app" })}
     />
   );
 }

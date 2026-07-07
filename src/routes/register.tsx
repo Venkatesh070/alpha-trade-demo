@@ -58,27 +58,13 @@ function RegisterPage() {
 
 function RegisterOtpStep() {
   const { email } = useSearch({ from: "/register" });
-  const { sendLoginOtp } = useAuth();
   const nav = useNavigate();
 
   return (
     <EmailVerifyOtpStep
       email={email ?? ""}
       backTo={{ to: "/register", search: { step: "form" } }}
-      onVerified={() => {
-        void (async () => {
-          try {
-            await sendLoginOtp();
-            toast.message("Enter the sign-in code sent to your email");
-          } catch {
-            // user can resend from the login OTP screen
-          }
-          nav({
-            to: "/login",
-            search: { step: "otp", email: email ?? "", redirect: "/app" },
-          });
-        })();
-      }}
+      onVerified={() => nav({ to: "/app" })}
     />
   );
 }

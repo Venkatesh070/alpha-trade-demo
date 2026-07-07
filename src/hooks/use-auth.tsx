@@ -192,9 +192,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     const idToken = await firebaseUser.getIdToken();
-    await mailVerifyRegistrationOtp(idToken, code);
+    // The server verifies the code, marks the email verified, and opens a
+    // completed session — so no separate sign-in OTP is needed afterwards.
+    const status = await mailVerifyRegistrationOtp(idToken, code);
     await firebaseUser.reload();
     setEmailVerified(firebaseUser.emailVerified);
+    setOtpSessionReady(!status.otpRequired);
   }, []);
 
   const confirmEmailVerified = useCallback(async (): Promise<boolean> => {
