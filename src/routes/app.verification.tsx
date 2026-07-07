@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { CheckCircle2, ShieldCheck, Upload } from "lucide-react";
+import { CheckCircle2, Clock, ShieldCheck, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { useVerification } from "@/hooks/use-verification";
 import { PageShell } from "@/components/dashboard/page-shell";
 import { DataPanel } from "@/components/dashboard/data-panel";
 import { cn } from "@/lib/utils";
@@ -11,30 +11,12 @@ export const Route = createFileRoute("/app/verification")({
   component: VerificationPage,
 });
 
-const STEPS = [
-  {
-    id: "identity",
-    title: "Identity verification",
-    desc: "Upload Aadhaar or Passport — front and back.",
-  },
-  {
-    id: "address",
-    title: "Proof of address",
-    desc: "Recent utility bill or bank statement (within 3 months).",
-  },
-  { id: "pan", title: "PAN card", desc: "Required for tax compliance on live accounts." },
-];
-
 function VerificationPage() {
-  const [done, setDone] = useState<Set<string>>(new Set());
-  const progress = Math.round((done.size / STEPS.length) * 100);
+  const { steps, completedCount, progress, fullySubmitted, state, submitStep } = useVerification();
 
-  const mark = (id: string) => {
-    setDone((p) => {
-      const n = new Set(p);
-      n.add(id);
-      return n;
-    });
+  const mark = (id: (typeof steps)[number]["id"]) => {
+    if (state.steps[id] !== "pending") return;
+    submitStep(id);
     toast.success("Document uploaded · review in ~1 hour");
   };
 
@@ -47,7 +29,7 @@ function VerificationPage() {
     >
       <DataPanel
         title="Verification progress"
-        description={`${done.size} of ${STEPS.length} steps complete`}
+        description={`${completedCount} of ${steps.length} steps complete`}
       >
         <div className="mb-2 flex items-center justify-between text-xs">
           <span className="text-muted-foreground">Overall progress</span>
@@ -59,46 +41,64 @@ function VerificationPage() {
             style={{ width: `${progress}%` }}
           />
         </div>
+        {fullySubmitted && (
+          <p className="mt-3 text-xs text-[color:var(--success)]">
+            All documents submitted — your KYC is under review.
+          </p>
+        )}
       </DataPanel>
 
       <div className="space-y-3">
-        {STEPS.map((s, i) => (
-          <div
-            key={s.id}
-            className={cn(
-              "glossy-soft flex flex-col gap-4 rounded-2xl p-5 sm:flex-row sm:items-center",
-              done.has(s.id) && "ring-1 ring-[color:var(--success)]/30",
-            )}
-          >
-            <div className="flex flex-1 items-center gap-4">
-              <div
-                className={cn(
-                  "grid h-11 w-11 shrink-0 place-items-center rounded-xl text-sm font-bold",
-                  done.has(s.id)
-                    ? "bg-[color:var(--success)] text-[color:var(--success-foreground)]"
-                    : "bg-[color:var(--gold)]/15 text-[color:var(--gold)]",
-                )}
-              >
-                {done.has(s.id) ? <CheckCircle2 className="h-5 w-5" /> : i + 1}
-              </div>
-              <div>
-                <div className="font-semibold">{s.title}</div>
-                <div className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{s.desc}</div>
-              </div>
-            </div>
-            <Button
-              onClick={() => mark(s.id)}
-              variant={done.has(s.id) ? "outline" : "default"}
+        {steps.map((s, i) => {
+          const status = state.steps[s.id];
+          const done = status !== "pending";
+          return (
+            <div
+              key={s.id}
               className={cn(
-                "shrink-0 sm:w-auto",
-                !done.has(s.id) && "gold-button hover:gold-button-hover",
+                "glossy-soft flex flex-col gap-4 rounded-2xl p-5 sm:flex-row sm:items-center",
+                done && "ring-1 ring-[color:var(--success)]/30",
               )}
             >
-              <Upload className="mr-2 h-4 w-4" />
-              {done.has(s.id) ? "Re-upload" : "Upload"}
-            </Button>
-          </div>
-        ))}
+              <div className="flex flex-1 items-center gap-4">
+                <div
+                  className={cn(
+                    "grid h-11 w-11 shrink-0 place-items-center rounded-xl text-sm font-bold",
+                    done
+                      ? "bg-[color:var(--success)] text-[color:var(--success-foreground)]"
+                      : "bg-[color:var(--gold)]/15 text-[color:var(--gold)]",
+                  )}
+                >
+                  {done ? <CheckCircle2 className="h-5 w-5" /> : i + 1}
+                </div>
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <div className="font-semibold">{s.title}</div>
+                    {status === "submitted" && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-[color:var(--gold)]/10 px-2 py-0.5 text-[10px] font-medium text-[color:var(--gold-deep)]">
+                        <Clock className="h-3 w-3" />
+                        Under review
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{s.desc}</div>
+                </div>
+              </div>
+              <Button
+                onClick={() => mark(s.id)}
+                disabled={done}
+                variant={done ? "outline" : "default"}
+                className={cn(
+                  "shrink-0 sm:w-auto",
+                  !done && "gold-button hover:gold-button-hover",
+                )}
+              >
+                <Upload className="mr-2 h-4 w-4" />
+                {done ? "Submitted" : "Upload"}
+              </Button>
+            </div>
+          );
+        })}
       </div>
 
       <div className="glossy-soft flex items-start gap-3 rounded-2xl p-4 text-sm text-muted-foreground">

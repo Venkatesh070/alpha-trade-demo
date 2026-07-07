@@ -19,6 +19,7 @@ import { TradingProvider } from "@/hooks/use-trading";
 import { DepositPromptProvider } from "@/hooks/use-deposit-prompt";
 import { ReferralProvider } from "@/hooks/use-referral";
 import { NotificationProvider } from "@/hooks/use-notifications";
+import { VerificationProvider } from "@/hooks/use-verification";
 import { Toaster } from "@/components/ui/sonner";
 import { useTheme } from "@/hooks/use-theme";
 
@@ -151,6 +152,7 @@ function RootComponent() {
       <ThemeProvider>
         <AuthProvider>
           <NotificationProvider>
+            <VerificationProvider>
             <AdminAuthProvider>
               <WalletProvider>
                 <ReferralProvider>
@@ -163,6 +165,7 @@ function RootComponent() {
                 </ReferralProvider>
               </WalletProvider>
             </AdminAuthProvider>
+            </VerificationProvider>
           </NotificationProvider>
         </AuthProvider>
       </ThemeProvider>
