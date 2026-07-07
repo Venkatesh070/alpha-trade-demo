@@ -1,11 +1,5 @@
 import { loadAdminSession } from "@/lib/admin-session-storage";
-
-function getApiBase(): string {
-  const configured = import.meta.env.VITE_API_URL as string | undefined;
-  if (configured?.trim()) return configured.replace(/\/$/, "");
-  if (import.meta.env.DEV) return "";
-  return "http://localhost:4000";
-}
+import { getApiBase } from "@/lib/api-base";
 
 const API_URL = getApiBase();
 
@@ -78,12 +72,12 @@ async function adminFetch<T>(
   path: string,
   options: RequestInit = {},
 ): Promise<T> {
-  // Cookie session is enough for same-origin admin routes; skip Bearer to avoid
-  // oversized request headers on shared hosting (413).
+  const token = await getAdminToken();
   const res = await fetch(path, {
     ...options,
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
       ...options.headers,
     },
   });

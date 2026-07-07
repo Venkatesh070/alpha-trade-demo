@@ -59,10 +59,6 @@ import { Route as AdminCmsRouteImport } from './routes/admin.cms'
 import { Route as AppWalletIndexRouteImport } from './routes/app.wallet.index'
 import { Route as AppWalletWithdrawRouteImport } from './routes/app.wallet.withdraw'
 import { Route as AppWalletDepositRouteImport } from './routes/app.wallet.deposit'
-import { Route as ApiAdminUsersRouteImport } from './routes/api/admin/users'
-import { Route as ApiAdminDashboardRouteImport } from './routes/api/admin/dashboard'
-import { Route as ApiAdminSplatRouteImport } from './routes/api/admin/$'
-import { Route as ApiAdminDepositsPaymentSettingsRouteImport } from './routes/api/admin/deposits/payment-settings'
 
 const VerifyRoute = VerifyRouteImport.update({
   id: '/verify',
@@ -314,27 +310,6 @@ const AppWalletDepositRoute = AppWalletDepositRouteImport.update({
   path: '/deposit',
   getParentRoute: () => AppWalletRoute,
 } as any)
-const ApiAdminUsersRoute = ApiAdminUsersRouteImport.update({
-  id: '/api/admin/users',
-  path: '/api/admin/users',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminDashboardRoute = ApiAdminDashboardRouteImport.update({
-  id: '/api/admin/dashboard',
-  path: '/api/admin/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminSplatRoute = ApiAdminSplatRouteImport.update({
-  id: '/api/admin/$',
-  path: '/api/admin/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminDepositsPaymentSettingsRoute =
-  ApiAdminDepositsPaymentSettingsRouteImport.update({
-    id: '/api/admin/deposits/payment-settings',
-    path: '/api/admin/deposits/payment-settings',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -384,13 +359,9 @@ export interface FileRoutesByFullPath {
   '/app/wallet': typeof AppWalletRouteWithChildren
   '/admin/': typeof AdminIndexRoute
   '/app/': typeof AppIndexRoute
-  '/api/admin/$': typeof ApiAdminSplatRoute
-  '/api/admin/dashboard': typeof ApiAdminDashboardRoute
-  '/api/admin/users': typeof ApiAdminUsersRoute
   '/app/wallet/deposit': typeof AppWalletDepositRoute
   '/app/wallet/withdraw': typeof AppWalletWithdrawRoute
   '/app/wallet/': typeof AppWalletIndexRoute
-  '/api/admin/deposits/payment-settings': typeof ApiAdminDepositsPaymentSettingsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -437,13 +408,9 @@ export interface FileRoutesByTo {
   '/app/verification': typeof AppVerificationRoute
   '/admin': typeof AdminIndexRoute
   '/app': typeof AppIndexRoute
-  '/api/admin/$': typeof ApiAdminSplatRoute
-  '/api/admin/dashboard': typeof ApiAdminDashboardRoute
-  '/api/admin/users': typeof ApiAdminUsersRoute
   '/app/wallet/deposit': typeof AppWalletDepositRoute
   '/app/wallet/withdraw': typeof AppWalletWithdrawRoute
   '/app/wallet': typeof AppWalletIndexRoute
-  '/api/admin/deposits/payment-settings': typeof ApiAdminDepositsPaymentSettingsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -494,13 +461,9 @@ export interface FileRoutesById {
   '/app/wallet': typeof AppWalletRouteWithChildren
   '/admin/': typeof AdminIndexRoute
   '/app/': typeof AppIndexRoute
-  '/api/admin/$': typeof ApiAdminSplatRoute
-  '/api/admin/dashboard': typeof ApiAdminDashboardRoute
-  '/api/admin/users': typeof ApiAdminUsersRoute
   '/app/wallet/deposit': typeof AppWalletDepositRoute
   '/app/wallet/withdraw': typeof AppWalletWithdrawRoute
   '/app/wallet/': typeof AppWalletIndexRoute
-  '/api/admin/deposits/payment-settings': typeof ApiAdminDepositsPaymentSettingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -552,13 +515,9 @@ export interface FileRouteTypes {
     | '/app/wallet'
     | '/admin/'
     | '/app/'
-    | '/api/admin/$'
-    | '/api/admin/dashboard'
-    | '/api/admin/users'
     | '/app/wallet/deposit'
     | '/app/wallet/withdraw'
     | '/app/wallet/'
-    | '/api/admin/deposits/payment-settings'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -605,13 +564,9 @@ export interface FileRouteTypes {
     | '/app/verification'
     | '/admin'
     | '/app'
-    | '/api/admin/$'
-    | '/api/admin/dashboard'
-    | '/api/admin/users'
     | '/app/wallet/deposit'
     | '/app/wallet/withdraw'
     | '/app/wallet'
-    | '/api/admin/deposits/payment-settings'
   id:
     | '__root__'
     | '/'
@@ -661,13 +616,9 @@ export interface FileRouteTypes {
     | '/app/wallet'
     | '/admin/'
     | '/app/'
-    | '/api/admin/$'
-    | '/api/admin/dashboard'
-    | '/api/admin/users'
     | '/app/wallet/deposit'
     | '/app/wallet/withdraw'
     | '/app/wallet/'
-    | '/api/admin/deposits/payment-settings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -690,10 +641,6 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TradingRoute: typeof TradingRoute
   VerifyRoute: typeof VerifyRoute
-  ApiAdminSplatRoute: typeof ApiAdminSplatRoute
-  ApiAdminDashboardRoute: typeof ApiAdminDashboardRoute
-  ApiAdminUsersRoute: typeof ApiAdminUsersRoute
-  ApiAdminDepositsPaymentSettingsRoute: typeof ApiAdminDepositsPaymentSettingsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1048,34 +995,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppWalletDepositRouteImport
       parentRoute: typeof AppWalletRoute
     }
-    '/api/admin/users': {
-      id: '/api/admin/users'
-      path: '/api/admin/users'
-      fullPath: '/api/admin/users'
-      preLoaderRoute: typeof ApiAdminUsersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/dashboard': {
-      id: '/api/admin/dashboard'
-      path: '/api/admin/dashboard'
-      fullPath: '/api/admin/dashboard'
-      preLoaderRoute: typeof ApiAdminDashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/$': {
-      id: '/api/admin/$'
-      path: '/api/admin/$'
-      fullPath: '/api/admin/$'
-      preLoaderRoute: typeof ApiAdminSplatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/deposits/payment-settings': {
-      id: '/api/admin/deposits/payment-settings'
-      path: '/api/admin/deposits/payment-settings'
-      fullPath: '/api/admin/deposits/payment-settings'
-      preLoaderRoute: typeof ApiAdminDepositsPaymentSettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -1187,10 +1106,6 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TradingRoute: TradingRoute,
   VerifyRoute: VerifyRoute,
-  ApiAdminSplatRoute: ApiAdminSplatRoute,
-  ApiAdminDashboardRoute: ApiAdminDashboardRoute,
-  ApiAdminUsersRoute: ApiAdminUsersRoute,
-  ApiAdminDepositsPaymentSettingsRoute: ApiAdminDepositsPaymentSettingsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

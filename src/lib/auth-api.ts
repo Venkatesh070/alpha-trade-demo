@@ -3,6 +3,7 @@ import {
   publicFetch,
   persistUserTokens,
 } from "@/lib/api-client";
+import { getApiBase } from "@/lib/api-base";
 import { getAccessToken, type UserApiTokens } from "@/lib/token-store";
 
 export interface UserProfile {
@@ -40,13 +41,6 @@ export class AuthApiError extends Error {
     super(message);
     this.status = status;
   }
-}
-
-function getApiBase(): string {
-  const configured = import.meta.env.VITE_API_URL as string | undefined;
-  if (configured?.trim()) return configured.replace(/\/$/, "");
-  if (import.meta.env.DEV) return "";
-  return "http://localhost:4000";
 }
 
 const API_URL = getApiBase();
