@@ -245,3 +245,57 @@ export async function adminMe(idToken: string): Promise<{ admin: AdminProfile }>
 export function getApiAccessToken(): string | null {
   return getAccessToken();
 }
+
+function apiBaseUrl(): string {
+  const configured = import.meta.env.VITE_API_URL as string | undefined;
+  if (configured?.trim()) return configured.replace(/\/$/, "");
+  if (import.meta.env.DEV) return "";
+  return "http://localhost:4000";
+}
+
+async function requestWithIdToken<T>(
+  path: string,
+  idToken: string,
+  options: RequestInit = {},
+): Promise<T> {
+  let res: Response;
+
+  try {
+    res = await fetch(`${apiBaseUrl()}${path}`, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${idToken}`,
+        ...options.headers,
+      },
+    });
+  } catch {
+    throw new AuthApiError(0, "Unable to reach the server. Is the API running on port 4000?");
+  }
+
+  const data = await parseResponse<T>(res);
+  if (!res.ok) {
+    throw new AuthApiError(res.status, data.error ?? "Request failed.");
+  }
+
+  return data;
+}
+
+/** Firebase ID-token variants used by OTP/mail session flows before JWT is issued. */
+export async function userMeWithIdToken(idToken: string): Promise<{ user: UserProfile }> {
+  return requestWithIdToken("/api/auth/user/me", idToken);
+}
+
+export async function userSyncWithIdToken(
+  idToken: string,
+  input: { name: string; country?: string },
+): Promise<{ user: UserProfile }> {
+  return requestWithIdToken("/api/auth/user/sync", idToken, {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}
+
+export async function userVerifyEmail(idToken: string): Promise<{ user: UserProfile }> {
+  return requestWithIdToken("/api/auth/user/verify-email", idToken, { method: "POST" });
+}

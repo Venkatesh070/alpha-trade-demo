@@ -1,12 +1,11 @@
-import { existsSync, mkdirSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Pool } from "mysql2/promise";
-import type Database from "better-sqlite3";
 import { loadServerEnv } from "@/server/load-env";
 import { SESSION_MIGRATION_SQL } from "@/server/db/session-migration-sql";
 
-export type DbDialect = "mysql" | "sqlite";
+export type DbDialect = "mysql";
 
 export interface DbExecResult {
   changes?: number;
@@ -76,25 +75,6 @@ class MysqlDatabase implements SqlDatabase {
   }
 }
 
-class SqliteDatabase implements SqlDatabase {
-  dialect: DbDialect = "sqlite";
-
-  constructor(private db: Database.Database) {}
-
-  async query<T extends Record<string, unknown>>(sql: string, params: unknown[] = []): Promise<T[]> {
-    return this.db.prepare(sql).all(...params) as T[];
-  }
-
-  async execute(sql: string, params: unknown[] = []): Promise<DbExecResult> {
-    const result = this.db.prepare(sql).run(...params);
-    return { changes: result.changes };
-  }
-
-  async close(): Promise<void> {
-    this.db.close();
-  }
-}
-
 function resolveMysqlConfig():
   | { mode: "url"; url: string }
   | { mode: "env"; host: string; port: number; user: string; password: string; database: string }
@@ -124,7 +104,9 @@ function resolveMysqlConfig():
 async function createMysqlDatabase(): Promise<SqlDatabase> {
   const config = resolveMysqlConfig();
   if (!config) {
-    throw new Error("MySQL is not configured.");
+    throw new Error(
+      "MySQL is not configured. Set DATABASE_URL or MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, and MYSQL_DATABASE in .env.",
+    );
   }
 
   const mysql = await import("mysql2/promise");
@@ -144,50 +126,10 @@ async function createMysqlDatabase(): Promise<SqlDatabase> {
   return new MysqlDatabase(pool);
 }
 
-function projectRoot(): string {
-  let dir = dirname(fileURLToPath(import.meta.url));
-  for (let i = 0; i < 6; i++) {
-    if (existsSync(resolve(dir, "package.json"))) return dir;
-    dir = dirname(dir);
-  }
-  return process.cwd();
-}
-
-function defaultSqlitePath(): string {
-  const dataDir = resolve(projectRoot(), ".data");
-  mkdirSync(dataDir, { recursive: true });
-  return resolve(dataDir, "exness-sessions.sqlite");
-}
-
-async function createSqliteDatabase(): Promise<SqlDatabase> {
-  const sqlitePath = process.env.SQLITE_PATH?.trim() || defaultSqlitePath();
-  const { default: BetterSqlite3 } = await import("better-sqlite3");
-  const db = new BetterSqlite3(sqlitePath);
-  db.pragma("journal_mode = WAL");
-  return new SqliteDatabase(db);
-}
-
-async function createDatabase(): Promise<SqlDatabase> {
-  if (resolveMysqlConfig()) {
-    return createMysqlDatabase();
-  }
-
-  if (process.env.NODE_ENV === "production") {
-    throw new Error(
-      "MySQL is not configured. Set DATABASE_URL or MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, and MYSQL_DATABASE in .env.",
-    );
-  }
-
-  console.warn(
-    "[db] MySQL not configured — using local SQLite at .data/exness-sessions.sqlite (dev only).",
-  );
-  return createSqliteDatabase();
-}
-
 export async function getDatabase(): Promise<SqlDatabase> {
   if (dbInstance) return dbInstance;
 
-  const db = await createDatabase();
+  const db = await createMysqlDatabase();
   try {
     await runMigrations(db);
     dbInstance = db;

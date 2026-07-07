@@ -8,7 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, type User as FirebaseUser } from "firebase/auth";
-import { adminMe, type UserProfile, userMe, userRegister, userVerifyEmail } from "@/lib/auth-api";
+import { adminMe, type UserProfile, userMeWithIdToken, userRegister, userVerifyEmail } from "@/lib/auth-api";
 import { ensureUserProfile } from "@/lib/ensure-user-profile";
 import { signInWithGooglePopup } from "@/lib/google-auth";
 import { mailSendLoginOtp, mailSendPasswordReset, mailSendRegistrationOtp, mailSendWelcome, mailVerifyLoginOtp, mailVerifyRegistrationOtp } from "@/lib/mail-api";
@@ -56,7 +56,7 @@ const AuthContext = createContext<AuthCtx | null>(null);
 
 async function loadProfile(firebaseUser: FirebaseUser): Promise<UserProfile> {
   const idToken = await firebaseUser.getIdToken();
-  const { user } = await userMe(idToken);
+  const { user } = await userMeWithIdToken(idToken);
   return user;
 }
 
@@ -218,8 +218,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = useCallback(async (name: string, email: string, password: string, refCode?: string) => {
     try {
-      const { user: profile } = await userRegister({ name, email, password });
-      setUser(profile);
+      await userRegister({ name, email, password }).catch(() => {
+        // Backend may already have this user from a prior attempt.
+      });
       setEmailVerified(false);
       setOtpSessionReady(false);
 
