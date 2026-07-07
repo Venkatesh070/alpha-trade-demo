@@ -10,6 +10,7 @@ import { AuthShell, GoogleAuthButton, authInputClass, authLabelClass } from "@/c
 import { EmailVerifyOtpStep } from "@/components/auth/email-verify-otp-step";
 import { RedirectIfAuthed } from "@/components/auth/redirect-if-authed";
 import { useAuth } from "@/hooks/use-auth";
+import { useGoogleSignIn } from "@/hooks/use-google-sign-in";
 import { cn } from "@/lib/utils";
 import { readReferralCode } from "@/lib/referral-db";
 
@@ -74,6 +75,7 @@ function RegisterForm() {
   const nav = useNavigate();
   const { ref } = useSearch({ from: "/register" });
   const refCode = readReferralCode(ref);
+  const { handleGoogleSignIn, googleLoading } = useGoogleSignIn({ refCode });
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -178,7 +180,12 @@ function RegisterForm() {
           <span className="h-px flex-1 bg-[#141d22]/10" />
         </div>
 
-        <GoogleAuthButton label="Google" />
+        <GoogleAuthButton
+          label="Google"
+          onClick={handleGoogleSignIn}
+          loading={googleLoading}
+          disabled={loading}
+        />
       </form>
     </AuthShell>
   );

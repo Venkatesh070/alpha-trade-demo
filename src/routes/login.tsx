@@ -11,6 +11,7 @@ import { AuthOtpShell } from "@/components/auth/auth-otp-shell";
 import { OtpVerifyPanel } from "@/components/auth/otp-verify-panel";
 import { RedirectIfAuthed } from "@/components/auth/redirect-if-authed";
 import { useAuth, getAuthIdToken } from "@/hooks/use-auth";
+import { useGoogleSignIn } from "@/hooks/use-google-sign-in";
 import { cn } from "@/lib/utils";
 import { adminMe } from "@/lib/auth-api";
 import { signOut } from "firebase/auth";
@@ -53,6 +54,7 @@ function LoginForm() {
   const { login, refreshSessionStatus, sendLoginOtp } = useAuth();
   const nav = useNavigate();
   const { redirect } = useSearch({ from: "/login" });
+  const { handleGoogleSignIn, googleLoading } = useGoogleSignIn({ redirect });
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -179,7 +181,12 @@ function LoginForm() {
           <span className="h-px flex-1 bg-[#141d22]/10" />
         </div>
 
-        <GoogleAuthButton label="Google" />
+        <GoogleAuthButton
+          label="Google"
+          onClick={handleGoogleSignIn}
+          loading={googleLoading}
+          disabled={loading}
+        />
 
         <p className="pt-2 text-center">
           <Link to="/forgot-password" className="text-sm text-[#158bf9] hover:underline">

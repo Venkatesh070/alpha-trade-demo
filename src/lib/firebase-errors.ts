@@ -22,6 +22,13 @@ const FIREBASE_AUTH_ERRORS: Record<string, string> = {
     "Verification link misconfigured. Ensure localhost is in Firebase Authorized domains.",
   "auth/expired-action-code": "This link has expired. Request a new one.",
   "auth/invalid-action-code": "This link is invalid or has already been used.",
+  "auth/popup-closed-by-user": "Sign-in was cancelled.",
+  "auth/popup-blocked": "Pop-up was blocked. Allow pop-ups for this site and try again.",
+  "auth/cancelled-popup-request": "Sign-in was cancelled.",
+  "auth/account-exists-with-different-credential":
+    "An account already exists with this email using a different sign-in method. Try email and password instead.",
+  "auth/operation-not-allowed-google":
+    "Google sign-in is disabled. Enable it in Firebase Console → Authentication → Sign-in method → Google.",
 };
 
 const REST_ERROR_MESSAGES: Record<string, string> = {
@@ -33,6 +40,10 @@ export function mapFirebaseAuthError(err: unknown): string {
   const code = (err as { code?: string })?.code?.toLowerCase();
   if (code && FIREBASE_AUTH_ERRORS[code]) {
     return FIREBASE_AUTH_ERRORS[code];
+  }
+
+  if (code === "auth/operation-not-allowed") {
+    return FIREBASE_AUTH_ERRORS["auth/operation-not-allowed-google"];
   }
 
   const message = (err as Error)?.message ?? "";

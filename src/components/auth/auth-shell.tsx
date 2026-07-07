@@ -1,7 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Globe } from "lucide-react";
 import type { ReactNode } from "react";
-import { toast } from "sonner";
 import { Logo } from "@/components/site/logo";
 import { cn } from "@/lib/utils";
 
@@ -22,17 +21,27 @@ const FOOTER_LINKS = [
   "Complaints Handling Policy",
 ];
 
-export function GoogleAuthButton({ label }: { label: string }) {
+export function GoogleAuthButton({
+  label,
+  onClick,
+  disabled = false,
+  loading = false,
+}: {
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+  loading?: boolean;
+}) {
   return (
     <button
       type="button"
-      onClick={() =>
-        toast.message("Google sign-in is currently unavailable. Please use your email instead.")
-      }
+      onClick={onClick}
+      disabled={disabled || loading}
       className={cn(
         "inline-flex h-11 w-full items-center justify-center gap-2 rounded",
         "bg-[#f4f6f7] text-sm font-medium text-[#141d22]",
         "transition-colors hover:bg-[#eceff1] active:bg-[#e3e7e9]",
+        "disabled:cursor-not-allowed disabled:opacity-60",
       )}
     >
       <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden>
@@ -53,7 +62,7 @@ export function GoogleAuthButton({ label }: { label: string }) {
           d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4 5.6l6.5 5.5C41.6 35.3 44 30.1 44 24c0-1.3-.1-2.6-.4-3.9z"
         />
       </svg>
-      {label}
+      {loading ? "Connecting…" : label}
     </button>
   );
 }
