@@ -324,7 +324,3 @@ export async function userSyncWithIdToken(
     body: JSON.stringify(input),
   });
 }
-
-export async function userVerifyEmail(idToken: string): Promise<{ user: UserProfile }> {
-  return requestWithIdToken("/api/auth/user/verify-email", idToken, { method: "POST" });
-}
