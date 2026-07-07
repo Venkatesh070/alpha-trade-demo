@@ -11,6 +11,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { addDepositRequest } from "@/lib/payments";
 import { applyReferralDepositReward } from "@/lib/referral-db";
 import { emptyWallet, getWallet, updateWallet, type WalletState } from "@/lib/wallet-db";
+import { pushNotification } from "@/lib/notifications-db";
 
 export const MIN_TRADING_BALANCE = 5000;
 
@@ -78,6 +79,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       if (user.email) {
         applyReferralDepositReward(user.email, amount);
       }
+      pushNotification(user.email, {
+        type: "deposit",
+        title: "Deposit received",
+        body: `₹${amount.toLocaleString("en-IN")} credited via ${method}.`,
+      });
     },
     [persist, user?.email],
   );
@@ -106,6 +112,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           ],
         };
       });
+      pushNotification(user.email, {
+        type: "deposit",
+        title: "Withdrawal initiated",
+        body: `₹${amount.toLocaleString("en-IN")} withdrawn via ${method}.`,
+      });
     },
     [persist, user?.email],
   );
@@ -122,6 +133,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         screenshot,
       });
       refresh();
+      pushNotification(user.email, {
+        type: "deposit",
+        title: "Deposit request submitted",
+        body: `₹${amount.toLocaleString("en-IN")} is pending admin approval.`,
+      });
     },
     [refresh, user],
   );

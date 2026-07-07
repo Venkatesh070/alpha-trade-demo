@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Bell, CheckCircle2, CreditCard, Inbox, ShieldCheck, Sparkles, Server } from "lucide-react";
-import { NOTIFICATIONS, type AppNotification } from "@/data/content";
+import { useNotifications } from "@/hooks/use-notifications";
 import { PageShell } from "@/components/dashboard/page-shell";
 import { FilterTabs } from "@/components/dashboard/filter-tabs";
 import { EmptyState } from "@/components/dashboard/empty-state";
@@ -30,7 +30,7 @@ const TABS = [
 ];
 
 function NotificationsPage() {
-  const [items, setItems] = useState<AppNotification[]>(NOTIFICATIONS);
+  const { items, unreadCount, markAllRead } = useNotifications();
   const [tab, setTab] = useState("all");
 
   const filtered =
@@ -39,24 +39,27 @@ function NotificationsPage() {
       : tab === "unread"
         ? items.filter((i) => !i.read)
         : items.filter((i) => i.type === tab);
-  const unread = items.filter((i) => !i.read).length;
 
   return (
     <PageShell
       eyebrow="Inbox"
       title="Notifications"
       description={
-        unread > 0 ? `${unread} unread message${unread === 1 ? "" : "s"}` : "You're all caught up."
+        unreadCount > 0
+          ? `${unreadCount} unread message${unreadCount === 1 ? "" : "s"}`
+          : "You're all caught up."
       }
       width="md"
       actions={
-        <button
-          type="button"
-          onClick={() => setItems((p) => p.map((x) => ({ ...x, read: true })))}
-          className="text-xs font-medium text-[color:var(--gold)] hover:underline"
-        >
-          Mark all read
-        </button>
+        unreadCount > 0 ? (
+          <button
+            type="button"
+            onClick={markAllRead}
+            className="text-xs font-medium text-[color:var(--gold)] hover:underline"
+          >
+            Mark all read
+          </button>
+        ) : null
       }
     >
       <FilterTabs tabs={TABS} value={tab} onChange={setTab} />

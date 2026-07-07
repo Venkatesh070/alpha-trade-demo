@@ -1,5 +1,6 @@
 import { creditWallet, updateWallet, type WalletTxn } from "@/lib/wallet-db";
 import { applyReferralDepositReward } from "@/lib/referral-db";
+import { pushNotification } from "@/lib/notifications-db";
 import { randomId } from "@/lib/id";
 
 const SETTINGS_KEY = "exness-payment-settings";
@@ -148,6 +149,11 @@ export function approveDepositRequest(requestId: string) {
     referenceId: req.referenceId,
   });
   applyReferralDepositReward(req.userEmail, req.amount);
+  pushNotification(req.userEmail, {
+    type: "deposit",
+    title: "Deposit approved",
+    body: `₹${req.amount.toLocaleString("en-IN")} credited via UPI.`,
+  });
 
   return requests[idx];
 }
@@ -168,6 +174,12 @@ export function rejectDepositRequest(requestId: string) {
       t.depositRequestId === requestId ? { ...t, status: "Rejected" as const } : t,
     ),
   }));
+
+  pushNotification(req.userEmail, {
+    type: "deposit",
+    title: "Deposit rejected",
+    body: `Your deposit request of ₹${req.amount.toLocaleString("en-IN")} was not approved.`,
+  });
 
   return requests[idx];
 }

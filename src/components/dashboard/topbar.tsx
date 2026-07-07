@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Bell, LogOut, Menu, Moon, Search, Sun, User2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { useNotifications } from "@/hooks/use-notifications";
 import { useTheme } from "@/hooks/use-theme";
 import { DepositButton, WithdrawButton } from "@/components/pricing/price-gate";
 import { accountIdFromEmail } from "@/lib/account-id";
@@ -15,6 +16,7 @@ import {
 
 export function AppTopbar({ onMenu }: { onMenu: () => void }) {
   const { user, logout } = useAuth();
+  const { unreadCount } = useNotifications();
   const { theme, toggle } = useTheme();
   const nav = useNavigate();
   const accountId = accountIdFromEmail(user?.email);
@@ -50,9 +52,11 @@ export function AppTopbar({ onMenu }: { onMenu: () => void }) {
           className="relative grid h-9 w-9 place-items-center rounded-md border border-border/60"
         >
           <Bell className="h-4 w-4" />
-          <span className="absolute -right-0.5 -top-0.5 grid h-4 w-4 place-items-center rounded-full bg-[color:var(--gold)] text-[10px] font-bold text-[color:var(--primary-foreground)]">
-            2
-          </span>
+          {unreadCount > 0 && (
+            <span className="absolute -right-0.5 -top-0.5 grid h-4 w-4 min-w-4 place-items-center rounded-full bg-[color:var(--gold)] px-0.5 text-[10px] font-bold text-[color:var(--primary-foreground)]">
+              {unreadCount > 9 ? "9+" : unreadCount}
+            </span>
+          )}
         </Link>
         <DropdownMenu>
           <DropdownMenuTrigger className="flex items-center gap-2 rounded-md border border-border/60 bg-surface px-2 py-1.5 text-sm">

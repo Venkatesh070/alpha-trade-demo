@@ -19,6 +19,7 @@ import {
   type ClosedTrade,
   type OpenPosition,
 } from "@/lib/trading-db";
+import { pushNotification } from "@/lib/notifications-db";
 
 interface PlaceOrderInput {
   symbol: string;
@@ -85,6 +86,11 @@ export function TradingProvider({ children }: { children: ReactNode }) {
           ...prev.open,
         ],
       }));
+      pushNotification(user.email, {
+        type: "trade",
+        title: "Order filled",
+        body: `${order.side.toUpperCase()} ${order.qty} ${order.symbol} @ ${order.price.toFixed(4)} executed.`,
+      });
     },
     [persist, user?.email],
   );

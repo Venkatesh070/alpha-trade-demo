@@ -18,6 +18,7 @@ import { WalletProvider } from "@/hooks/use-wallet";
 import { TradingProvider } from "@/hooks/use-trading";
 import { DepositPromptProvider } from "@/hooks/use-deposit-prompt";
 import { ReferralProvider } from "@/hooks/use-referral";
+import { NotificationProvider } from "@/hooks/use-notifications";
 import { Toaster } from "@/components/ui/sonner";
 import { useTheme } from "@/hooks/use-theme";
 
@@ -149,18 +150,20 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>
-          <AdminAuthProvider>
-            <WalletProvider>
-              <ReferralProvider>
-                <TradingProvider>
-                  <DepositPromptProvider>
-                    <Outlet />
-                    <ThemedToaster />
-                  </DepositPromptProvider>
-                </TradingProvider>
-              </ReferralProvider>
-            </WalletProvider>
-          </AdminAuthProvider>
+          <NotificationProvider>
+            <AdminAuthProvider>
+              <WalletProvider>
+                <ReferralProvider>
+                  <TradingProvider>
+                    <DepositPromptProvider>
+                      <Outlet />
+                      <ThemedToaster />
+                    </DepositPromptProvider>
+                  </TradingProvider>
+                </ReferralProvider>
+              </WalletProvider>
+            </AdminAuthProvider>
+          </NotificationProvider>
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
