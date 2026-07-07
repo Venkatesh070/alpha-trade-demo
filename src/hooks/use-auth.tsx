@@ -14,6 +14,7 @@ import { sendUserVerificationEmail } from "@/lib/email-verification";
 import { mapFirebaseAuthError } from "@/lib/firebase-errors";
 import { auth } from "@/lib/firebase";
 import { clearReferralCode, markReferralVerified, recordReferralSignup } from "@/lib/referral-db";
+import { getProfileExtras } from "@/lib/profile-db";
 
 interface AuthCtx {
   user: UserProfile | null;
@@ -65,7 +66,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         const profile = await loadProfile(firebaseUser);
-        setUser(profile);
+        const extras = getProfileExtras(profile.email);
+        setUser({
+          ...profile,
+          country: extras.country ?? profile.country,
+          twoFA: extras.twoFA ?? profile.twoFA,
+        });
         if (firebaseUser.emailVerified && !profile.verified) {
           const freshToken = await firebaseUser.getIdToken(true);
           const { user: verifiedProfile } = await userVerifyEmail(freshToken);

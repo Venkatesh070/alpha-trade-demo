@@ -20,6 +20,7 @@ import { DepositPromptProvider } from "@/hooks/use-deposit-prompt";
 import { ReferralProvider } from "@/hooks/use-referral";
 import { NotificationProvider } from "@/hooks/use-notifications";
 import { VerificationProvider } from "@/hooks/use-verification";
+import { ProfileProvider } from "@/hooks/use-profile";
 import { Toaster } from "@/components/ui/sonner";
 import { useTheme } from "@/hooks/use-theme";
 
@@ -154,16 +155,18 @@ function RootComponent() {
           <NotificationProvider>
             <VerificationProvider>
             <AdminAuthProvider>
-              <WalletProvider>
-                <ReferralProvider>
+            <WalletProvider>
+              <ProfileProvider>
+              <ReferralProvider>
                   <TradingProvider>
                     <DepositPromptProvider>
                       <Outlet />
                       <ThemedToaster />
                     </DepositPromptProvider>
                   </TradingProvider>
-                </ReferralProvider>
-              </WalletProvider>
+              </ReferralProvider>
+              </ProfileProvider>
+            </WalletProvider>
             </AdminAuthProvider>
             </VerificationProvider>
           </NotificationProvider>
