@@ -1,10 +1,8 @@
 import { loadAdminSessionFromServer } from "@/lib/session-api";
 
+// Admin routes are always served (or proxied) by the TanStack server.
 function getApiBase(): string {
-  const configured = import.meta.env.VITE_API_URL as string | undefined;
-  if (configured?.trim()) return configured.replace(/\/$/, "");
-  if (import.meta.env.DEV) return "";
-  return "http://localhost:4000";
+  return "";
 }
 
 const API_URL = getApiBase();
@@ -81,6 +79,7 @@ async function adminFetch<T>(
   const token = await getAdminToken();
   const res = await fetch(`${API_URL}${path}`, {
     ...options,
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,

@@ -70,6 +70,9 @@ import { Route as ApiEmailSendVerificationRouteImport } from './routes/api/email
 import { Route as ApiEmailSendRegistrationOtpRouteImport } from './routes/api/email/send-registration-otp'
 import { Route as ApiEmailSendPasswordResetRouteImport } from './routes/api/email/send-password-reset'
 import { Route as ApiEmailSendLoginOtpRouteImport } from './routes/api/email/send-login-otp'
+import { Route as ApiAdminUsersRouteImport } from './routes/api/admin/users'
+import { Route as ApiAdminDashboardRouteImport } from './routes/api/admin/dashboard'
+import { Route as ApiAdminSplatRouteImport } from './routes/api/admin/$'
 
 const VerifyRoute = VerifyRouteImport.update({
   id: '/verify',
@@ -380,6 +383,21 @@ const ApiEmailSendLoginOtpRoute = ApiEmailSendLoginOtpRouteImport.update({
   path: '/api/email/send-login-otp',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminUsersRoute = ApiAdminUsersRouteImport.update({
+  id: '/api/admin/users',
+  path: '/api/admin/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminDashboardRoute = ApiAdminDashboardRouteImport.update({
+  id: '/api/admin/dashboard',
+  path: '/api/admin/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminSplatRoute = ApiAdminSplatRouteImport.update({
+  id: '/api/admin/$',
+  path: '/api/admin/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -429,6 +447,9 @@ export interface FileRoutesByFullPath {
   '/app/wallet': typeof AppWalletRouteWithChildren
   '/admin/': typeof AdminIndexRoute
   '/app/': typeof AppIndexRoute
+  '/api/admin/$': typeof ApiAdminSplatRoute
+  '/api/admin/dashboard': typeof ApiAdminDashboardRoute
+  '/api/admin/users': typeof ApiAdminUsersRoute
   '/api/email/send-login-otp': typeof ApiEmailSendLoginOtpRoute
   '/api/email/send-password-reset': typeof ApiEmailSendPasswordResetRoute
   '/api/email/send-registration-otp': typeof ApiEmailSendRegistrationOtpRoute
@@ -489,6 +510,9 @@ export interface FileRoutesByTo {
   '/app/verification': typeof AppVerificationRoute
   '/admin': typeof AdminIndexRoute
   '/app': typeof AppIndexRoute
+  '/api/admin/$': typeof ApiAdminSplatRoute
+  '/api/admin/dashboard': typeof ApiAdminDashboardRoute
+  '/api/admin/users': typeof ApiAdminUsersRoute
   '/api/email/send-login-otp': typeof ApiEmailSendLoginOtpRoute
   '/api/email/send-password-reset': typeof ApiEmailSendPasswordResetRoute
   '/api/email/send-registration-otp': typeof ApiEmailSendRegistrationOtpRoute
@@ -553,6 +577,9 @@ export interface FileRoutesById {
   '/app/wallet': typeof AppWalletRouteWithChildren
   '/admin/': typeof AdminIndexRoute
   '/app/': typeof AppIndexRoute
+  '/api/admin/$': typeof ApiAdminSplatRoute
+  '/api/admin/dashboard': typeof ApiAdminDashboardRoute
+  '/api/admin/users': typeof ApiAdminUsersRoute
   '/api/email/send-login-otp': typeof ApiEmailSendLoginOtpRoute
   '/api/email/send-password-reset': typeof ApiEmailSendPasswordResetRoute
   '/api/email/send-registration-otp': typeof ApiEmailSendRegistrationOtpRoute
@@ -618,6 +645,9 @@ export interface FileRouteTypes {
     | '/app/wallet'
     | '/admin/'
     | '/app/'
+    | '/api/admin/$'
+    | '/api/admin/dashboard'
+    | '/api/admin/users'
     | '/api/email/send-login-otp'
     | '/api/email/send-password-reset'
     | '/api/email/send-registration-otp'
@@ -678,6 +708,9 @@ export interface FileRouteTypes {
     | '/app/verification'
     | '/admin'
     | '/app'
+    | '/api/admin/$'
+    | '/api/admin/dashboard'
+    | '/api/admin/users'
     | '/api/email/send-login-otp'
     | '/api/email/send-password-reset'
     | '/api/email/send-registration-otp'
@@ -741,6 +774,9 @@ export interface FileRouteTypes {
     | '/app/wallet'
     | '/admin/'
     | '/app/'
+    | '/api/admin/$'
+    | '/api/admin/dashboard'
+    | '/api/admin/users'
     | '/api/email/send-login-otp'
     | '/api/email/send-password-reset'
     | '/api/email/send-registration-otp'
@@ -777,6 +813,9 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TradingRoute: typeof TradingRoute
   VerifyRoute: typeof VerifyRoute
+  ApiAdminSplatRoute: typeof ApiAdminSplatRoute
+  ApiAdminDashboardRoute: typeof ApiAdminDashboardRoute
+  ApiAdminUsersRoute: typeof ApiAdminUsersRoute
   ApiEmailSendLoginOtpRoute: typeof ApiEmailSendLoginOtpRoute
   ApiEmailSendPasswordResetRoute: typeof ApiEmailSendPasswordResetRoute
   ApiEmailSendRegistrationOtpRoute: typeof ApiEmailSendRegistrationOtpRoute
@@ -1219,6 +1258,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiEmailSendLoginOtpRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/users': {
+      id: '/api/admin/users'
+      path: '/api/admin/users'
+      fullPath: '/api/admin/users'
+      preLoaderRoute: typeof ApiAdminUsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/dashboard': {
+      id: '/api/admin/dashboard'
+      path: '/api/admin/dashboard'
+      fullPath: '/api/admin/dashboard'
+      preLoaderRoute: typeof ApiAdminDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/$': {
+      id: '/api/admin/$'
+      path: '/api/admin/$'
+      fullPath: '/api/admin/$'
+      preLoaderRoute: typeof ApiAdminSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1330,6 +1390,9 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TradingRoute: TradingRoute,
   VerifyRoute: VerifyRoute,
+  ApiAdminSplatRoute: ApiAdminSplatRoute,
+  ApiAdminDashboardRoute: ApiAdminDashboardRoute,
+  ApiAdminUsersRoute: ApiAdminUsersRoute,
   ApiEmailSendLoginOtpRoute: ApiEmailSendLoginOtpRoute,
   ApiEmailSendPasswordResetRoute: ApiEmailSendPasswordResetRoute,
   ApiEmailSendRegistrationOtpRoute: ApiEmailSendRegistrationOtpRoute,
