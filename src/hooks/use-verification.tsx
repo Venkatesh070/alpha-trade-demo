@@ -11,13 +11,16 @@ import { useAuth } from "@/hooks/use-auth";
 import { pushNotification } from "@/lib/notifications-db";
 import {
   emptyKycState,
+  getKycOverallStatus,
   getKycState,
+  isKycApproved,
   isKycFullySubmitted,
-  kycCompletedCount,
+  kycApprovedCount,
   kycProgressPercent,
   KYC_STEPS,
   submitKycStep,
   VERIFICATION_STORAGE_KEY,
+  type KycOverallStatus,
   type KycState,
   type KycStepId,
 } from "@/lib/verification-db";
@@ -25,10 +28,12 @@ import {
 interface VerificationCtx {
   state: KycState;
   steps: typeof KYC_STEPS;
-  completedCount: number;
+  approvedCount: number;
   progress: number;
   fullySubmitted: boolean;
-  submitStep: (stepId: KycStepId) => void;
+  isApproved: boolean;
+  overallStatus: KycOverallStatus;
+  submitStep: (stepId: KycStepId, file: File) => Promise<void>;
   refresh: () => void;
 }
 
@@ -65,43 +70,51 @@ export function VerificationProvider({ children }: { children: ReactNode }) {
   }, [refresh]);
 
   const submitStep = useCallback(
-    (stepId: KycStepId) => {
+    async (stepId: KycStepId, file: File) => {
       if (!user?.email) return;
       const prev = getKycState(user.email);
-      if (prev.steps[stepId] !== "pending") return;
+      const step = prev.steps[stepId];
+      if (step.status === "submitted" || step.status === "approved") return;
 
-      const next = submitKycStep(user.email, stepId);
+      const next = await submitKycStep(user.email, stepId, file, {
+        userName: user.name,
+        userId: user.id,
+      });
       setState(next);
 
-      const step = KYC_STEPS.find((s) => s.id === stepId);
+      const meta = KYC_STEPS.find((s) => s.id === stepId);
       pushNotification(user.email, {
         type: "verification",
         title: "Document uploaded",
-        body: `${step?.title ?? "KYC document"} submitted for review.`,
+        body: `${meta?.title ?? "KYC document"} submitted for review.`,
       });
 
       if (isKycFullySubmitted(next) && !isKycFullySubmitted(prev)) {
         pushNotification(user.email, {
           type: "verification",
           title: "KYC submitted",
-          body: "All documents received. Review typically completes within 1 hour.",
+          body: "All documents received. Our team will review them shortly.",
         });
       }
     },
-    [user?.email],
+    [user],
   );
+
+  const overallStatus = getKycOverallStatus(state);
 
   const value = useMemo<VerificationCtx>(
     () => ({
       state,
       steps: KYC_STEPS,
-      completedCount: kycCompletedCount(state),
+      approvedCount: kycApprovedCount(state),
       progress: kycProgressPercent(state),
       fullySubmitted: isKycFullySubmitted(state),
+      isApproved: isKycApproved(state),
+      overallStatus,
       submitStep,
       refresh,
     }),
-    [state, submitStep, refresh],
+    [state, overallStatus, submitStep, refresh],
   );
 
   return <VerificationContext.Provider value={value}>{children}</VerificationContext.Provider>;
